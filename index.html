@@ -67,6 +67,9 @@
          The canvas above is the visible cabinet; these stay in sync. -->
     <div class="cabinet-fallback sr-only" aria-hidden="false">
       <div class="jackpot-sign" id="jackpotSign">JACKPOT!</div>
+      <!-- Machine-face prize readout: the translated prize name lights up here
+           on every win (DOM fallback path). Hidden until a prize is won. -->
+      <div class="prize-display hidden" id="prizeDisplay" role="status"></div>
       <div class="reels" id="reels">
         <div class="reel" data-reel="0"><div class="strip"></div><div class="winline"></div></div>
         <div class="reel" data-reel="1"><div class="strip"></div><div class="winline"></div></div>
@@ -141,12 +144,18 @@
   </div>
 </div>
 
-<!-- Payout screen: prize name, what was won, link choice, claim action -->
+<!-- Payout screen: prize name, credit award, cash-in/save choice, link choice -->
 <div class="modal hidden" id="payoutModal">
   <div class="modal-card gold">
     <h2 class="neon-gold" id="payoutTitle">PAYOUT</h2>
     <p id="payoutWhat"></p>
-    <div class="link-list" id="payoutLinks"></div>
+    <div class="credit-box" id="payoutCreditBox">
+      <div class="credit-earn" id="payoutEarn"></div>
+      <div class="credit-score-line" id="payoutScoreLine"></div>
+      <p class="credit-ask" id="payoutAsk"></p>
+      <p class="fine" id="payoutDisclaimer"></p>
+    </div>
+    <div class="link-list hidden" id="payoutLinks"></div>
     <div class="link-list" id="payoutFiles"></div>
     <div class="payout-score">
       <span>Your score: <b id="payoutScore">0</b></span>
@@ -154,8 +163,9 @@
       <button id="payoutCopyCode" class="link-btn">Copy score code</button>
     </div>
     <p class="fine">Free promo game. No gambling. No cash prizes.</p>
-    <div class="payout-actions">
-      <button id="payoutClaim" class="spin-btn small">CLAIM &amp; CLOSE</button>
+    <div class="payout-actions" id="payoutActions">
+      <button id="payoutCashIn" class="spin-btn small">CASH IN</button>
+      <button id="payoutSave" class="spin-btn small ghost">SAVE AS CREDIT</button>
     </div>
   </div>
 </div>
@@ -206,7 +216,7 @@
 
 <!-- Boot reliability: any uncaught error becomes a VISIBLE toast, never a silent blank page. -->
 <script>
-window.NN_BUILD = "nn777-v6";
+window.NN_BUILD = "nn777-v8";
 window.__nnErrors = [];
 window.addEventListener("error", function (e) {
   try {
@@ -254,7 +264,7 @@ setTimeout(function () {
 <script type="module" src="cabinet3d.js"></script>
 <script type="module" src="game.js"></script>
 <script>
-// Service worker: nn777-v3. Never caches error responses; non-atomic install.
+// Service worker: nn777-v8. Never caches error responses; non-atomic install.
 // Version handshake: when a new SW is waiting, show an "Update available —
 // tap to reload" toast instead of letting a phone sit on a stale build.
 (function () {

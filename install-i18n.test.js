@@ -75,6 +75,36 @@ for (const loc of locales) {
   }
 }
 
+/* ---- Neon Credits: every locale carries the credit strings (fun points, no money) ---- */
+const CREDIT_KEYS = ["ask", "cashin", "save", "score", "earned", "choose", "need", "disclaimer"];
+// ask/cashin/save use the required "cash in / save credit" feature copy; the
+// no-gambling regex runs on the rest. The disclaimer MUST carry a no-money-value negation.
+for (const loc of locales) {
+  const c = I18N[loc] && I18N[loc].credits;
+  ok(c && typeof c === "object", `${loc}: credits block exists`);
+  if (!c) continue;
+  for (const k of CREDIT_KEYS) {
+    ok(typeof c[k] === "string" && c[k].trim().length > 0, `${loc}: credits.${k} non-empty`);
+  }
+  for (const k of ["score", "earned", "choose", "need"]) {
+    if (typeof c[k] === "string") {
+      for (const re of NO_GAMBLE) {
+        ok(!re.test(c[k]), `${loc}: credits.${k} carries no gambling claims`);
+      }
+    }
+  }
+  if (typeof c.earned === "string") ok(c.earned.includes("{n}"), `${loc}: credits.earned carries the award ({n})`);
+  if (typeof c.need === "string") ok(c.need.includes("{n}"), `${loc}: credits.need carries the shortfall ({n})`);
+  if (typeof c.disclaimer === "string") {
+    // The disclaimer must carry a NEGATION (no money value / not gambling),
+    // in any of the 41 languages — never a positive money claim.
+    ok(/(no|not|non|kein|geen|pas |sans |sin |sem |não|niet|ne |нет|не |όχι|nem |ikke|inget|inga|ei |fără|žádný|nie |না |নয়|இல்லை|లేదు|没有|沒有|無|없|không|ไม่|tidak|tiada|नहीं|hazi|babu|ba |אין|لا |نہیں|ندار|نه |نہ|ਨਹੀਂ|ନାହିଁ|kò|ለም|yok|walang)/i.test(c.disclaimer),
+      `${loc}: credits.disclaimer carries a no-money/no-gambling negation`);
+    ok(!/(real money|cash prize|win money|earn (real )?cash|wygrana pieniężna)/i.test(c.disclaimer),
+      `${loc}: credits.disclaimer makes no positive money claim`);
+  }
+}
+
 /* ---- payout links: verified entries, no invented Tidal ---- */
 const cfgSrc = fs.readFileSync(path.join(here, "config.js"), "utf8");
 ok(cfgSrc.includes("https://www.youtube.com/watch?v=3L5eUDui-00"), "YouTube payout link present (verified 2026-09-20)");

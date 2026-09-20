@@ -58,6 +58,7 @@ function newState() {
     goldenSpinsLeft: 0,
     bonusLastPlayed: 0,
     bonusWins: 0,
+    credits: 0, // Neon Credits banked (fun points — no money value; persisted in localStorage via S)
     muted: false,
     version: 1,
   };

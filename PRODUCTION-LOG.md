@@ -14,7 +14,26 @@
 - Local top-10 high scores with portable tamper-evident score codes.
 - Anonymous local-only metrics + per-link issuance ledger with JSON export.
 
-## QA results
+## QA results (nn777-v8 — jackpot showmanship + Neon Credits, 2026-09-20)
+
+| Suite | Result |
+|---|---|
+| CDP regression `qa/jackpot-show.js` (3D + DOM fallback) | **44/44 pass** |
+| CDP regression `qa/winfix.js` (v6 iPhone defects) | **21/21 pass** |
+| Node unit tests (`game-logic.test.js`) | **56/56 pass** |
+| Node unit tests (`install-i18n.test.js`) | **3768/3768 pass** |
+| Node unit tests (`payout-metrics.test.js`) | **37/37 pass** |
+| Node unit tests (`cabinet-anim.test.js`) | **33/33 pass** |
+| Console/page errors | **0** |
+
+**v8 highlights:** prize name + credit score render ON THE MACHINE (3D marquee
+face / DOM LED readout); jackpot lights the background (3D gold-magenta wash +
+bloom kick, DOM CSS light sweep); Neon Credits economy (jackpot +1000, triple
++50, listening unlock +25 once-ever, 1000-credit link redemption from 10
+allowlisted platforms); credits persist across reload; listening-prize award
+pays once ever (no reload farming).
+
+## QA results (v6 baseline)
 
 | Suite | Result |
 |---|---|

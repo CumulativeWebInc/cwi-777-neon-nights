@@ -16,6 +16,8 @@ import { spinLabelFor } from './cabinet-anim.js';
   try { S = JSON.parse(localStorage.getItem(KEY)) || L.newState(); }
   catch (e) { S = L.newState(); }
   if (!S.roundsDone) S.roundsDone = [];
+  if (typeof S.credits !== "number" || S.credits < 0) S.credits = 0; // Neon Credits bank (fun points)
+  if (!Array.isArray(S.creditsAwarded)) S.creditsAwarded = []; // prize IDs whose unlock award already paid (once ever)
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
   /* ---------- language (how-to translations) ---------- */
@@ -164,10 +166,46 @@ import { spinLabelFor } from './cabinet-anim.js';
     return t;
   }
   function claimWord() { return winText("claim") || "CLAIM"; }
+  /* ---------- Neon Credits (fun points — no money value) ---------- */
+  // Award table: jackpot = 1000 (reaches the link price instantly),
+  // triple = 50, listening-prize unlock = 25. Banked in S.credits,
+  // persisted in localStorage via save(), shown on the machine display.
+  function creditsText(key, vars) {
+    const entry = I18N[lang] && I18N[lang].credits;
+    let t = (entry && entry[key]) || (I18N.en && I18N.en.credits && I18N.en.credits[key]) || "";
+    if (vars) for (const k of Object.keys(vars)) t = t.split("{" + k + "}").join(String(vars[k]));
+    return t;
+  }
+  function creditScoreLine() {
+    return "⭐ " + creditsText("score") + ": " + S.credits;
+  }
+  function bankCredits(n) {
+    n = Math.max(0, n | 0);
+    if (!n) return S.credits;
+    S.credits += n; save();
+    M.log("credit_earn", { award: n, balance: S.credits });
+    return S.credits;
+  }
+  function spendCredits(n) {
+    n = Math.max(0, n | 0);
+    if (S.credits < n) return false;
+    S.credits -= n; save();
+    M.log("credit_redeem", { spent: n, balance: S.credits });
+    return true;
+  }
   // Persistent on-screen win announcement + toast, naming the prize.
   function announcePrizeUnlock(p) {
     const msg = winText("prize", { name: p.name, claim: claimWord() });
+    // +25 Neon Credits per listening-prize unlock — paid ONCE EVER per prize.
+    // The announcement itself stays once-per-session, but the award must not
+    // re-bank on every reload (that would let a player farm credits by
+    // reloading). S.creditsAwarded persists the paid prize IDs.
+    if (!S.creditsAwarded.includes(p.id)) {
+      S.creditsAwarded.push(p.id);
+      bankCredits(C.creditAwards.prize);
+    }
     $("winBanner").textContent = msg;
+    if (CAB) CAB.showPrize(msg, creditScoreLine()); // prize name + credit score ON THE MACHINE (all 41 languages)
     toast(msg);
   }
   function randSym() {
@@ -273,6 +311,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     userGestured = true; tryPlay();
     spinning = true; $("spinBtn").disabled = true;
     $("winBanner").textContent = "";
+    if (CAB) CAB.clearPrize(); // new pull: the machine's prize readout resets
     if (CAB) CAB.setSignFlare(1);   // JACKPOT! sign flares while reels spin
     const res = L.spin(S, Math.random);
     L.applySpinResult(S, res);
@@ -286,17 +325,22 @@ import { spinLabelFor } from './cabinet-anim.js';
   function finishSpin(res) {
     spinning = false;
     if (res.jackpot) {
-      // Golden token pour on the canvas, then the unchanged payout screen.
+      // Golden token pour on the canvas, then the credit-claim payout screen.
       if (CAB) CAB.celebrate();
+      bankCredits(C.creditAwards.jackpot); // +1000: jackpot reaches the link price instantly
       $("winBanner").textContent = winText("jackpot");
+      if (CAB) CAB.showPrize(winText("jackpot"), creditScoreLine()); // prize name + credit score ON THE MACHINE
       setTimeout(() => { if (CAB) CAB.endCelebrate(); openJackpot(); }, 2400);
     } else {
       if (CAB) CAB.setSignFlare(0);
       if (res.triple) {
         const label = C.symbols.find(s => s.id === res.triple).label;
+        bankCredits(C.creditAwards.triple); // +50 Neon Credits per triple
         $("winBanner").textContent = winText("triple", { label });
+        if (CAB) CAB.showPrize($("winBanner").textContent, creditScoreLine()); // triple + credit score ON THE MACHINE
         if (res.triple === "bell" && L.bonusUnlocked(S))
           toast("🔔 Triple bell! The Encore Round is calling — tap 🎰");
+        setTimeout(() => openTriplePayout(label), 1200);
       }
     }
     const doneRounds = L.advanceRounds(S);
@@ -316,24 +360,46 @@ import { spinLabelFor } from './cabinet-anim.js';
   }
 
   /* ---------- payout screen ---------- */
-  // One payout screen for every win: prize name, what was won, link choice,
-  // claim action. Every streaming-link tap is issuance-tracked.
+  // One payout screen for every win: prize name, credit award, cash-in/save
+  // choice, link choice. Wins with a credit award (jackpot/triple/listening
+  // prize) bank the award first, then ASK: "Cash in now, or save as credit?"
+  // Cash-in (balance >= link price) opens the 10 allowlisted music platforms;
+  // one tap issues the link and deducts the price. Save just closes.
+  // The encore round keeps the legacy direct-link flow (no credits).
   function showPayout(opts) {
+    const award = Math.max(0, opts.award | 0);
+    const creditFlow = award > 0;
+    const price = C.creditLinkPrice;
     $("payoutTitle").textContent = opts.title;
     $("payoutWhat").innerHTML = opts.what;
-    const links = $("payoutLinks"); links.innerHTML = "";
-    (opts.links || []).forEach(l => {
-      const a = document.createElement("a");
-      a.href = l.url; a.target = "_blank"; a.rel = "noopener";
-      a.innerHTML = `${l.label}<small>${l.sub || ""}</small>`;
-      a.addEventListener("click", () => {
-        M.recordLinkIssued(l.label, l.url, opts.title);
-        M.log("prize_claim", { kind: opts.kind, via: l.label });
-        toast(`✅ Link issued: ${l.label} — enjoy the music 🎶`);
-        setTimeout(() => $("payoutModal").classList.add("hidden"), 600);
+    const creditBox = $("payoutCreditBox");
+    const linksEl = $("payoutLinks");
+    const actions = $("payoutActions");
+    const cashIn = $("payoutCashIn");
+    const saveBtn = $("payoutSave");
+    linksEl.innerHTML = ""; linksEl.classList.add("hidden");
+    let linksShown = false;
+    function renderLinks() {
+      if (linksShown) return; linksShown = true;
+      (opts.links || []).forEach(l => {
+        const a = document.createElement("a");
+        a.href = l.url; a.target = "_blank"; a.rel = "noopener";
+        a.innerHTML = `${l.label}<small>${l.sub || ""}</small>`;
+        a.addEventListener("click", () => {
+          if (!spendCredits(price)) {
+            toast("⏳ " + creditsText("need", { n: price - S.credits }));
+            return;
+          }
+          M.recordLinkIssued(l.label, l.url, opts.title);
+          M.log("prize_claim", { kind: opts.kind, via: l.label, credits: true });
+          toast(`✅ Link issued: ${l.label} — enjoy the music 🎶`);
+          refresh();
+          setTimeout(() => $("payoutModal").classList.add("hidden"), 600);
+        });
+        linksEl.appendChild(a);
       });
-      links.appendChild(a);
-    });
+      linksEl.classList.remove("hidden");
+    }
     const files = $("payoutFiles"); files.innerHTML = "";
     (opts.files || []).forEach(f => {
       const a = document.createElement("a");
@@ -343,13 +409,47 @@ import { spinLabelFor } from './cabinet-anim.js';
       files.appendChild(a);
     });
     $("payoutScore").textContent = SC.computeScore(S).score;
-    $("payoutClaim").textContent = opts.claimLabel || "CLAIM & CLOSE";
+    if (creditFlow) {
+      // The award was already banked before the modal opened (finishSpin/claim).
+      creditBox.style.display = "";
+      $("payoutEarn").textContent = creditsText("earned", { n: award });
+      $("payoutScoreLine").textContent = creditScoreLine();
+      $("payoutAsk").textContent = creditsText("ask");
+      $("payoutDisclaimer").textContent = creditsText("disclaimer");
+      actions.style.display = "";
+      cashIn.style.display = "";
+      cashIn.textContent = creditsText("cashin");
+      cashIn.onclick = () => {
+        if (S.credits < price) {
+          toast("⏳ " + creditsText("need", { n: price - S.credits }));
+          return;
+        }
+        M.log("credit_cashin_open", { kind: opts.kind, balance: S.credits });
+        creditBox.style.display = "none";
+        actions.style.display = "none";
+        $("payoutWhat").innerHTML = "<b>" + creditsText("choose") + "</b>";
+        renderLinks();
+      };
+      saveBtn.textContent = creditsText("save");
+      saveBtn.onclick = () => {
+        M.log("credit_save", { kind: opts.kind, balance: S.credits });
+        $("payoutModal").classList.add("hidden");
+        refresh();
+      };
+    } else {
+      // Legacy direct-link flow (encore round): no credits involved.
+      creditBox.style.display = "none";
+      cashIn.style.display = "none";
+      actions.style.display = "";
+      saveBtn.textContent = opts.claimLabel || "CLOSE";
+      saveBtn.onclick = () => {
+        M.log("prize_claim", { kind: opts.kind + "-close" });
+        $("payoutModal").classList.add("hidden");
+      };
+      renderLinks();
+    }
     $("payoutModal").classList.remove("hidden");
   }
-  $("payoutClaim").addEventListener("click", () => {
-    M.log("prize_claim", { kind: "modal-close" });
-    $("payoutModal").classList.add("hidden");
-  });
   $("payoutSaveScore").addEventListener("click", () => saveScore());
   $("payoutCopyCode").addEventListener("click", () => copyScoreCode());
 
@@ -359,9 +459,20 @@ import { spinLabelFor } from './cabinet-anim.js';
     showPayout({
       kind: "jackpot",
       title: winText("jackpot"),
-      what: `You hit <b>777</b> on <b>Neon Nights Pt. 777</b> — pick your <b>free</b> stream:`,
+      what: `You hit <b>777</b> on <b>Neon Nights Pt. 777</b> — <b>+${C.creditAwards.jackpot} Neon Credits</b> banked!`,
       links: C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url })),
-      claimLabel: "KEEP SPINNING",
+      award: C.creditAwards.jackpot,
+    });
+  }
+
+  /* ---------- triple (wins get the same cash-in/save claim modal) ---------- */
+  function openTriplePayout(label) {
+    showPayout({
+      kind: "triple",
+      title: winText("triple", { label }),
+      what: `Triple <b>${label}</b> — nice hit! <b>+${C.creditAwards.triple} Neon Credits</b> banked.`,
+      links: C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url })),
+      award: C.creditAwards.triple,
     });
   }
 
@@ -427,7 +538,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       what: `<b>${p.name}</b> — ${p.desc}`,
       links: musicLinks,
       files,
-      claimLabel: `${claimWord()} & CLOSE`,
+      award: C.creditAwards.prize,
     });
     refresh();
   }
@@ -555,5 +666,8 @@ import { spinLabelFor } from './cabinet-anim.js';
   M.log("game_start", { lang });
   if (!M.endpoint()) $("metricsNote").textContent = "Metrics are local-only (no endpoint configured). Export anytime.";
   // Headless-QA handle: drives the real UI path (spin/refresh/state) for tests.
-  window.NN_GAME = { spin: doSpin, refresh, state: () => S };
+  // spinning() reports the true in-flight state — the spin button is
+  // re-enabled synchronously by refresh() mid-spin, so button.disabled is
+  // NOT a settle signal (a spin started while spinning=true is ignored).
+  window.NN_GAME = { spin: doSpin, refresh, state: () => S, spinning: () => spinning };
 })();

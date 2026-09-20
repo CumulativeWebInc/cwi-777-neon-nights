@@ -9,6 +9,16 @@ en: { name: "English", spin: "Spin!",
     prize: "🎁 {name} unlocked! Tap {claim} below for your free music link.",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "Cash in now, or save as credit?",
+    cashin: "CASH IN",
+    save: "SAVE AS CREDIT",
+    score: "Credit score",
+    earned: "+{n} credits",
+    choose: "Choose your free music link",
+    need: "{n} more credits for a free link",
+    disclaimer: "Neon Credits are just for fun — no money value. Redeemable only for free music links. No gambling."
+  },
   bullets: [
   "Tap SPIN — spins are free and refill over time.",
   "Clear rounds to climb: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -28,6 +38,16 @@ es: { name: "Español", spin: "¡Girar!",
     triple: "✨ ¡Triple {label}! ✨",
     prize: "🎁 ¡{name} desbloqueado! Toca {claim} abajo para tu enlace de música gratis.",
     claim: "RECLAMAR"
+  },
+  credits: {
+    ask: "¿Cobrar ahora o guardar el crédito?",
+    cashin: "COBRAR",
+    save: "GUARDAR CRÉDITO",
+    score: "Puntos de crédito",
+    earned: "+{n} créditos",
+    choose: "Elige tu enlace de música gratis",
+    need: "{n} créditos más para un enlace gratis",
+    disclaimer: "Los Neon Credits son solo diversión — sin valor monetario. Solo canjeables por enlaces de música gratis. Sin apuestas."
   },
   bullets: [
   "Toca GIRAR: los giros son gratis y se recargan con el tiempo.",
@@ -49,6 +69,16 @@ fr: { name: "Français", spin: "Tourner !",
     prize: "🎁 {name} débloqué ! Touchez {claim} ci-dessous pour votre lien musique gratuit.",
     claim: "RÉCLAMER"
   },
+  credits: {
+    ask: "Encaisser maintenant ou garder le crédit ?",
+    cashin: "ENCAISSER",
+    save: "GARDER LE CRÉDIT",
+    score: "Score de crédit",
+    earned: "+{n} crédits",
+    choose: "Choisis ton lien musical gratuit",
+    need: "Encore {n} crédits pour un lien gratuit",
+    disclaimer: "Les Neon Credits sont juste pour le fun — aucune valeur monétaire. Échangeables uniquement contre des liens musicaux gratuits. Pas de jeu d'argent."
+  },
   bullets: [
   "Appuyez sur TOURNER : les tours sont gratuits et se rechargent avec le temps.",
   "Terminez les manches pour monter : Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -68,6 +98,16 @@ pt: { name: "Português", spin: "Girar!",
     triple: "✨ Trinca de {label}! ✨",
     prize: "🎁 {name} desbloqueado! Toque em {claim} abaixo para seu link de música grátis.",
     claim: "RESGATAR"
+  },
+  credits: {
+    ask: "Resgatar agora ou guardar o crédito?",
+    cashin: "RESGATAR",
+    save: "GUARDAR CRÉDITO",
+    score: "Saldo de crédito",
+    earned: "+{n} créditos",
+    choose: "Escolha seu link de música grátis",
+    need: "Faltam {n} créditos para um link grátis",
+    disclaimer: "Neon Credits são só diversão — sem valor monetário. Resgatáveis apenas por links de música grátis. Sem apostas."
   },
   bullets: [
   "Toque em GIRAR: as rodadas são grátis e recarregam com o tempo.",
@@ -89,6 +129,16 @@ de: { name: "Deutsch", spin: "Drehen!",
     prize: "🎁 {name} freigeschaltet! Tippe unten auf {claim} für deinen gratis Musik-Link.",
     claim: "EINLÖSEN"
   },
+  credits: {
+    ask: "Jetzt einlösen oder als Guthaben sparen?",
+    cashin: "EINLÖSEN",
+    save: "GUTHABEN SPAREN",
+    score: "Guthabenstand",
+    earned: "+{n} Credits",
+    choose: "Wähle deinen gratis Musik-Link",
+    need: "Noch {n} Credits bis zum Gratis-Link",
+    disclaimer: "Neon Credits sind nur zum Spaß — kein Geldwert. Nur gegen gratis Musik-Links einlösbar. Kein Glücksspiel."
+  },
   bullets: [
   "Tippe auf DREHEN – Drehs sind gratis und laden sich mit der Zeit auf.",
   "Meistere Runden und steige auf: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -108,6 +158,16 @@ it: { name: "Italiano", spin: "Gira!",
     triple: "✨ Tris di {label}! ✨",
     prize: "🎁 {name} sbloccato! Tocca {claim} qui sotto per il tuo link musicale gratis.",
     claim: "RISCATTA"
+  },
+  credits: {
+    ask: "Riscuoti ora o salva il credito?",
+    cashin: "RISCUOTI",
+    save: "SALVA CREDITO",
+    score: "Punteggio credito",
+    earned: "+{n} crediti",
+    choose: "Scegli il tuo link musicale gratis",
+    need: "Ancora {n} crediti per un link gratis",
+    disclaimer: "I Neon Credits sono solo per divertimento — nessun valore monetario. Riscattabili solo per link musicali gratuiti. Niente gioco d'azzardo."
   },
   bullets: [
   "Tocca GIRA: i giri sono gratis e si ricaricano col tempo.",
@@ -129,6 +189,16 @@ nl: { name: "Nederlands", spin: "Draaien!",
     prize: "🎁 {name} ontgrendeld! Tik hieronder op {claim} voor je gratis muziek-link.",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "Nu inwisselen of als tegoed bewaren?",
+    cashin: "INWISSELEN",
+    save: "TEGOED BEWAREN",
+    score: "Tegoedscore",
+    earned: "+{n} credits",
+    choose: "Kies je gratis muzieklink",
+    need: "Nog {n} credits voor een gratis link",
+    disclaimer: "Neon Credits zijn puur voor de lol — geen geldwaarde. Alleen inwisselbaar voor gratis muzieklinks. Geen gokken."
+  },
   bullets: [
   "Tik op DRAAIEN – beurten zijn gratis en vullen zich na verloop van tijd aan.",
   "Voltooi rondes om te stijgen: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -148,6 +218,16 @@ ru: { name: "Русский", spin: "Крутить!",
     triple: "✨ Тройка: {label}! ✨",
     prize: "🎁 {name} разблокирован! Нажмите {claim} ниже, чтобы получить бесплатную музыкальную ссылку.",
     claim: "ЗАБРАТЬ"
+  },
+  credits: {
+    ask: "Обналичить сейчас или сохранить кредит?",
+    cashin: "ОБНАЛИЧИТЬ",
+    save: "СОХРАНИТЬ КРЕДИТ",
+    score: "Баланс кредитов",
+    earned: "+{n} кредитов",
+    choose: "Выберите бесплатную музыкальную ссылку",
+    need: "Ещё {n} кредитов до бесплатной ссылки",
+    disclaimer: "Neon Credits — просто для веселья, денежной ценности не имеют. Обмениваются только на бесплатные музыкальные ссылки. Не азартная игра."
   },
   bullets: [
   "Нажмите «КРУТИТЬ» — вращения бесплатны и восстанавливаются со временем.",
@@ -169,6 +249,16 @@ uk: { name: "Українська", spin: "Крутити!",
     prize: "🎁 {name} розблоковано! Натисніть {claim} нижче, щоб отримати безкоштовне музичне посилання.",
     claim: "ЗАБРАТИ"
   },
+  credits: {
+    ask: "Обміняти зараз чи зберегти кредит?",
+    cashin: "ОБМІНЯТИ",
+    save: "ЗБЕРЕГТИ КРЕДИТ",
+    score: "Баланс кредитів",
+    earned: "+{n} кредитів",
+    choose: "Оберіть безкоштовне музичне посилання",
+    need: "Ще {n} кредитів до безкоштовного посилання",
+    disclaimer: "Neon Credits — просто для розваги, грошової цінності не мають. Обмінюються лише на безкоштовні музичні посилання. Не азартна гра."
+  },
   bullets: [
   "Натисніть «КРУТИТИ» — обертання безкоштовні та відновлюються з часом.",
   "Проходьте раунди й піднімайтеся: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -188,6 +278,16 @@ pl: { name: "Polski", spin: "Zakręć!",
     triple: "✨ Trójka: {label}! ✨",
     prize: "🎁 Odblokowano: {name}! Kliknij {claim} poniżej, aby odebrać darmowy link do muzyki.",
     claim: "ODBIERZ"
+  },
+  credits: {
+    ask: "Wypłacić teraz czy zapisać kredyt?",
+    cashin: "WYPŁAĆ",
+    save: "ZAPISZ KREDYT",
+    score: "Saldo kredytów",
+    earned: "+{n} kredytów",
+    choose: "Wybierz swój darmowy link muzyczny",
+    need: "Jeszcze {n} kredytów do darmowego linku",
+    disclaimer: "Neon Credits to tylko zabawa — bez wartości pieniężnej. Wymienialne wyłącznie na darmowe linki muzyczne. Bez hazardu."
   },
   bullets: [
   "Kliknij ZAKRĘĆ – zakręcenia są darmowe i odnawiają się z czasem.",
@@ -209,6 +309,16 @@ tr: { name: "Türkçe", spin: "Çevir!",
     prize: "🎁 {name} açıldı! Ücretsiz müzik bağlantın için aşağıda {claim} düğmesine dokun.",
     claim: "TALEP ET"
   },
+  credits: {
+    ask: "Şimdi bozdur ya da kredi olarak sakla?",
+    cashin: "BOZDUR",
+    save: "KREDİ SAKLA",
+    score: "Kredi puanı",
+    earned: "+{n} kredi",
+    choose: "Ücretsiz müzik bağlantını seç",
+    need: "Ücretsiz bağlantı için {n} kredi daha",
+    disclaimer: "Neon Krediler sadece eğlence içindir — parasal değeri yoktur. Yalnızca ücretsiz müzik bağlantılarıyla takas edilir. Kumar değildir."
+  },
   bullets: [
   "ÇEVİR'e dokun – çevirmeler ücretsizdir ve zamanla yenilenir.",
   "Turları geçerek yüksel: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -228,6 +338,16 @@ ar: { name: "العربية", rtl: true, spin: "دوران!",
     triple: "✨ ثلاثة {label}! ✨",
     prize: "🎁 تم فتح {name}! اضغط {claim} بالأسفل للحصول على رابط الموسيقى المجاني.",
     claim: "استلام"
+  },
+  credits: {
+    ask: "استبدل الآن أم احفظ الرصيد؟",
+    cashin: "استبدال",
+    save: "حفظ الرصيد",
+    score: "رصيد النقاط",
+    earned: "+{n} نقطة",
+    choose: "اختر رابط الموسيقى المجاني",
+    need: "{n} نقطة أخرى لرابط مجاني",
+    disclaimer: "نقاط النيون للمتعة فقط — لا قيمة نقدية لها. تُستبدل فقط بروابط موسيقى مجانية. ليست مقامرة."
   },
   bullets: [
   "اضغط «دوران» — الدورات مجانية وتتجدد مع الوقت.",
@@ -249,6 +369,16 @@ hi: { name: "हिन्दी", spin: "स्पिन!",
     prize: "🎁 {name} अनलॉक हो गया! मुफ्त म्यूज़िक लिंक के लिए नीचे {claim} दबाएं।",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "अभी भुनाएं या क्रेडिट बचाएं?",
+    cashin: "भुनाएं",
+    save: "क्रेडिट बचाएं",
+    score: "क्रेडिट स्कोर",
+    earned: "+{n} क्रेडिट",
+    choose: "अपना मुफ्त म्यूज़िक लिंक चुनें",
+    need: "मुफ्त लिंक के लिए {n} क्रेडिट और",
+    disclaimer: "Neon Credits सिर्फ मज़े के लिए हैं — इनका कोई मौद्रिक मूल्य नहीं। केवल मुफ्त म्यूज़िक लिंक के लिए भुनाए जा सकते हैं। जुआ नहीं।"
+  },
   bullets: [
   "स्पिन दबाएँ — स्पिन मुफ़्त हैं और समय के साथ फिर मिलते हैं।",
   "राउंड पूरे करके आगे बढ़ें: Lobby Lights → Midnight Strip → 777 Skyline।",
@@ -268,6 +398,16 @@ bn: { name: "বাংলা", spin: "স্পিন!",
     triple: "✨ ট্রিপল {label}! ✨",
     prize: "🎁 {name} আনলক হয়েছে! বিনামূল্যে মিউজিক লিঙ্ক পেতে নিচে {claim} চাপুন।",
     claim: "CLAIM"
+  },
+  credits: {
+    ask: "এখনই ভাঙান নাকি ক্রেডিট জমা রাখবেন?",
+    cashin: "ভাঙান",
+    save: "ক্রেডিট জমা রাখুন",
+    score: "ক্রেডিট স্কোর",
+    earned: "+{n} ক্রেডিট",
+    choose: "আপনার ফ্রি মিউজিক লিংক বেছে নিন",
+    need: "ফ্রি লিংকের জন্য আরও {n} ক্রেডিট",
+    disclaimer: "Neon Credits শুধু মজার জন্য — এর কোনো আর্থিক মূল্য নেই। শুধুমাত্র ফ্রি মিউজিক লিংকের জন্য ভাঙানো যায়। জুয়া নয়।"
   },
   bullets: [
   "স্পিন চাপুন — স্পিন ফ্রি এবং সময়ের সাথে আবার পাওয়া যায়।",
@@ -289,6 +429,16 @@ ur: { name: "اردو", rtl: true, spin: "اسپن!",
     prize: "🎁 {name} ان لاک ہو گیا! مفت میوزک لنک کے لیے نیچے {claim} دبائیں۔",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "ابھی کیش کریں یا کریڈٹ بچائیں؟",
+    cashin: "کیش کریں",
+    save: "کریڈٹ بچائیں",
+    score: "کریڈٹ اسکور",
+    earned: "+{n} کریڈٹ",
+    choose: "اپنا مفت میوزک لنک منتخب کریں",
+    need: "مفت لنک کے لیے مزید {n} کریڈٹ",
+    disclaimer: "Neon Credits صرف تفریح کے لیے ہیں — ان کی کوئی مالی قیمت نہیں۔ صرف مفت میوزک لنکس کے لیے قابلِ استعمال۔ جوا نہیں۔"
+  },
   bullets: [
   "اسپن دبائیں — اسپن مفت ہیں اور وقت کے ساتھ بحال ہوتے ہیں۔",
   "راؤنڈ مکمل کر کے آگے بڑھیں: Lobby Lights، پھر Midnight Strip، پھر 777 Skyline۔",
@@ -308,6 +458,16 @@ pa: { name: "ਪੰਜਾਬੀ", spin: "ਸਪਿਨ!",
     triple: "✨ ਟ੍ਰਿਪਲ {label}! ✨",
     prize: "🎁 {name} ਅਨਲਾਕ ਹੋ ਗਿਆ! ਮੁਫ਼ਤ ਮਿਊਜ਼ਿਕ ਲਿੰਕ ਲਈ ਹੇਠਾਂ {claim} ਦਬਾਓ।",
     claim: "CLAIM"
+  },
+  credits: {
+    ask: "ਹੁਣੇ ਭੁਨਾਓ ਜਾਂ ਕ੍ਰੈਡਿਟ ਬਚਾਓ?",
+    cashin: "ਭੁਨਾਓ",
+    save: "ਕ੍ਰੈਡਿਟ ਬਚਾਓ",
+    score: "ਕ੍ਰੈਡਿਟ ਸਕੋਰ",
+    earned: "+{n} ਕ੍ਰੈਡਿਟ",
+    choose: "ਆਪਣਾ ਮੁਫਤ ਮਿਊਜ਼ਿਕ ਲਿੰਕ ਚੁਣੋ",
+    need: "ਮੁਫਤ ਲਿੰਕ ਲਈ {n} ਕ੍ਰੈਡਿਟ ਹੋਰ",
+    disclaimer: "Neon Credits ਸਿਰਫ਼ ਮਜ਼ੇ ਲਈ ਹਨ — ਇਨ੍ਹਾਂ ਦੀ ਕੋਈ ਨਕਦ ਕੀਮਤ ਨਹੀਂ। ਸਿਰਫ਼ ਮੁਫਤ ਮਿਊਜ਼ਿਕ ਲਿੰਕਾਂ ਲਈ ਵਰਤੇ ਜਾ ਸਕਦੇ ਹਨ। ਜੂਆ ਨਹੀਂ।"
   },
   bullets: [
   "ਸਪਿਨ ਦਬਾਓ — ਸਪਿਨ ਮੁਫ਼ਤ ਹਨ ਅਤੇ ਸਮੇਂ ਨਾਲ ਮੁੜ ਮਿਲਦੇ ਹਨ।",
@@ -329,6 +489,16 @@ ta: { name: "தமிழ்", spin: "SPIN!",
     prize: "🎁 {name} திறக்கப்பட்டது! இலவச இசை இணைப்பைப் பெற கீழே {claim} ஐ அழுத்தவும்.",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "இப்போது மீட்கவா அல்லது கிரெடிட்டாக சேமிக்கவா?",
+    cashin: "மீட்குக",
+    save: "கிரெடிட்டாக சேமி",
+    score: "கிரெடிட் மதிப்பெண்",
+    earned: "+{n} கிரெடிட்",
+    choose: "உங்கள் இலவச இசை இணைப்பைத் தேர்வு செய்க",
+    need: "இலவச இணைப்புக்கு இன்னும் {n} கிரெடிட்",
+    disclaimer: "Neon Credits வேடிக்கைக்காக மட்டுமே — பண மதிப்பு இல்லை. இலவச இசை இணைப்புகளுக்கு மட்டுமே மீட்கலாம். சூதாட்டம் அல்ல."
+  },
   bullets: [
   "SPIN-ஐ அழுத்தவும் — சுழற்சிகள் இலவசம், நேரத்தில் மீண்டும் கிடைக்கும்.",
   "சுற்றுகளை முடித்து முன்னேறவும்: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -348,6 +518,16 @@ te: { name: "తెలుగు", spin: "SPIN!",
     triple: "✨ ట్రిపుల్ {label}! ✨",
     prize: "🎁 {name} అన్‌లాక్ అయింది! ఉచిత మ్యూజిక్ లింక్ కోసం కింద {claim} నొక్కండి.",
     claim: "CLAIM"
+  },
+  credits: {
+    ask: "ఇప్పుడే రీడీమ్ చేయాలా లేదా క్రెడిట్‌గా దాచాలా?",
+    cashin: "రీడీమ్ చేయి",
+    save: "క్రెడిట్‌గా దాచు",
+    score: "క్రెడిట్ స్కోరు",
+    earned: "+{n} క్రెడిట్లు",
+    choose: "మీ ఉచిత సంగీత లింక్‌ను ఎంచుకోండి",
+    need: "ఉచిత లింక్ కోసం మరో {n} క్రెడిట్లు",
+    disclaimer: "Neon Credits కేవలం సరదా కోసం — వాటికి డబ్బు విలువ లేదు. ఉచిత సంగీత లింకులకు మాత్రమే రీడీమ్ చేయవచ్చు. జూదం కాదు."
   },
   bullets: [
   "SPIN నొక్కండి — స్పిన్‌లు ఉచితం, కాలంతో మళ్లీ వస్తాయి.",
@@ -369,6 +549,16 @@ zh: { name: "简体中文", spin: "旋转！",
     prize: "🎁 {name}已解锁！点击下方的{claim}获取免费音乐链接。",
     claim: "领取"
   },
+  credits: {
+    ask: "现在兑换，还是存为积分？",
+    cashin: "兑换",
+    save: "存为积分",
+    score: "积分余额",
+    earned: "+{n} 积分",
+    choose: "选择你的免费音乐链接",
+    need: "再得 {n} 积分可兑换免费链接",
+    disclaimer: "Neon 积分仅供娱乐——没有现金价值。仅可兑换免费音乐链接。不是赌博。"
+  },
   bullets: [
   "点击旋转——旋转免费，随时间恢复。",
   "通关回合不断晋级：Lobby Lights → Midnight Strip → 777 Skyline。",
@@ -388,6 +578,16 @@ zh: { name: "简体中文", spin: "旋转！",
     triple: "✨ 三連 {label}！✨",
     prize: "🎁 {name}已解鎖！點擊下方的{claim}獲取免費音樂連結。",
     claim: "領取"
+  },
+  credits: {
+    ask: "現在兌換，還是存為積分？",
+    cashin: "兌換",
+    save: "存為積分",
+    score: "積分餘額",
+    earned: "+{n} 積分",
+    choose: "選擇你的免費音樂連結",
+    need: "再得 {n} 積分可兌換免費連結",
+    disclaimer: "Neon 積分僅供娛樂——沒有現金價值。僅可兌換免費音樂連結。不是賭博。"
   },
   bullets: [
   "點擊旋轉——旋轉免費，隨時間恢復。",
@@ -411,6 +611,16 @@ ja: { name: "日本語", spin: "スピン！",
     prize: "🎁 {name}をアンロック！無料の音楽リンクは下の{claim}をタップ。",
     claim: "受け取る"
   },
+  credits: {
+    ask: "今すぐ引き換える？それともクレジットとして貯める？",
+    cashin: "引き換える",
+    save: "クレジットで貯める",
+    score: "クレジットスコア",
+    earned: "+{n} クレジット",
+    choose: "無料の音楽リンクを選んでください",
+    need: "無料リンクまであと {n} クレジット",
+    disclaimer: "Neon クレジットはお楽しみ用です——金銭的価値はありません。無料の音楽リンクとのみ引き換え可能です。ギャンブルではありません。"
+  },
   bullets: [
   "スピンをタップ——スピンは無料で、時間とともに回復します。",
   "ラウンドをクリアして昇格：Lobby Lights → Midnight Strip → 777 Skyline。",
@@ -430,6 +640,16 @@ ko: { name: "한국어", spin: "스핀!",
     triple: "✨ 트리플 {label}! ✨",
     prize: "🎁 {name} 잠금 해제! 무료 음악 링크는 아래 {claim}을 눌러주세요.",
     claim: "받기"
+  },
+  credits: {
+    ask: "지금 교환할까요, 크레딧으로 저장할까요?",
+    cashin: "교환하기",
+    save: "크레딧 저장",
+    score: "크레딧 점수",
+    earned: "+{n} 크레딧",
+    choose: "무료 음악 링크를 선택하세요",
+    need: "무료 링크까지 {n} 크레딧 남음",
+    disclaimer: "Neon 크레딧은 재미용입니다 — 금전적 가치가 없습니다. 무료 음악 링크로만 교환할 수 있습니다. 도박이 아닙니다."
   },
   bullets: [
   "스핀을 누르세요 — 스핀은 무료이며 시간이 지나면 충전됩니다.",
@@ -451,6 +671,16 @@ vi: { name: "Tiếng Việt", spin: "Quay!",
     prize: "🎁 Đã mở khóa {name}! Nhấn {claim} bên dưới để nhận link nhạc miễn phí.",
     claim: "NHẬN"
   },
+  credits: {
+    ask: "Đổi ngay hay lưu thành điểm?",
+    cashin: "ĐỔI NGAY",
+    save: "LƯU ĐIỂM",
+    score: "Điểm tín dụng",
+    earned: "+{n} điểm",
+    choose: "Chọn link nhạc miễn phí của bạn",
+    need: "Còn {n} điểm nữa để có link miễn phí",
+    disclaimer: "Neon Credits chỉ để vui — không có giá trị tiền mặt. Chỉ đổi được link nhạc miễn phí. Không phải cờ bạc."
+  },
   bullets: [
   "Chạm QUAY — lượt quay miễn phí và hồi theo thời gian.",
   "Vượt qua các vòng để thăng hạng: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -470,6 +700,16 @@ th: { name: "ไทย", spin: "หมุน!",
     triple: "✨ ทริปเปิล {label}! ✨",
     prize: "🎁 ปลดล็อก {name} แล้ว! แตะ{claim}ด้านล่างเพื่อรับลิงก์เพลงฟรี",
     claim: "รับรางวัล"
+  },
+  credits: {
+    ask: "แลกเลยหรือเก็บเป็นเครดิต?",
+    cashin: "แลกเลย",
+    save: "เก็บเป็นเครดิต",
+    score: "คะแนนเครดิต",
+    earned: "+{n} เครดิต",
+    choose: "เลือกลิงก์เพลงฟรีของคุณ",
+    need: "อีก {n} เครดิตเพื่อรับลิงก์ฟรี",
+    disclaimer: "Neon Credits เพื่อความสนุกเท่านั้น — ไม่มีมูลค่าเป็นเงิน แลกได้เฉพาะลิงก์เพลงฟรี ไม่ใช่การพนัน"
   },
   bullets: [
   "แตะหมุน — หมุนฟรีและจะเติมใหม่ตามเวลา",
@@ -491,6 +731,16 @@ id: { name: "Bahasa Indonesia", spin: "Putar!",
     prize: "🎁 {name} terbuka! Ketuk {claim} di bawah untuk link musik gratis.",
     claim: "KLAIM"
   },
+  credits: {
+    ask: "Tukar sekarang atau simpan sebagai kredit?",
+    cashin: "TUKAR",
+    save: "SIMPAN KREDIT",
+    score: "Skor kredit",
+    earned: "+{n} kredit",
+    choose: "Pilih link musik gratis Anda",
+    need: "{n} kredit lagi untuk link gratis",
+    disclaimer: "Neon Credits hanya untuk seru-seruan — tidak ada nilai uang. Hanya dapat ditukar dengan link musik gratis. Bukan judi."
+  },
   bullets: [
   "Ketuk PUTAR — putaran gratis dan terisi lagi seiring waktu.",
   "Selesaikan ronde untuk naik level: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -510,6 +760,16 @@ ms: { name: "Bahasa Melayu", spin: "Putar!",
     triple: "✨ Triple {label}! ✨",
     prize: "🎁 {name} telah dibuka! Ketik {claim} di bawah untuk pautan muzik percuma.",
     claim: "TUNTUT"
+  },
+  credits: {
+    ask: "Tebus sekarang atau simpan sebagai kredit?",
+    cashin: "TEBUS",
+    save: "SIMPAN KREDIT",
+    score: "Skor kredit",
+    earned: "+{n} kredit",
+    choose: "Pilih pautan muzik percuma anda",
+    need: "{n} kredit lagi untuk pautan percuma",
+    disclaimer: "Neon Credits hanya untuk hiburan — tiada nilai wang. Hanya boleh ditebus untuk pautan muzik percuma. Bukan perjudian."
   },
   bullets: [
   "Ketik PUTAR — putaran percuma dan diisi semula dari semasa ke semasa.",
@@ -531,6 +791,16 @@ tl: { name: "Tagalog", spin: "SPIN!",
     prize: "🎁 Na-unlock ang {name}! I-tap ang {claim} sa ibaba para sa libreng music link.",
     claim: "CLAIM"
   },
+  credits: {
+    ask: "I-cash in ngayon o i-save bilang credit?",
+    cashin: "I-CASH IN",
+    save: "I-SAVE ANG CREDIT",
+    score: "Credit score",
+    earned: "+{n} credits",
+    choose: "Piliin ang iyong libreng music link",
+    need: "{n} pang credits para sa libreng link",
+    disclaimer: "Ang Neon Credits ay para sa saya lang — walang halagang pera. Maaari lang ipalit sa libreng music links. Hindi sugal."
+  },
   bullets: [
   "Pindutin ang SPIN — libre ang spin at kusang nadadagdagan.",
   "Tapusin ang mga round para umakyat: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -550,6 +820,16 @@ sw: { name: "Kiswahili", spin: "SPIN!",
     triple: "✨ Triple {label}! ✨",
     prize: "🎁 {name} imefunguliwa! Bonyeza {claim} hapa chini ili upate kiungo cha muziki bila malipo.",
     claim: "CLAIM"
+  },
+  credits: {
+    ask: "Tumia sasa au weka kama mkopo?",
+    cashin: "TUMIA",
+    save: "WEKA MKOPO",
+    score: "Alama za mkopo",
+    earned: "+{n} mkopo",
+    choose: "Chagua kiungo chako cha muziki bila malipo",
+    need: "Mkopo {n} zaidi kwa kiungo bila malipo",
+    disclaimer: "Neon Credits ni kwa furaha tu — hazina thamani ya pesa. Zinabadilishwa kwa viungo vya muziki bila malipo tu. Sio kamari."
   },
   bullets: [
   "Gusa SPIN — mizunguko ni bure na hujazwa tena baada ya muda.",
@@ -571,6 +851,16 @@ ha: { name: "Hausa", spin: "SPIN!",
     prize: "🎁 An buɗe {name}! Danna {claim} a ƙasa don samun mahaɗin kiɗa kyauta.",
     claim: "KARƁA"
   },
+  credits: {
+    ask: "A karɓa yanzu ko a ajiye a matsayin kiredit?",
+    cashin: "KARƁA",
+    save: "AJIYE KIREDIT",
+    score: "Makin kiredit",
+    earned: "+{n} kiredit",
+    choose: "Zaɓi mahaɗinka na kiɗa kyauta",
+    need: "Kiredit {n} don mahaɗi kyauta",
+    disclaimer: "Neon Credits don nishaɗi ne kawai — ba su da darajar kuɗi. Ana musanya su da mahaɗan kiɗa kyauta kawai. Ba caca ba."
+  },
   bullets: [
   "Danna SPIN — juyawa kyauta ne kuma suna dawowa da lokaci.",
   "Kammala zagaye domin hawa: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -590,6 +880,16 @@ yo: { name: "Yorùbá", spin: "SPIN!",
     triple: "✨ Mẹ́ta {label}! ✨",
     prize: "🎁 A ti {name} sílẹ̀! Tẹ {claim} ni ìsàlẹ̀ fún ọ̀nà orin ọ̀fẹ́.",
     claim: "GBÀ"
+  },
+  credits: {
+    ask: "Ṣe o fẹ́ yọ ọ́ kúrò báyìí tàbí fi pamọ́ gẹ́gẹ́ bí kírédìtì?",
+    cashin: "YỌ KÚRÒ",
+    save: "FI PAMỌ́",
+    score: "Àmì kírédìtì",
+    earned: "+{n} kírédìtì",
+    choose: "Yan ọ̀nà orin ọ̀fẹ́ rẹ",
+    need: "Kírédìtì {n} sí i fún ọ̀nà ọ̀fẹ́",
+    disclaimer: "Neon Credits jẹ́ fún ìgbádùn lásán — kò ní iye owó. A lè fi wọ́n ṣe pàṣípààrọ̀ ọ̀nà orin ọ̀fẹ́ nìkan. Kì í ṣe tẹ́tẹ́."
   },
   bullets: [
   "Tẹ SPIN — ọfẹ ni awọn iyipo, wọn yoo pada wa lẹ́yìn ìgbà díẹ̀.",
@@ -611,6 +911,16 @@ am: { name: "አማርኛ", spin: "SPIN!",
     prize: "🎁 {name} ተከፍቷል! ነጻ የሙዚቃ ማገናኛ ለማግኘት ከታች {claim} ይጫኑ።",
     claim: "ውሰድ"
   },
+  credits: {
+    ask: "አሁን ይለውጡ ወይስ እንደ ክሬዲት ያስቀምጡ?",
+    cashin: "ይለውጡ",
+    save: "እንደ ክሬዲት አስቀምጥ",
+    score: "የክሬዲት ነጥብ",
+    earned: "+{n} ክሬዲት",
+    choose: "የእርስዎን ነፃ የሙዚቃ ሊንክ ይምረጡ",
+    need: "ለነፃ ሊንክ {n} ክሬዲት ቀርቧል",
+    disclaimer: "Neon Credits ለመዝናኛ ብቻ ናቸው — የገንዘብ ዋጋ የላቸውም። ለነፃ የሙዚቃ ሊንኮች ብቻ ይለውጣሉ። ቁማር አይደለም።"
+  },
   bullets: [
   "SPIN ን ይንኩ — ሽክርክሪቶች ነፃ ናቸው እና ከጊዜ በኋላ ይመለሳሉ።",
   "ዙሮችን ጨርሰው ይውጡ: Lobby Lights → Midnight Strip → 777 Skyline።",
@@ -630,6 +940,16 @@ fa: { name: "فارسی", rtl: true, spin: "چرخش!",
     triple: "✨ سه‌تایی {label}! ✨",
     prize: "🎁 {name} باز شد! برای دریافت لینک رایگان موسیقی، {claim} را در پایین بزنید.",
     claim: "دریافت"
+  },
+  credits: {
+    ask: "الان نقد کن یا به‌صورت اعتبار ذخیره کن؟",
+    cashin: "نقد کن",
+    save: "ذخیره اعتبار",
+    score: "امتیاز اعتبار",
+    earned: "+{n} اعتبار",
+    choose: "لینک موسیقی رایگان خود را انتخاب کنید",
+    need: "{n} اعتبار دیگر تا لینک رایگان",
+    disclaimer: "Neon Credits فقط برای سرگرمی است — ارزش پولی ندارد. فقط با لینک‌های موسیقی رایگان قابل معاوضه است. قمار نیست."
   },
   bullets: [
   "«چرخش» را بزنید — چرخش‌ها رایگان‌اند و به‌مرور پر می‌شوند.",
@@ -651,6 +971,16 @@ he: { name: "עברית", rtl: true, spin: "ספין!",
     prize: "🎁 {name} נפתח! לחצו על {claim} למטה כדי לקבל קישור מוזיקה בחינם.",
     claim: "קבל"
   },
+  credits: {
+    ask: "לפדות עכשיו או לשמור כקרדיט?",
+    cashin: "פדה",
+    save: "שמור כקרדיט",
+    score: "ניקוד קרדיט",
+    earned: "+{n} קרדיט",
+    choose: "בחר את קישור המוזיקה החינמי שלך",
+    need: "עוד {n} קרדיט לקישור חינמי",
+    disclaimer: "Neon Credits הם רק לכיף — אין להם ערך כספי. ניתנים למימוש רק עבור קישורי מוזיקה חינמיים. לא הימורים."
+  },
   bullets: [
   "לחצו על ספין — הספינים בחינם ומתמלאים עם הזמן.",
   "עברו סיבובים כדי להתקדם: Lobby Lights, אחר כך Midnight Strip, אחר כך 777 Skyline.",
@@ -670,6 +1000,16 @@ el: { name: "Ελληνικά", spin: "Περιστροφή!",
     triple: "✨ Τριάδα {label}! ✨",
     prize: "🎁 Ξεκλειδώθηκε: {name}! Πατήστε {claim} παρακάτω για τον δωρεάν σύνδεσμο μουσικής.",
     claim: "ΠΑΡΑΛΑΒΗ"
+  },
+  credits: {
+    ask: "Εξαργύρωση τώρα ή αποθήκευση ως πίστωση;",
+    cashin: "ΕΞΑΡΓΥΡΩΣΗ",
+    save: "ΑΠΟΘΗΚΕΥΣΗ",
+    score: "Υπόλοιπο πίστωσης",
+    earned: "+{n} πιστώσεις",
+    choose: "Διάλεξε τον δωρεάν μουσικό σου σύνδεσμο",
+    need: "Ακόμα {n} πιστώσεις για δωρεάν σύνδεσμο",
+    disclaimer: "Τα Neon Credits είναι μόνο για διασκέδαση — δεν έχουν χρηματική αξία. Εξαργυρώνονται μόνο για δωρεάν μουσικούς συνδέσμους. Όχι τζόγος."
   },
   bullets: [
   "Πάτα ΠΕΡΙΣΤΡΟΦΗ — οι περιστροφές είναι δωρεάν και αναπληρώνονται με τον χρόνο.",
@@ -691,6 +1031,16 @@ sv: { name: "Svenska", spin: "SPINN!",
     prize: "🎁 {name} upplåst! Tryck på {claim} nedan för din gratis musiklänk.",
     claim: "HÄMTA"
   },
+  credits: {
+    ask: "Lös in nu eller spara som kredit?",
+    cashin: "LÖS IN",
+    save: "SPARA KREDIT",
+    score: "Kreditpoäng",
+    earned: "+{n} krediter",
+    choose: "Välj din gratis musiklänk",
+    need: "{n} krediter kvar till en gratis länk",
+    disclaimer: "Neon Credits är bara för skojs skull — inget pengavärde. Kan endast lösas in mot gratis musiklänkar. Inget spelande."
+  },
   bullets: [
   "Tryck på SPINN — snurr är gratis och fylls på med tiden.",
   "Klara rundor för att klättra: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -710,6 +1060,16 @@ no: { name: "Norsk", spin: "SPINN!",
     triple: "✨ Trippel {label}! ✨",
     prize: "🎁 {name} er låst opp! Trykk {claim} nedenfor for gratis musikklink.",
     claim: "HENT"
+  },
+  credits: {
+    ask: "Løs inn nå eller lagre som kreditt?",
+    cashin: "LØS INN",
+    save: "LAGRE KREDITT",
+    score: "Kredittscore",
+    earned: "+{n} kreditter",
+    choose: "Velg din gratis musikklenke",
+    need: "{n} kreditter til for en gratis lenke",
+    disclaimer: "Neon Credits er bare for moro skyld — ingen pengeverdi. Kan kun løses inn mot gratis musikklenker. Ikke gambling."
   },
   bullets: [
   "Trykk på SPINN — spinn er gratis og fylles opp over tid.",
@@ -731,6 +1091,16 @@ da: { name: "Dansk", spin: "SPIN!",
     prize: "🎁 {name} er låst op! Tryk på {claim} nedenfor for at få dit gratis musiklink.",
     claim: "HENT"
   },
+  credits: {
+    ask: "Indløs nu eller gem som kredit?",
+    cashin: "INDLØS",
+    save: "GEM KREDIT",
+    score: "Kreditscore",
+    earned: "+{n} kreditter",
+    choose: "Vælg dit gratis musiklink",
+    need: "{n} kreditter mere til et gratis link",
+    disclaimer: "Neon Credits er kun for sjov — ingen pengeværdi. Kan kun indløses til gratis musiklinks. Ikke hasard."
+  },
   bullets: [
   "Tryk på SPIN — spins er gratis og fyldes op med tiden.",
   "Gennemfør runder for at stige: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -750,6 +1120,16 @@ fi: { name: "Suomi", spin: "Pyöräytä!",
     triple: "✨ Tripla {label}! ✨",
     prize: "🎁 {name} avattu! Napauta alla {claim} saadaksesi ilmaisen musiikkilinkin.",
     claim: "LUNASTA"
+  },
+  credits: {
+    ask: "Lunasta nyt vai säästä krediittinä?",
+    cashin: "LUNASTA",
+    save: "SÄÄSTÄ KREDIITTI",
+    score: "Krediittipisteet",
+    earned: "+{n} krediittiä",
+    choose: "Valitse ilmainen musiikkilinkkisi",
+    need: "Vielä {n} krediittiä ilmaiseen linkkiin",
+    disclaimer: "Neon Credits ovat vain huviksi — ei rahallista arvoa. Lunastettavissa vain ilmaisia musiikkilinkkejä vastaan. Ei uhkapeliä."
   },
   bullets: [
   "Napauta PYÖRÄYTÄ — pyöräytykset ovat ilmaisia ja täyttyvät ajan myötä.",
@@ -771,6 +1151,16 @@ ro: { name: "Română", spin: "Învârte!",
     prize: "🎁 {name} deblocat! Apasă {claim} mai jos pentru linkul tău gratuit de muzică.",
     claim: "REVENDICĂ"
   },
+  credits: {
+    ask: "Răscumpără acum sau salvează ca și credit?",
+    cashin: "RĂSCUMPĂRĂ",
+    save: "SALVEAZĂ CREDIT",
+    score: "Scor credit",
+    earned: "+{n} credite",
+    choose: "Alege linkul tău muzical gratuit",
+    need: "Încă {n} credite pentru un link gratuit",
+    disclaimer: "Neon Credits sunt doar pentru distracție — fără valoare monetară. Răscumpărabile doar pentru linkuri muzicale gratuite. Fără jocuri de noroc."
+  },
   bullets: [
   "Apasă ÎNVÂRTE — învârtirile sunt gratuite și se reîncarcă în timp.",
   "Completează runde pentru a urca: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -791,6 +1181,16 @@ hu: { name: "Magyar", spin: "Pörgess!",
     prize: "🎁 {name} feloldva! Koppints a lenti {claim} gombra az ingyenes zenei linkedért.",
     claim: "ÁTVÉTEL"
   },
+  credits: {
+    ask: "Most váltod be, vagy mented kreditként?",
+    cashin: "BEVÁLTÁS",
+    save: "MENTÉS KREDITKÉNT",
+    score: "Kreditpont",
+    earned: "+{n} kredit",
+    choose: "Válaszd ki az ingyenes zenei linked",
+    need: "Még {n} kredit az ingyenes linkig",
+    disclaimer: "A Neon Credits csak szórakozásra szolgál — nincs pénzértéke. Csak ingyenes zenei linkekre váltható be. Nem szerencsejáték."
+  },
   bullets: [
   "Nyomd meg a PÖRGETÉST — a pörgetések ingyenesek és idővel újratöltődnek.",
   "Teljesíts köröket a feljutáshoz: Lobby Lights → Midnight Strip → 777 Skyline.",
@@ -810,6 +1210,16 @@ cs: { name: "Čeština", spin: "Točit!",
     triple: "✨ Trojice {label}! ✨",
     prize: "🎁 Odemčeno: {name}! Klepni na {claim} níže a získej hudební odkaz zdarma.",
     claim: "VYZVEDNOUT"
+  },
+  credits: {
+    ask: "Vybrat teď, nebo uložit jako kredit?",
+    cashin: "VYBRAT",
+    save: "ULOŽIT KREDIT",
+    score: "Kreditní skóre",
+    earned: "+{n} kreditů",
+    choose: "Vyber si svůj hudební odkaz zdarma",
+    need: "Ještě {n} kreditů k odkazu zdarma",
+    disclaimer: "Neon Credits jsou jen pro zábavu — nemají peněžní hodnotu. Lze je vyměnit pouze za hudební odkazy zdarma. Žádný hazard."
   },
   bullets: [
   "Klepni na TOČIT — točení je zdarma a časem se doplňuje.",

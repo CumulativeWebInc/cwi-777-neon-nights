@@ -10,8 +10,19 @@
    API surface (identical to the old 2D cabinet so game.js is untouched):
      window.NN_CABINET = { init()->bool, setRest(rows), spin(rows)->Promise,
        celebrate(), endCelebrate(), setSpins(n,ok), setSignFlare(v),
-       onSpinRequest(cb), fpsStats()->{frames,avg,p95} }
+       onSpinRequest(cb), fpsStats()->{frames,avg,p95},
+       showPrize(text, scoreLine), clearPrize() }
    rows[reel] = [top, middle, bottom] symbol ids.
+
+   Prize display: showPrize(text) swaps the marquee face for a neon-tube prize
+   readout — the prize is announced ON THE MACHINE ITSELF, visible during the
+   celebration camera push-in. clearPrize() restores the NEON NIGHTS face.
+
+   Jackpot background light-up: celebrate() (flareMode 'jackpot') drives a
+   gold-to-magenta wash light + bloom kick + scene-background pulse. The rig
+   YIELDS under the FPS kill-switch: when the composer is bypassed the wash
+   goes static-dim and the bloom kick is skipped — lights degrade before the
+   cabinet does.
 
    Reliability (the iPhone post-mortem): if WebGL is unavailable the module
    installs a VISIBLE DOM-reel implementation of the same API — never a blank
@@ -142,9 +153,67 @@ function marqueeTexture() {
   return toTex(c);
 }
 
+/* Prize readout for the machine's marquee display (showPrize/clearPrize).
+   Neon-tube gold lettering on the same dark-red panel; wraps to two lines
+   and shrinks to fit so long translated win strings stay on the machine. */
+/* Prize readout for the machine's marquee display (showPrize/clearPrize).
+   Neon-tube gold lettering on the same dark-red panel; the prize name takes
+   line one (shrunk to fit), and an optional credit-score line takes line two
+   so the banked Neon Credits score rides alongside the prize name. Without a
+   score line, long translated win strings wrap to two lines as before. */
+function prizeTexture(text, scoreLine) {
+  const langKey = (() => { try { return localStorage.getItem('nn777-lang-v1') || 'en'; } catch (e) { return 'en'; } })();
+  const rtl = (() => { try { return !!(window.NN_I18N && window.NN_I18N[langKey] && window.NN_I18N[langKey].rtl); } catch (e) { return false; } })();
+  const c = cnv(1024, 256), x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 256);
+  g.addColorStop(0, '#3a0d0d'); g.addColorStop(0.5, '#2a0808'); g.addColorStop(1, '#1c0505');
+  x.fillStyle = g; x.fillRect(0, 0, 1024, 256);
+  x.strokeStyle = 'rgba(255,180,80,0.75)'; x.lineWidth = 6;
+  x.strokeRect(14, 14, 996, 228);
+  try { x.direction = rtl ? 'rtl' : 'ltr'; } catch (e) {}
+  x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round';
+  const setF = (s) => { x.font = `900 ${s}px "Arial Black", Arial, sans-serif`; };
+  const neonLine = (line, size, y, glow) => {
+    setF(size);
+    x.shadowColor = glow; x.shadowBlur = 34;
+    x.strokeStyle = '#ff8a2a'; x.lineWidth = Math.max(3, size * 0.09); x.strokeText(line, 512, y);
+    x.shadowBlur = 14;
+    x.strokeStyle = '#ffd9a0'; x.lineWidth = Math.max(2, size * 0.04); x.strokeText(line, 512, y);
+    x.shadowBlur = 0;
+    x.fillStyle = '#fff2dd'; x.fillText(line, 512, y);
+  };
+  if (scoreLine) {
+    // Two-line layout: prize name up top, credit score beneath it.
+    let size = 84; setF(size);
+    let prize = String(text || '');
+    while (size > 40 && x.measureText(prize).width > 940) { size -= 8; setF(size); }
+    neonLine(prize, size, 84, '#ffb020');
+    let scSize = 54; setF(scSize);
+    let sc = String(scoreLine);
+    while (scSize > 30 && x.measureText(sc).width > 940) { scSize -= 6; setF(scSize); }
+    neonLine(sc, scSize, 190, '#ffd700');
+  } else {
+    let size = 96; setF(size);
+    const words = String(text || '').split(/\s+/).filter(Boolean);
+    let lines = [''];
+    for (const w of words) {
+      const cur = lines[lines.length - 1];
+      const trial = cur ? cur + ' ' + w : w;
+      if (x.measureText(trial).width > 940 && cur) {
+        if (lines.length === 2) lines[1] += ' ' + w;
+        else lines.push(w);
+      } else lines[lines.length - 1] = trial;
+    }
+    if (!lines[0]) lines = [''];
+    while (size > 40 && lines.some(l => x.measureText(l).width > 940)) { size -= 8; setF(size); }
+    const ys = lines.length === 1 ? [134] : [86, 182];
+    lines.forEach((line, i) => neonLine(line, size, ys[i], '#ffb020'));
+  }
+  return toTex(c);
+}
+
 /* Red JACKPOT! sign face. */
-function jackpotTexture() {
-  const c = cnv(1024, 168), x = c.getContext('2d');
+function jackpotTexture() {  const c = cnv(1024, 168), x = c.getContext('2d');
   x.fillStyle = '#160404'; x.fillRect(0, 0, 1024, 168);
   x.font = '900 104px "Arial Black", Arial, sans-serif';
   x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round';
@@ -257,7 +326,9 @@ function makeWebGLCabinet() {
     deltas: [], lastT: 0, frames2s: 0, t2s: -1,
     spinBtn: null, spinPress: null, spinLabel: null, spinLabelMat: null,
     spinLabelTex: null, spinLabelText: '', btnMeshes: [], spinPressed: false,
-    signMat: null, tubeMat: null, marqueeMat: null, meterTex: null, meterMat: null,
+    signMat: null, tubeMat: null, marqueeMat: null, marqueeTex: null,
+    prizeTex: null, prizeText: '', prizeScore: '', meterTex: null, meterMat: null,
+    jackLight: null,
     wmMat: null, glowSprites: [],
     _resolveSpin: null, raf: 0, running: false,
     settled: [], // compat
@@ -310,6 +381,7 @@ function makeWebGLCabinet() {
   function buildScene() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050306);
+    S.scene = scene;
 
     // environment reflections for the chrome (procedural — no external HDR)
     const pmrem = new THREE.PMREMGenerator(S.renderer);
@@ -318,6 +390,9 @@ function makeWebGLCabinet() {
 
     scene.add(new THREE.AmbientLight(0x604038, 0.38));
     const key = new THREE.PointLight(0xffc080, 28, 40); key.position.set(3, 6, 8); scene.add(key);
+    // jackpot wash light (intensity 0 at rest — lit only during celebrate)
+    const jack = new THREE.PointLight(0xffc040, 0, 60); jack.position.set(0, 4.5, 6.5);
+    scene.add(jack); S.jackLight = jack;
     const rim = new THREE.PointLight(0x4d6aff, 14, 40); rim.position.set(-5, 3, -2); scene.add(rim);
     const warm = new THREE.PointLight(0xff7a1a, 9, 20); warm.position.set(0, 1.5, 5); scene.add(warm);
 
@@ -371,8 +446,9 @@ function makeWebGLCabinet() {
     // marquee: dark red panel + tube letters
     const mq = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.02, 0.3), darkPanel);
     mq.position.set(0, 3.72, 0.62); mq.rotation.x = -0.06; cab.add(mq);
+    S.marqueeTex = marqueeTexture();
     const mqFace = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 0.96),
-      new THREE.MeshBasicMaterial({ map: marqueeTexture(), toneMapped: false }));
+      new THREE.MeshBasicMaterial({ map: S.marqueeTex, toneMapped: false }));
     // no HDR push on the whole face: only the neon tubes bloom, the dark-red
     // panel stays dark (a full-face multiplier was washing the cabinet out)
     mqFace.position.set(0, 3.72, 0.78); mqFace.rotation.x = -0.06; cab.add(mqFace);
@@ -673,7 +749,7 @@ function makeWebGLCabinet() {
     S.frames2s++;
     if (now - S.t2s >= 2000) {
       const fps = S.frames2s / ((now - S.t2s) / 1000);
-      if (S.useComposer && fps < 50) {
+      if (S.useComposer && fps < 50 && !S.composerPinned) {
         S.useComposer = false;
         for (const sp of S.glowSprites) sp.visible = true;
       }
@@ -706,7 +782,30 @@ function makeWebGLCabinet() {
     else if (S.flareMode === 'jackpot') flareA = 0.75 + 0.25 * Math.sin(now / 210);
     const base = 1.0, amp = 0.55;
     S.signMat.color.setRGB(base + amp * flareA, base + amp * flareA, base + amp * flareA);
-    if (S.bloomPass) S.bloomPass.strength = 0.9 + 0.5 * flareA;
+    // Jackpot background light-up: a gold-to-magenta wash light + bloom kick +
+    // scene-background pulse. YIELDS under the FPS kill-switch: when the
+    // composer is bypassed the wash goes static-dim and the bloom kick is
+    // skipped — the lights degrade before the cabinet does.
+    const jp = S.flareMode === 'jackpot';
+    const pulse = 0.5 + 0.5 * Math.sin(now / 210);
+    if (S.jackLight) {
+      if (jp && S.useComposer) {
+        S.jackLight.intensity = 45 + 55 * pulse;
+        S.jackLight.color.setHSL(0.08 + 0.82 * pulse, 1.0, 0.6);
+      } else if (jp) {
+        S.jackLight.intensity = 10; // yielded: static warm dim
+        S.jackLight.color.set(0xffc040);
+      } else {
+        S.jackLight.intensity = 0;
+      }
+    }
+    if (S.scene) {
+      if (jp && S.useComposer) S.scene.background.setHSL(0.88 + 0.1 * Math.sin(now / 700), 0.85, 0.045 + 0.035 * pulse);
+      else S.scene.background.set(0x050306);
+    }
+    let bloomKick = 0;
+    if (jp && S.useComposer) bloomKick = 0.7 * pulse;
+    if (S.bloomPass) S.bloomPass.strength = 0.9 + 0.5 * flareA + bloomKick;
     // watermark fade
     const wmTarget = S.celebrating ? 0.9 : 0;
     S.wmMat.opacity += (wmTarget - S.wmMat.opacity) * Math.min(1, dt * 5);
@@ -819,6 +918,27 @@ function makeWebGLCabinet() {
       S.camMode = 'relax'; S.camT0 = performance.now();
     },
     setSignFlare(v) { S.flareMode = v ? 'spin' : 'off'; },
+    /* Prize notification ON THE MACHINE: the marquee face becomes a neon-tube
+       prize readout (translated text from game.js's win i18n blocks). The
+       optional scoreLine (e.g. "⭐ Credit score: 1,025") rides on line two so
+       the banked Neon Credits score shows alongside the prize name. Stays
+       lit until clearPrize() — a new spin clears it. */
+    showPrize(text, scoreLine) {
+      if (!S.marqueeMat || !S.marqueeTex) return; // scene not built — nothing to do
+      S.prizeText = String(text || '');
+      S.prizeScore = String(scoreLine || '');
+      const old = S.prizeTex;
+      S.prizeTex = prizeTexture(S.prizeText, S.prizeScore);
+      S.marqueeMat.map = S.prizeTex; S.marqueeMat.needsUpdate = true;
+      S.marqueeMat.color.setScalar(1.5); // HDR push: blooms through the threshold-1.0 pass
+      if (old) old.dispose();
+    },
+    clearPrize() {
+      if (!S.marqueeMat || !S.marqueeTex || !S.prizeTex) return;
+      S.marqueeMat.map = S.marqueeTex; S.marqueeMat.needsUpdate = true;
+      S.marqueeMat.color.setScalar(1);
+      S.prizeTex.dispose(); S.prizeTex = null; S.prizeText = ''; S.prizeScore = '';
+    },
     setSpins(n, ok) {
       S.spinsLeft = n; S.canSpin = !!ok;
       if (S.meterTex) {
@@ -871,10 +991,27 @@ function makeWebGLCabinet() {
       const mean = d.length ? d.reduce((a, b) => a + b, 0) / d.length : 0;
       return { useComposer: S.useComposer, fps: mean ? +(1000 / mean).toFixed(1) : 0 };
     },
+    // QA hook: celebration state — machine prize display + jackpot light rig
+    _debugCelebState() {
+      return {
+        prizeText: S.prizeText || null,
+        prizeScore: S.prizeScore || null,
+        marqueeIsPrize: !!(S.marqueeMat && S.prizeTex && S.marqueeMat.map === S.prizeTex),
+        flareMode: S.flareMode,
+        useComposer: S.useComposer,
+        jackLightIntensity: S.jackLight ? +S.jackLight.intensity.toFixed(1) : null,
+      };
+    },
+    // QA hook: force the composer path on/off for kill-switch yield tests.
+    // Pinning: the FPS kill-switch re-evaluates every 2s and would flip a
+    // forced-ON composer back off on slow devices (headless CI renders well
+    // under 50fps), making the full-power path untestable. Pinning holds the
+    // forced state so the test deterministically exercises each light path.
+    _debugSetComposer(v) { S.useComposer = !!v; S.composerPinned = true; },
   };
   // QA hooks are non-enumerable: hidden from Object.keys() so the public API
   // surface stays exactly the documented set, but still callable by the harness.
-  for (const k of ["_debugSpinCenter", "_debugSpinInfo", "_debugPerf", "_debugMeterValue"]) {
+  for (const k of ["_debugSpinCenter", "_debugSpinInfo", "_debugPerf", "_debugMeterValue", "_debugCelebState", "_debugSetComposer"]) {
     const desc = Object.getOwnPropertyDescriptor(CAB, k);
     if (desc) Object.defineProperty(CAB, k, { ...desc, enumerable: false });
   }
@@ -973,11 +1110,45 @@ function makeDOMCabinet() {
       }
       const sign = $('jackpotSign');
       if (sign) sign.classList.add('flaring');
+      // Jackpot background light-up (no-WebGL equivalent of the 3D wash light):
+      // a CSS light sweep behind the cabinet, pure paint — mobile-safe.
+      document.body.classList.add('jackpot-lights');
     },
     endCelebrate() {
       S.celebrating = false;
       const sign = $('jackpotSign');
       if (sign) sign.classList.remove('flaring');
+      document.body.classList.remove('jackpot-lights');
+    },
+    /* Prize notification ON THE MACHINE (DOM fallback): the LED readout on the
+       machine face shows the translated prize name plus the credit score
+       until the next spin. */
+    showPrize(text, scoreLine) {
+      const el = $('prizeDisplay');
+      if (!el) return;
+      const t = String(text || '');
+      const s = String(scoreLine || '');
+      el.textContent = s ? t + '\n' + s : t;
+      el.classList.remove('hidden');
+    },
+    clearPrize() {
+      const el = $('prizeDisplay');
+      if (el) { el.classList.add('hidden'); el.textContent = ''; }
+    },
+    // QA hook: celebration state for the DOM path — mirrors the 3D hook shape
+    _debugCelebState() {
+      const el = $('prizeDisplay');
+      const txt = (el && !el.classList.contains('hidden')) ? el.textContent : null;
+      const parts = txt ? txt.split('\n') : [];
+      return {
+        prizeText: parts.length ? parts[0] : null,
+        prizeScore: parts.length > 1 ? parts.slice(1).join('\n') : null,
+        marqueeIsPrize: null,
+        flareMode: S.celebrating ? 'jackpot' : 'off',
+        useComposer: null,
+        jackLightIntensity: null,
+        bodyLightsOn: document.body.classList.contains('jackpot-lights'),
+      };
     },
     setSignFlare(v) {
       const sign = $('jackpotSign');

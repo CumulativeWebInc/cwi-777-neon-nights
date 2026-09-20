@@ -17,6 +17,10 @@ const CONFIG = {
   // triple-bell is now the Encore teaser. Total weight unchanged (18).
   // Jackpot = three 7s on the middle row. Pity guarantees one by this many spins.
   pitySpins: 200,
+  // Neon Credits: fun points — NO money value, redeemable only for free music links.
+  // A jackpot (1000) reaches the link price instantly; smaller wins accumulate.
+  creditAwards: { jackpot: 1000, triple: 50, prize: 25 },
+  creditLinkPrice: 1000,
 
   // Free-spin economy (never purchasable)
   spinsStart: 30, spinCap: 40, spinRegenSec: 45,
