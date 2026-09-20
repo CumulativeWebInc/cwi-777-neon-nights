@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>777 Neon Nights — That Boy Hi Hat promo game</title>
+<meta name="description" content="Free promo slot game for Neon Nights Pt. 777 by That Boy Hi Hat. No gambling. No cash prizes.">
+<meta name="theme-color" content="#140608">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="777 Neon Nights">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="sym-seven" viewBox="0 0 100 100">
+      <text x="50" y="78" text-anchor="middle" font-size="72" font-weight="900"
+        font-family="Arial Black, sans-serif" fill="#e21a1a" stroke="#fff" stroke-width="3">7</text>
+    </symbol>
+    <symbol id="sym-cherry" viewBox="0 0 100 100">
+      <path d="M45 28 Q55 12 70 10 M45 28 Q35 14 24 14" stroke="#2ea050" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="36" cy="62" r="17" fill="#d61c2c" stroke="#8c0e18" stroke-width="3"/>
+      <circle cx="64" cy="66" r="17" fill="#d61c2c" stroke="#8c0e18" stroke-width="3"/>
+      <ellipse cx="30" cy="56" rx="5" ry="7" fill="#ff9aa0" opacity="0.8"/>
+      <ellipse cx="58" cy="60" rx="5" ry="7" fill="#ff9aa0" opacity="0.8"/>
+    </symbol>
+    <symbol id="sym-lemon" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="52" rx="30" ry="21" fill="#facc2a" stroke="#be8c0a" stroke-width="3"/>
+      <ellipse cx="40" cy="45" rx="8" ry="5" fill="#ffeaa8" opacity="0.9"/>
+      <path d="M78 48 L90 52 L78 57 Z" fill="#facc2a" stroke="#be8c0a" stroke-width="2"/>
+    </symbol>
+    <symbol id="sym-bell" viewBox="0 0 100 100">
+      <rect x="45" y="16" width="10" height="14" rx="3" fill="#96700f"/>
+      <path d="M28 72 L36 32 Q50 26 64 32 L72 72 Z" fill="#e8b22e" stroke="#96700f" stroke-width="3"/>
+      <circle cx="50" cy="78" r="9" fill="#ffdc78" stroke="#96700f" stroke-width="3"/>
+      <rect x="40" y="40" width="7" height="26" rx="3" fill="#fff0be" opacity="0.85"/>
+    </symbol>
+    <symbol id="sym-leaf" viewBox="0 0 100 100">
+      <g fill="#2eaa50" stroke="#1d7a38" stroke-width="1.5">
+        <path d="M50 88 L44 52 L50 18 L56 52 Z"/>
+        <path d="M50 84 L28 48 L38 34 L52 58 Z"/>
+        <path d="M50 84 L72 48 L62 34 L48 58 Z"/>
+        <path d="M50 78 L18 62 L24 50 L50 66 Z"/>
+        <path d="M50 78 L82 62 L76 50 L50 66 Z"/>
+      </g>
+      <rect x="47" y="70" width="6" height="22" fill="#1d7a38"/>
+    </symbol>
+    <symbol id="sym-disc" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="34" fill="#1a1a22" stroke="#ffd34d" stroke-width="4"/>
+      <circle cx="50" cy="50" r="22" fill="none" stroke="#ffd34d" stroke-width="1.5" opacity="0.6"/>
+      <circle cx="50" cy="50" r="8" fill="#ffd34d"/>
+      <circle cx="50" cy="50" r="3" fill="#1a1a22"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app">
+  <header class="marquee">
+    <div class="marquee-title">777 NEON NIGHTS</div>
+    <div class="marquee-sub">Neon Nights Pt. 777 &bull; That Boy Hi Hat</div>
+  </header>
+
+  <div class="stagebar">
+    <div class="stage-name" id="stageName">Lobby Lights</div>
+    <div class="round-line"><span id="roundName">First Pull</span> &mdash; <span id="roundProg">0 / 1</span></div>
+    <div class="progress"><div class="progress-fill" id="roundFill"></div></div>
+  </div>
+
+  <main class="cabinet" id="cabinet">
+    <div class="jackpot-sign" id="jackpotSign">JACKPOT!</div>
+    <div class="reels" id="reels">
+      <div class="reel" data-reel="0"><div class="strip"></div><div class="winline"></div></div>
+      <div class="reel" data-reel="1"><div class="strip"></div><div class="winline"></div></div>
+      <div class="reel" data-reel="2"><div class="strip"></div><div class="winline"></div></div>
+    </div>
+    <div class="winbanner" id="winBanner"></div>
+    <div class="controls">
+      <button id="spinBtn" class="spin-btn">SPIN</button>
+      <div class="meters">
+        <div class="meter"><span class="meter-label">SPINS</span><span id="spinsLeft">30</span></div>
+        <button id="muteBtn" class="icon-btn" aria-label="mute">🔊</button>
+        <button id="encoreBtn" class="icon-btn locked" aria-label="encore round">🎰</button>
+        <select id="langPicker" class="lang-picker" aria-label="language"></select>
+      </div>
+    </div>
+    <div class="listenbar">
+      <span>🎧 <span id="listenTime">0:00</span> listening</span>
+      <span id="nextPrize">next prize 3:00</span>
+    </div>
+  </main>
+
+  <section class="panel" id="prizePanel">
+    <h2>Listening prizes</h2>
+    <p class="fine">Prizes unlock while the music plays. Muting pauses the clock.</p>
+    <ul id="prizeList"></ul>
+  </section>
+
+  <section class="panel" id="scorePanel">
+    <h2>High scores</h2>
+    <p class="fine">Deterministic score: spins&times;1 + triples&times;25 + jackpots&times;500 + rounds&times;100 + listen-min&times;10 + encore&times;50. Stored on this device only &mdash; share a score code to verify a score anywhere.</p>
+    <ol id="scoreBoard" class="score-board"></ol>
+    <div class="row">
+      <input id="scoreName" placeholder="Name (optional)" maxlength="24" aria-label="display name">
+      <button id="saveScoreBtn" class="link-btn">Save my score</button>
+      <button id="copyCodeBtn" class="link-btn">Copy score code</button>
+    </div>
+    <div class="row">
+      <input id="importCode" placeholder="Paste a score code to verify" aria-label="score code">
+      <button id="importScoreBtn" class="link-btn">Verify &amp; add</button>
+    </div>
+    <div class="row">
+      <button id="exportMetricsBtn" class="link-btn">Export metrics log (JSON)</button>
+      <span class="fine" id="metricsNote"></span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Your stats</h2>
+    <div class="stats" id="statsGrid"></div>
+  </section>
+
+  <footer>
+    <p class="disclaimer">Free promo game. No gambling. No cash prizes. No purchase necessary.<br>
+    A Cumulative Web Inc promo for That Boy Hi Hat.</p>
+    <button id="rulesBtn" class="link-btn">How this works</button>
+  </footer>
+</div>
+
+<!-- Bonus / Encore round modal -->
+<div class="modal hidden" id="bonusModal">
+  <div class="modal-card gold">
+    <h2 class="neon-gold">ENCORE ROUND</h2>
+    <p>Bonus round prize: a <b>free music link</b> from the catalog. One golden spin &mdash; every spin wins.</p>
+    <div class="reels mini"><div class="reel"><div class="strip" id="bonusStrip"></div></div></div>
+    <button id="bonusSpinBtn" class="spin-btn small">GOLDEN SPIN</button>
+    <div class="link-list hidden" id="bonusLinks"></div>
+    <button class="close-btn" data-close="bonusModal">Close</button>
+  </div>
+</div>
+
+<!-- Payout screen: prize name, what was won, link choice, claim action -->
+<div class="modal hidden" id="payoutModal">
+  <div class="modal-card gold">
+    <h2 class="neon-gold" id="payoutTitle">PAYOUT</h2>
+    <p id="payoutWhat"></p>
+    <div class="link-list" id="payoutLinks"></div>
+    <div class="link-list" id="payoutFiles"></div>
+    <div class="payout-score">
+      <span>Your score: <b id="payoutScore">0</b></span>
+      <button id="payoutSaveScore" class="link-btn">Save score</button>
+      <button id="payoutCopyCode" class="link-btn">Copy score code</button>
+    </div>
+    <p class="fine">Free promo game. No gambling. No cash prizes.</p>
+    <div class="payout-actions">
+      <button id="payoutClaim" class="spin-btn small">CLAIM &amp; CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rules modal -->
+<div class="modal hidden" id="rulesModal">
+  <div class="modal-card">
+    <h2>How this works</h2>
+    <h3 class="howto-title" id="howtoTitle">Quick how-to</h3>
+    <ol class="howto" id="howtoList"></ol>
+    <ul class="rules">
+      <li>Free promo game for <b>Neon Nights Pt. 777</b>. Spins are free and regenerate over time. Nothing can be bought.</li>
+      <li><b>No gambling:</b> no real-money wagering, no cash prizes, prizes have no cash value.</li>
+      <li><b>777</b> on the middle row = jackpot: pick a free streaming link.</li>
+      <li>Clear rounds to climb <b>Lobby Lights &rarr; Midnight Strip &rarr; 777 Skyline</b>.</li>
+      <li>Listening prizes unlock at <b>3, 7 and 15 minutes</b> of audible play.</li>
+      <li><b>Encore Round</b> unlocks after Midnight Strip + 5 min listening: a bonus spin for a free catalog music link. Once per day.</li>
+    </ul>
+    <button class="close-btn" data-close="rulesModal">Close</button>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="logic.js"></script>
+<script src="i18n.js"></script>
+<script src="metrics.js"></script>
+<script src="scores.js"></script>
+<script src="game.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
