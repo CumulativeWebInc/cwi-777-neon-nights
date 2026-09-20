@@ -106,5 +106,19 @@ function detRng() { let s = 0.12345; return () => { s = (s * 16807) % 1; return 
   ok(H.frontCellIndex(p, H.planSettleOffset(p, 1)) === p.N - 2, "settle ends on new mid");
 }
 
+/* --- single SPIN button contract (replaced the 7-button row 2026-09-20) --- */
+ok(H.SPIN_BUTTON.w === 1.5 && H.SPIN_BUTTON.h === 0.6, "SPIN_BUTTON dims 1.5 x 0.6");
+ok(H.SPIN_BUTTON.h >= H.OLD_BUTTON_DIAMETER * 1.5,
+  `new button ~2x old diameter (h=${H.SPIN_BUTTON.h} vs old d=${H.OLD_BUTTON_DIAMETER})`);
+ok(H.SPIN_BUTTON.w > H.SPIN_BUTTON.h, "SPIN_BUTTON is a wide rounded rect");
+{
+  const DICT = { en: { spin: "Spin!" }, es: { spin: "¡Girar!" }, ar: { spin: "دوران!", rtl: true } };
+  ok(H.spinLabelFor("es", DICT) === "¡Girar!", "spinLabelFor resolves the locale label");
+  ok(H.spinLabelFor("ar", DICT) === "دوران!", "spinLabelFor keeps RTL label intact");
+  ok(H.spinLabelFor("xx", DICT) === "Spin!", "spinLabelFor falls back to English");
+  ok(H.spinLabelFor("xx", {}) === "Spin!", "spinLabelFor last-resort Spin!");
+  ok(H.spinLabelFor("en", null) === "Spin!", "spinLabelFor tolerates a missing dict");
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

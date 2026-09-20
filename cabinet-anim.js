@@ -22,6 +22,23 @@ export const REEL_WIDTH = 1.2;
 export const REEL_PX_PER_UNIT = 200;
 export const REEL_CELL_PX = Math.round((2 * Math.PI * REEL_RADIUS / REEL_CELLS) * REEL_PX_PER_UNIT); // 108
 
+/* Spin button geometry contract (single source of truth — cabinet3d.js builds
+   the physical button from these; the QA harness asserts them).
+   Replaced the old 7-button row 2026-09-20: one large centered glossy-green
+   rounded-rect SPIN button, ~2x the old button diameter. */
+export const SPIN_BUTTON = { w: 1.5, h: 0.6, depth: 0.16, corner: 0.22 };
+export const OLD_BUTTON_DIAMETER = 0.31; // old 7-button row: r=0.155 cylinders
+
+/* Resolve the cabinet button label for a language code from the NN_I18N
+   dict. Every locale ships its own `spin` key; English is the fallback, and
+   "Spin!" is the last resort so the button is never label-less. */
+export function spinLabelFor(lang, dict) {
+  const d = dict || {};
+  const e = d[lang], en = d.en;
+  const s = (e && e.spin) || (en && en.spin) || "Spin!";
+  return String(s);
+}
+
 export function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
 export function easeInOutCubic(t) { t = clamp01(t); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 export function easeOutCubic(t) { t = clamp01(t); return 1 - Math.pow(1 - t, 3); }

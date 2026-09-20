@@ -42,6 +42,13 @@ for (const loc of locales) {
   }
 }
 
+/* ---- spin button label: translated for all 41 locales, never English-only ---- */
+ok(I18N.en.spin === "Spin!", `en spin label is "Spin!" (got "${I18N.en.spin}")`);
+for (const loc of locales) {
+  const s = I18N[loc] && I18N[loc].spin;
+  ok(typeof s === "string" && s.trim().length > 0, `${loc}: spin label non-empty`);
+}
+
 /* ---- payout links: verified entries, no invented Tidal ---- */
 const cfgSrc = fs.readFileSync(path.join(here, "config.js"), "utf8");
 ok(cfgSrc.includes("https://www.youtube.com/watch?v=3L5eUDui-00"), "YouTube payout link present (verified 2026-09-20)");

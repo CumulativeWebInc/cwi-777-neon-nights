@@ -1,1 +1,6 @@
-{"build":"nn777-v4","date":"2026-09-20","game":"777 Neon Nights","what":"Install guide (beforeinstallprompt + iOS walkthrough, all 41 languages), YouTube payout link, audio hardening, 180px Apple touch icon."}
+{
+  "build": "nn777-v5",
+  "date": "2026-09-20",
+  "game": "777 Neon Nights",
+  "what": "Single large centered glossy-green SPIN button (translated label in all 41 languages, blue/purple glowing rim) replaces the 7-button row; no auto-spin."
+}

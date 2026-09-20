@@ -1,4 +1,5 @@
 /* 777 Neon Nights — UI controller. Uses NN_CONFIG + logic.js (browser globals). */
+import { spinLabelFor } from './cabinet-anim.js';
 (function () {
   "use strict";
   const C = window.NN_CONFIG;
@@ -61,6 +62,11 @@
     }
     const pk = $("langPicker");
     if (pk && pk.value !== code) pk.value = code;
+    // The cabinet's physical button label follows the language: translate the
+    // DOM fallback button and notify the 3D cabinet (it redraws its texture).
+    const sb = $("spinBtn");
+    if (sb) sb.textContent = spinLabelFor(code, I18N);
+    try { window.dispatchEvent(new CustomEvent("nn777-lang", { detail: code })); } catch (e) {}
   }
   function buildPicker() {
     const pk = $("langPicker");

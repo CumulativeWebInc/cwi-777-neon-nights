@@ -2,8 +2,10 @@
    Full 3D rebuild 2026-09-20 from the reference video: dark casino + warm bokeh,
    chrome/glass cabinet (PBR + RoomEnvironment reflections), warm-orange neon tube
    edging, NEON NIGHTS marquee, red JACKPOT! sign with blue side panels, three
-   reel wheels (cherries/lemons/bells/red 7s — no leaf), 7 push buttons (red =
-   SPIN, raycast tap), dark tray with golden token pour + @CUMULATIVEWEB watermark.
+   reel wheels (cherries/lemons/bells/red 7s — no leaf), one large centered
+   glossy-green SPIN button (translated label, blue/purple glowing rim,
+   raycast tap — no auto-spin), dark tray with golden token pour +
+   @CUMULATIVEWEB watermark.
 
    API surface (identical to the old 2D cabinet so game.js is untouched):
      window.NN_CABINET = { init()->bool, setRest(rows), spin(rows)->Promise,
@@ -29,7 +31,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import {
   clamp01, easeInOutCubic, easeOutCubic, easeOutQuart, settleBounce, cameraScale,
   reelDurations, blurAlpha, reelSpinPlan, planOffsetAt, planSpeed01, planSettleOffset,
-  tokenMound,
+  tokenMound, spinLabelFor, SPIN_BUTTON,
   REEL_CELLS, REEL_RADIUS, REEL_WIDTH, REEL_PX_PER_UNIT,
 } from './cabinet-anim.js';
 
@@ -224,6 +226,23 @@ function roundedRectPoints(w, h, r, seg) {
   return new THREE.CatmullRomCurve3(pts, true);
 }
 
+/* Rounded-rectangle outline traced onto a Shape or Path (same API), for
+   extruded button bodies and rim rings. */
+function traceRoundedRect(t, w, h, r) {
+  const x = -w / 2, y = -h / 2;
+  t.moveTo(x + r, y);
+  t.lineTo(x + w - r, y);
+  t.absarc(x + w - r, y + r, r, -Math.PI / 2, 0, false);
+  t.lineTo(x + w, y + h - r);
+  t.absarc(x + w - r, y + h - r, r, 0, Math.PI / 2, false);
+  t.lineTo(x + r, y + h);
+  t.absarc(x + r, y + h - r, r, Math.PI / 2, Math.PI, false);
+  t.lineTo(x, y + r);
+  t.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5, false);
+  return t;
+}
+function roundedRectShape(w, h, r) { return traceRoundedRect(new THREE.Shape(), w, h, r); }
+
 function makeWebGLCabinet() {
   const S = {
     renderer: null, scene: null, camera: null, composer: null, bloomPass: null,
@@ -236,7 +255,8 @@ function makeWebGLCabinet() {
     tokens: null, tokenData: [], settledCount: 0, mound: null, sparks: null, sparkData: [],
     spinsLeft: 30, canSpin: true, spinCb: null,
     deltas: [], lastT: 0, frames2s: 0, t2s: -1,
-    redBtn: null, btnMeshes: [], redPressed: false,
+    spinBtn: null, spinPress: null, spinLabel: null, spinLabelMat: null,
+    spinLabelTex: null, spinLabelText: '', btnMeshes: [], spinPressed: false,
     signMat: null, tubeMat: null, marqueeMat: null, meterTex: null, meterMat: null,
     wmMat: null, glowSprites: [],
     _resolveSpin: null, raf: 0, running: false,
@@ -244,6 +264,40 @@ function makeWebGLCabinet() {
   };
 
   const FOV = 35, CAB_W = 4.9, CAB_H = 9.4;
+
+  /* Spin-button label i18n: the cabinet reads the game's language key and
+     listens for game.js's nn777-lang event so the 3D label follows the
+     selected language without touching the CAB public API. */
+  function currentLang() {
+    try { return localStorage.getItem('nn777-lang-v1') || 'en'; } catch (e) { return 'en'; }
+  }
+  function spinLabelTexture(text) {
+    const rtl = (() => { try { return !!(window.NN_I18N && window.NN_I18N[currentLang()] && window.NN_I18N[currentLang()].rtl); } catch (e) { return false; } })();
+    const c = cnv(1024, 384), x = c.getContext('2d');
+    x.clearRect(0, 0, 1024, 384);
+    try { x.direction = rtl ? 'rtl' : 'ltr'; } catch (e) {}
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ffffff'; x.lineJoin = 'round';
+    let size = 230;
+    const setF = (s) => { x.font = `900 ${s}px "Arial Black", Arial, sans-serif`; };
+    setF(size);
+    while (x.measureText(text).width > 960 && size > 60) { size -= 10; setF(size); }
+    x.lineWidth = Math.max(4, size * 0.045); x.strokeStyle = 'rgba(0,60,20,0.55)';
+    x.strokeText(text, 512, 196);
+    x.fillText(text, 512, 196);
+    return toTex(c);
+  }
+  function refreshSpinLabel() {
+    if (!S.spinLabelMat) return; // scene not built (DOM fallback) — nothing to do
+    const text = spinLabelFor(currentLang(), window.NN_I18N || {});
+    if (text === S.spinLabelText) return;
+    S.spinLabelText = text;
+    const old = S.spinLabelTex;
+    S.spinLabelTex = spinLabelTexture(text);
+    S.spinLabelMat.map = S.spinLabelTex; S.spinLabelMat.needsUpdate = true;
+    if (old) old.dispose();
+  }
+  try { window.addEventListener('nn777-lang', refreshSpinLabel); } catch (e) {}
 
   function neonMat(hex, intensity) {
     // Unlit, HDR color -> blooms through the threshold-1.0 pass. toneMapped:false.
@@ -393,26 +447,59 @@ function makeWebGLCabinet() {
       mask.position.set(0, py, 0.55); cab.add(mask);
     }
 
-    // 7 push buttons
-    // Button colors: cream/yellow kept below the bloom threshold (0.85) so
-    // they hold their hue on the 60fps composer path instead of blowing white.
-    const BTN_COLORS = [0xb01a26, 0xc7a05e, 0xc08f2e, 0xc7a05e, 0xc7a05e, 0x5a34b0, 0xc08f2e];
-    const btnY = -0.28, btnZ = 0.86;
-    const plate = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.5, 0.3), chromeDark);
-    plate.position.set(0, btnY, 0.62); cab.add(plate);
-    for (let i = 0; i < 7; i++) {
-      const col = BTN_COLORS[i];
-      const bmat = new THREE.MeshStandardMaterial({
-        color: col, metalness: 0.25, roughness: 0.35, envMapIntensity: 0.3,
-        emissive: i === 0 ? 0xd61c2c : 0x000000, emissiveIntensity: i === 0 ? 0.55 : 0,
-      });
-      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.175, 0.14, 24), bmat);
-      b.rotation.x = Math.PI / 2 - 0.35;
-      b.position.set(-1.8 + i * 0.6, btnY + 0.12, btnZ);
-      b.userData.isButton = true; b.userData.index = i;
-      cab.add(b); S.btnMeshes.push(b);
-      if (i === 0) S.redBtn = b;
-    }
+    // ONE large centered SPIN button — glossy green, blue/purple glowing rim.
+    // Replaced the 7-button row 2026-09-20 (~2x the old button diameter,
+    // single generous raycast target, translated label, no auto-spin).
+    const BTN = SPIN_BUTTON;
+    const spinGroup = new THREE.Group();
+    spinGroup.position.set(0, -0.28, 0.95);
+    spinGroup.rotation.x = -0.35; // face tipped up toward the player
+    cab.add(spinGroup);
+    // dark chrome housing the button sits in
+    const housing = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(roundedRectShape(BTN.w + 0.36, BTN.h + 0.36, BTN.corner + 0.15),
+        { depth: 0.10, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 2, curveSegments: 16 }),
+      chromeDark);
+    housing.position.z = -0.10;
+    spinGroup.add(housing);
+    // blue/purple illuminated rim (emissive over the 1.0 bloom threshold)
+    const rimShape = roundedRectShape(BTN.w + 0.24, BTN.h + 0.24, BTN.corner + 0.10);
+    rimShape.holes.push(traceRoundedRect(new THREE.Path(), BTN.w + 0.08, BTN.h + 0.08, BTN.corner + 0.03));
+    const rimRing = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(rimShape, { depth: 0.12, bevelEnabled: false, curveSegments: 16 }),
+      new THREE.MeshStandardMaterial({
+        color: 0x14142a, emissive: 0x5a5cff, emissiveIntensity: 2.2,
+        roughness: 0.4, metalness: 0.2,
+      }));
+    rimRing.position.z = -0.04;
+    spinGroup.add(rimRing);
+    // the green button itself (presses into the housing)
+    const press = new THREE.Group();
+    spinGroup.add(press);
+    const btn = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(roundedRectShape(BTN.w, BTN.h, BTN.corner),
+        { depth: BTN.depth, bevelEnabled: true, bevelThickness: 0.045, bevelSize: 0.045, bevelSegments: 3, curveSegments: 16 }),
+      new THREE.MeshPhysicalMaterial({
+        // vivid glossy green: keep envMapIntensity low so the RoomEnvironment
+        // clearcoat reflection can't wash the face white (caught in QA
+        // 2026-09-20 — the face rendered pale instead of green).
+        color: 0x1fae4b, roughness: 0.3, metalness: 0.05,
+        clearcoat: 0.5, clearcoatRoughness: 0.15, envMapIntensity: 0.15,
+        emissive: 0x0f8a38, emissiveIntensity: 0.65,
+      }));
+    btn.position.z = 0.02;
+    press.add(btn);
+    // translated white label, redrawn whenever the game language changes
+    S.spinLabelText = spinLabelFor(currentLang(), window.NN_I18N || {});
+    S.spinLabelTex = spinLabelTexture(S.spinLabelText);
+    S.spinLabelMat = new THREE.MeshBasicMaterial({ map: S.spinLabelTex, transparent: true, toneMapped: false });
+    const label = new THREE.Mesh(
+      new THREE.PlaneGeometry(BTN.w * 0.94, BTN.w * 0.94 * 0.375), // same 1024x384 aspect — no distortion
+      S.spinLabelMat);
+    label.position.z = 0.02 + BTN.depth + 0.045 + 0.006;
+    press.add(label);
+    S.spinBtn = btn; S.spinLabel = label; S.spinPress = press;
+    S.btnMeshes.push(btn); // exactly one physical button (taps on the label plane raycast through to the button behind it)
 
     // dark tray with glass front + spins meter
     const tray = new THREE.Mesh(new THREE.BoxGeometry(4.3, 1.15, 1.1), darkPanel);
@@ -639,7 +726,7 @@ function makeWebGLCabinet() {
     if (S.composer) S.composer.setSize(w, h);
   }
 
-  /* ---------- input: raycast the red button ---------- */
+  /* ---------- input: raycast the SPIN button ---------- */
   const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
   function castButton(e) {
     const r = S.canvas.getBoundingClientRect();
@@ -649,28 +736,24 @@ function makeWebGLCabinet() {
     const hits = ray.intersectObjects(S.btnMeshes, false);
     return hits.length ? hits[0].object : null;
   }
-  function pressRed(down) {
-    if (!S.redBtn) return;
-    S.redBtn.position.y += down ? -0.05 : 0.05;
-    S.redBtn.material.emissiveIntensity = down ? 1.4 : 0.55;
+  function pressSpin(down) {
+    if (!S.spinBtn) return;
+    S.spinPress.position.z += down ? -0.055 : 0.055;
+    S.spinBtn.material.emissiveIntensity = down ? 1.3 : 0.4;
   }
   function bindInput() {
     const cv = S.canvas;
     cv.addEventListener('pointerdown', (e) => {
-      const b = castButton(e);
-      if (b && b.userData.index === 0) { S.redPressed = true; pressRed(true); }
+      if (castButton(e)) { S.spinPressed = true; pressSpin(true); }
     });
     const up = (e) => {
-      if (S.redPressed) {
-        S.redPressed = false; pressRed(false);
-        if (e && S.spinCb) {
-          const b = castButton(e);
-          if (b && b.userData.index === 0) S.spinCb();
-        }
+      if (S.spinPressed) {
+        S.spinPressed = false; pressSpin(false);
+        if (e && S.spinCb && castButton(e)) S.spinCb();
       }
     };
     cv.addEventListener('pointerup', up);
-    cv.addEventListener('pointercancel', () => { if (S.redPressed) { S.redPressed = false; pressRed(false); } });
+    cv.addEventListener('pointercancel', () => { if (S.spinPressed) { S.spinPressed = false; pressSpin(false); } });
     cv.addEventListener('keydown', (e) => {
       if ((e.key === 'Enter' || e.key === ' ') && S.spinCb) { e.preventDefault(); S.spinCb(); }
     });
@@ -745,7 +828,7 @@ function makeWebGLCabinet() {
         old.dispose();
       }
       if (S.canvas) S.canvas.setAttribute('aria-label',
-        `777 Neon Nights slot cabinet. ${n} spins left. Tap the red button to spin.`);
+        `777 Neon Nights slot cabinet. ${n} spins left. Tap the Spin button to spin.`);
     },
     onSpinRequest(cb) { S.spinCb = cb; },
     fpsStats() {
@@ -756,13 +839,26 @@ function makeWebGLCabinet() {
       const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
       return { frames: d.length, avg: +(1000 / mean).toFixed(1), p95: +(1000 / p95).toFixed(1) };
     },
-    // QA hook: red button center in CSS px (for touch-tap tests) — non-enumerable
-    _debugRedCenter() {
-      if (!S.redBtn || !S.canvas) return null;
+    // QA hook: SPIN button center in CSS px (for touch-tap tests) — non-enumerable
+    _debugSpinCenter() {
+      if (!S.spinBtn || !S.canvas) return null;
       const v = new THREE.Vector3();
-      S.redBtn.getWorldPosition(v); v.project(S.camera);
+      S.spinBtn.getWorldPosition(v); v.project(S.camera);
       const r = S.canvas.getBoundingClientRect();
       return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
+    },
+    // QA hook: single-button spec proof (count/centering/size/label) — non-enumerable
+    _debugSpinInfo() {
+      if (!S.spinBtn || !S.camera) return null;
+      const v = new THREE.Vector3();
+      S.spinBtn.getWorldPosition(v); v.project(S.camera);
+      return {
+        count: S.btnMeshes.length,
+        ndcX: +v.x.toFixed(4),
+        width: SPIN_BUTTON.w,
+        height: SPIN_BUTTON.h,
+        label: S.spinLabelText || '',
+      };
     },
     // QA hook: perf path state (kill-switch verification) — non-enumerable
     _debugPerf() {
@@ -773,7 +869,7 @@ function makeWebGLCabinet() {
   };
   // QA hooks are non-enumerable: hidden from Object.keys() so the public API
   // surface stays exactly the documented set, but still callable by the harness.
-  for (const k of ["_debugRedCenter", "_debugPerf"]) {
+  for (const k of ["_debugSpinCenter", "_debugSpinInfo", "_debugPerf"]) {
     const desc = Object.getOwnPropertyDescriptor(CAB, k);
     if (desc) Object.defineProperty(CAB, k, { ...desc, enumerable: false });
   }
