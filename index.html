@@ -214,20 +214,41 @@
   <p class="fine">Free promo game. No gambling. No cash prizes.</p>
 </div>
 
-<!-- Boot reliability: any uncaught error becomes a VISIBLE toast, never a silent blank page. -->
+<!-- Boot reliability: uncaught errors from OUR code become a VISIBLE toast, never a silent
+     blank page. Errors from foreign injected scripts (in-app browsers inject cross-origin
+     scripts whose failures surface as masked "Script error.") are logged, never toasted:
+     their bug must not masquerade as ours. -->
 <script>
-window.NN_BUILD = "nn777-v8";
+window.NN_BUILD = "nn777-v8.1";
 window.__nnErrors = [];
+function __nnLogError(kind, msg, file, line, col) {
+  try {
+    window.__nnErrors.push({ t: new Date().toISOString(), kind: kind, msg: String(msg || "error"), file: file || "", line: line || 0, col: col || 0 });
+    try { localStorage.setItem("nn777-error-log", JSON.stringify(window.__nnErrors.slice(-50))); } catch (x) {}
+  } catch (x) {}
+}
 window.addEventListener("error", function (e) {
   try {
-    window.__nnErrors.push(String((e && e.message) || "error"));
+    var msg = (e && e.message) || "error";
+    var file = (e && e.filename) || "";
+    var line = (e && e.lineno) || 0;
+    __nnLogError("error", msg, file, line, (e && e.colno) || 0);
+    // A masked cross-origin failure ("Script error." with no attributable file) can never
+    // come from our same-origin scripts — log it, don't alarm the player.
+    var masked = msg === "Script error." && !file;
+    var ours = !masked && (!file || file.indexOf(location.host) !== -1 || /(^|\/)(game|logic|i18n|config|metrics|scores|cabinet-anim|cabinet3d)\.js$/.test(file));
     var t = document.getElementById("toast");
-    if (t) { t.textContent = "⚠️ " + ((e && e.message) || "Something hiccuped — reloading usually fixes it."); t.classList.remove("hidden"); }
+    if (t && ours) {
+      var where = file && line ? " (" + String(file).split("/").pop() + ":" + line + ")" : "";
+      t.textContent = "⚠️ " + msg + where;
+      t.classList.remove("hidden");
+    }
   } catch (x) {}
 });
 window.addEventListener("unhandledrejection", function (e) {
   try {
-    window.__nnErrors.push(String((e && e.reason && e.reason.message) || e.reason || "rejection"));
+    var r = e && e.reason;
+    __nnLogError("rejection", (r && r.message) || r || "rejection", (r && r.fileName) || "", (r && r.lineNumber) || 0, (r && r.columnNumber) || 0);
   } catch (x) {}
 });
 // Boot watchdog: if the module graph failed (e.g. a stale CDN served index.html
