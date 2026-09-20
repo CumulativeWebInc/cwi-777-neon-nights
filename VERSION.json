@@ -1,6 +1,6 @@
 {
-  "build": "nn777-v5",
+  "build": "nn777-v6",
   "date": "2026-09-20",
   "game": "777 Neon Nights",
-  "what": "Single large centered glossy-green SPIN button (translated label in all 41 languages, blue/purple glowing rim) replaces the 7-button row; no auto-spin."
+  "what": "Win-announcement + spin-counter + music-link fixes (iPhone regression, 2026-09-20): regen clock now advances while capped so SPINS visibly decrements 40->39; every listening-prize claim renders the verified 10 music-platform links; jackpot/triple/prize wins announce on screen naming the prize in all 41 languages; unlock announcements fire once per prize (no per-second spam). Single large centered glossy-green SPIN button; no auto-spin."
 }

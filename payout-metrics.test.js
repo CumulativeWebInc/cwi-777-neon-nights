@@ -60,6 +60,18 @@ ok(M.endpoint() === null, "no endpoint by default");
 M.flush().then(res => {
   ok(res.sent === false && res.reason === "no-endpoint-configured", "flush honest with no endpoint");
   ok(M.getOutbox().length === 4, "outbox retained locally when no endpoint");
+
+  // --- listening-prize claims carry music links (iPhone 2026-09-20 fix) ---
+  // Source-level check: claimPrizeUI must hand the payout modal a links array
+  // drawn from the verified jackpotLinks allowlist (install-i18n pins the URLs).
+  const fs = require("fs"), path = require("path");
+  const gameSrc = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");
+  const claimBody = (gameSrc.match(/function claimPrizeUI\(id\) \{([\s\S]*?)\n  \}\n/) || [null, ""])[1];
+  ok(claimBody.length > 0, "claimPrizeUI body found");
+  ok(/showPayout\(\{[\s\S]*links:/.test(claimBody), "claimPrizeUI passes links to the payout modal");
+  ok(claimBody.includes("C.jackpotLinks"), "claimPrizeUI music links come from the verified jackpotLinks allowlist");
+  ok(/title:\s*winText\("prize"/.test(claimBody), "claimPrizeUI title names the won prize (translated)");
+
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);
 });

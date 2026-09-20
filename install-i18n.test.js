@@ -49,6 +49,32 @@ for (const loc of locales) {
   ok(typeof s === "string" && s.trim().length > 0, `${loc}: spin label non-empty`);
 }
 
+/* ---- win announcements: every locale names the win (iPhone 2026-09-20 fix) ---- */
+ok(I18N.en.win && I18N.en.win.jackpot === "🎰 JACKPOT! 777 🎰", "en win.jackpot exact");
+ok(I18N.en.win && I18N.en.win.triple === "✨ Triple {label}! ✨", "en win.triple template exact");
+ok(I18N.en.win && I18N.en.win.claim === "CLAIM", "en win.claim exact");
+ok(I18N.en.win && I18N.en.win.prize === "🎁 {name} unlocked! Tap {claim} below for your free music link.",
+  "en win.prize template exact");
+const WIN_KEYS = ["jackpot", "triple", "prize", "claim"];
+for (const loc of locales) {
+  const w = I18N[loc] && I18N[loc].win;
+  ok(w && typeof w === "object", `${loc}: win block exists`);
+  if (!w) continue;
+  for (const k of WIN_KEYS) {
+    ok(typeof w[k] === "string" && w[k].trim().length > 0, `${loc}: win.${k} non-empty`);
+    if (typeof w[k] === "string") {
+      for (const re of NO_GAMBLE) {
+        ok(!re.test(w[k]), `${loc}: win.${k} carries no gambling claims`);
+      }
+    }
+  }
+  if (typeof w.triple === "string") ok(w.triple.includes("{label}"), `${loc}: win.triple names the symbol ({label})`);
+  if (typeof w.prize === "string") {
+    ok(w.prize.includes("{name}"), `${loc}: win.prize names the prize ({name})`);
+    ok(w.prize.includes("{claim}"), `${loc}: win.prize matches the CLAIM button word ({claim})`);
+  }
+}
+
 /* ---- payout links: verified entries, no invented Tidal ---- */
 const cfgSrc = fs.readFileSync(path.join(here, "config.js"), "utf8");
 ok(cfgSrc.includes("https://www.youtube.com/watch?v=3L5eUDui-00"), "YouTube payout link present (verified 2026-09-20)");

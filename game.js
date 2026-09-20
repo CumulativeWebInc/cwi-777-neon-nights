@@ -153,6 +153,23 @@ import { spinLabelFor } from './cabinet-anim.js';
   function symSVG(id) {
     return `<svg aria-hidden="true"><use href="#sym-${id}"></use></svg>`;
   }
+
+  /* ---------- translated win announcements (41-language i18n) ----------
+     Every win names WHAT was won on screen — the player never has to guess.
+     Falls back to English for locales that haven't shipped win strings. */
+  function winText(key, vars) {
+    const entry = I18N[lang] && I18N[lang].win;
+    let t = (entry && entry[key]) || (I18N.en && I18N.en.win && I18N.en.win[key]) || "";
+    if (vars) for (const k of Object.keys(vars)) t = t.split("{" + k + "}").join(String(vars[k]));
+    return t;
+  }
+  function claimWord() { return winText("claim") || "CLAIM"; }
+  // Persistent on-screen win announcement + toast, naming the prize.
+  function announcePrizeUnlock(p) {
+    const msg = winText("prize", { name: p.name, claim: claimWord() });
+    $("winBanner").textContent = msg;
+    toast(msg);
+  }
   function randSym() {
     const tot = C.symbols.reduce((a, s) => a + s.weight, 0);
     let r = Math.random() * tot;
@@ -220,7 +237,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       li.innerHTML = `<span><b>${p.name}</b> — ${fmt(p.at)} listening<br><small>${p.desc}</small></span>`;
       if (unlocked && !claimed) {
         const b = document.createElement("button");
-        b.className = "claim-btn"; b.textContent = "CLAIM";
+        b.className = "claim-btn"; b.textContent = claimWord();
         b.onclick = () => claimPrizeUI(p.id);
         li.appendChild(b);
       } else if (claimed) {
@@ -271,13 +288,13 @@ import { spinLabelFor } from './cabinet-anim.js';
     if (res.jackpot) {
       // Golden token pour on the canvas, then the unchanged payout screen.
       if (CAB) CAB.celebrate();
-      $("winBanner").textContent = "🎰 JACKPOT! 777 🎰";
+      $("winBanner").textContent = winText("jackpot");
       setTimeout(() => { if (CAB) CAB.endCelebrate(); openJackpot(); }, 2400);
     } else {
       if (CAB) CAB.setSignFlare(0);
       if (res.triple) {
         const label = C.symbols.find(s => s.id === res.triple).label;
-        $("winBanner").textContent = `✨ Triple ${label}! ✨`;
+        $("winBanner").textContent = winText("triple", { label });
         if (res.triple === "bell" && L.bonusUnlocked(S))
           toast("🔔 Triple bell! The Encore Round is calling — tap 🎰");
       }
@@ -289,8 +306,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       if (id === "r3") { toast("🌃 Welcome to the Midnight Strip — Stage 2 unlocked"); M.log("stage_unlock", { stage: 2, name: "Midnight Strip" }); }
       if (id === "r6") { toast("🌃 Welcome to the 777 Skyline — Stage 3 unlocked. Encore Round available!"); M.log("stage_unlock", { stage: 3, name: "777 Skyline" }); }
     });
-    const newPrizes = L.unlockedPrizes(S);
-    if (newPrizes.length) toast(`🎁 Listening prize unlocked: ${newPrizes[0].name} — claim it below`);
+    announceNewPrizes();
     refresh();
   }
 
@@ -342,7 +358,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     M.log("jackpot_win", { spinsSinceJackpot: S.spinsSinceJackpot, totalSpins: S.totalSpins });
     showPayout({
       kind: "jackpot",
-      title: "🎰 JACKPOT! 777 🎰",
+      title: winText("jackpot"),
       what: `You hit <b>777</b> on <b>Neon Nights Pt. 777</b> — pick your <b>free</b> stream:`,
       links: C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url })),
       claimLabel: "KEEP SPINNING",
@@ -400,12 +416,18 @@ import { spinLabelFor } from './cabinet-anim.js';
     const files = p.files || (p.file ? [p.file] : []);
     if (id === "golden") files.push("art/badge-777.png");
     if (id === "golden") toast(`🌟 Golden Reel active: ${C.goldenSpins} spins, double 7s odds!`);
+    // Every listening prize ships its free catalog music links — the fix for
+    // "the prize didn't generate a music link". Same verified platform URLs
+    // the Encore Round already uses (see openJackpot), allowlisted in tests.
+    const musicLinks = C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url }));
+    $("winBanner").textContent = winText("prize", { name: p.name, claim: claimWord() });
     showPayout({
       kind: "prize",
-      title: "🎁 PRIZE UNLOCKED",
+      title: winText("prize", { name: p.name, claim: claimWord() }),
       what: `<b>${p.name}</b> — ${p.desc}`,
+      links: musicLinks,
       files,
-      claimLabel: "CLAIM & CLOSE",
+      claimLabel: `${claimWord()} & CLOSE`,
     });
     refresh();
   }
@@ -469,12 +491,21 @@ import { spinLabelFor } from './cabinet-anim.js';
 
   /* ---------- listening clock + regen ---------- */
   let lastMinute = 0;
+  // Each prize announces exactly once per session: unlockedPrizes() keeps
+  // returning unclaimed prizes, so without this the banner/toast would
+  // re-fire every second until the player taps CLAIM.
+  const announcedPrizes = new Set();
+  function announceNewPrizes() {
+    for (const p of L.unlockedPrizes(S)) {
+      if (announcedPrizes.has(p.id)) continue;
+      announcedPrizes.add(p.id);
+      announcePrizeUnlock(p);
+    }
+  }
   setInterval(() => {
     const audible = !S.muted && !document.hidden && !audio.paused && audioReady;
-    if (L.listenTick(S, audible)) {
-      const newPrizes = L.unlockedPrizes(S);
-      if (newPrizes.length) toast(`🎁 Listening prize unlocked: ${newPrizes[0].name} — claim it below`);
-    }
+    L.listenTick(S, audible);
+    announceNewPrizes();
     const minute = Math.floor(S.listeningSec / 60);
     if (minute > lastMinute) { lastMinute = minute; M.log("listen_minute", { minute }); }
     refresh();

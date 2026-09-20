@@ -63,17 +63,18 @@ function newState() {
   };
 }
 
-/** Regen free spins based on elapsed wall time. Pure-ish: pass nowMs. */
+/** Regen free spins based on elapsed wall time. Pure-ish: pass nowMs.
+    Fast-forwards the regen clock by the FULL elapsed periods (keeping the
+    sub-period remainder), whether or not spins were granted. The old ratchet
+    (advancing only by granted spins) left lastRegen stale at the cap, so
+    every spin was instantly refunded and the counter never visibly moved. */
 function regenSpins(state, nowMs = Date.now()) {
   const elapsed = Math.floor((nowMs - state.lastRegen) / 1000);
-  if (elapsed >= NN_CONFIG.spinRegenSec && state.spins < NN_CONFIG.spinCap) {
-    const add = Math.min(
-      Math.floor(elapsed / NN_CONFIG.spinRegenSec),
-      NN_CONFIG.spinCap - state.spins
-    );
-    state.spins += add;
-    state.lastRegen += add * NN_CONFIG.spinRegenSec * 1000;
-  }
+  if (elapsed < NN_CONFIG.spinRegenSec) return state;
+  const periods = Math.floor(elapsed / NN_CONFIG.spinRegenSec);
+  const add = Math.min(periods, NN_CONFIG.spinCap - state.spins);
+  if (add > 0) state.spins += add;
+  state.lastRegen += periods * NN_CONFIG.spinRegenSec * 1000;
   return state;
 }
 

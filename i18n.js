@@ -2,7 +2,14 @@
    5 short bullets per language. Stage names stay as proper nouns.
    Order of bullets: [spin, stages, jackpot, prizes, free/no-gambling] */
 window.NN_I18N = {
-en: { name: "English", spin: "Spin!", bullets: [
+en: { name: "English", spin: "Spin!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 {name} unlocked! Tap {claim} below for your free music link.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "Tap SPIN — spins are free and refill over time.",
   "Clear rounds to climb: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: pick a free streaming link.",
@@ -15,7 +22,14 @@ en: { name: "English", spin: "Spin!", bullets: [
     ios3: "Open it from your home screen — it runs like an app.",
     note: "This is a web app — no app-store download needed."
   } },
-es: { name: "Español", spin: "¡Girar!", bullets: [
+es: { name: "Español", spin: "¡Girar!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ¡Triple {label}! ✨",
+    prize: "🎁 ¡{name} desbloqueado! Toca {claim} abajo para tu enlace de música gratis.",
+    claim: "RECLAMAR"
+  },
+  bullets: [
   "Toca GIRAR: los giros son gratis y se recargan con el tiempo.",
   "Supera rondas para subir: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: elige un enlace de streaming gratis.",
@@ -28,7 +42,14 @@ es: { name: "Español", spin: "¡Girar!", bullets: [
     ios3: "Ábrelo desde tu pantalla de inicio: funciona como una app.",
     note: "Es una web app: no necesitas descargarla de la tienda."
   } },
-fr: { name: "Français", spin: "Tourner !", bullets: [
+fr: { name: "Français", spin: "Tourner !",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label} ! ✨",
+    prize: "🎁 {name} débloqué ! Touchez {claim} ci-dessous pour votre lien musique gratuit.",
+    claim: "RÉCLAMER"
+  },
+  bullets: [
   "Appuyez sur TOURNER : les tours sont gratuits et se rechargent avec le temps.",
   "Terminez les manches pour monter : Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT : choisissez un lien de streaming gratuit.",
@@ -41,7 +62,14 @@ fr: { name: "Français", spin: "Tourner !", bullets: [
     ios3: "Ouvrez-le depuis l'écran d'accueil : il fonctionne comme une app.",
     note: "C'est une web app : aucun téléchargement sur l'App Store nécessaire."
   } },
-pt: { name: "Português", spin: "Girar!", bullets: [
+pt: { name: "Português", spin: "Girar!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Trinca de {label}! ✨",
+    prize: "🎁 {name} desbloqueado! Toque em {claim} abaixo para seu link de música grátis.",
+    claim: "RESGATAR"
+  },
+  bullets: [
   "Toque em GIRAR: as rodadas são grátis e recarregam com o tempo.",
   "Complete rodadas para subir: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: escolha um link de streaming grátis.",
@@ -54,7 +82,14 @@ pt: { name: "Português", spin: "Girar!", bullets: [
     ios3: "Abra a partir da tela inicial: funciona como um app.",
     note: "É um web app: não precisa baixar da loja de aplicativos."
   } },
-de: { name: "Deutsch", spin: "Drehen!", bullets: [
+de: { name: "Deutsch", spin: "Drehen!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Dreifach {label}! ✨",
+    prize: "🎁 {name} freigeschaltet! Tippe unten auf {claim} für deinen gratis Musik-Link.",
+    claim: "EINLÖSEN"
+  },
+  bullets: [
   "Tippe auf DREHEN – Drehs sind gratis und laden sich mit der Zeit auf.",
   "Meistere Runden und steige auf: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: Wähle einen gratis Streaming-Link.",
@@ -67,7 +102,14 @@ de: { name: "Deutsch", spin: "Drehen!", bullets: [
     ios3: "Öffne es vom Home-Bildschirm – es läuft wie eine App.",
     note: "Das ist eine Web-App: Kein Download aus dem App Store nötig."
   } },
-it: { name: "Italiano", spin: "Gira!", bullets: [
+it: { name: "Italiano", spin: "Gira!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Tris di {label}! ✨",
+    prize: "🎁 {name} sbloccato! Tocca {claim} qui sotto per il tuo link musicale gratis.",
+    claim: "RISCATTA"
+  },
+  bullets: [
   "Tocca GIRA: i giri sono gratis e si ricaricano col tempo.",
   "Supera i round per salire: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: scegli un link streaming gratuito.",
@@ -80,7 +122,14 @@ it: { name: "Italiano", spin: "Gira!", bullets: [
     ios3: "Aprilo dalla schermata Home: funziona come un'app.",
     note: "È una web app: nessun download dall'app store necessario."
   } },
-nl: { name: "Nederlands", spin: "Draaien!", bullets: [
+nl: { name: "Nederlands", spin: "Draaien!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Drie keer {label}! ✨",
+    prize: "🎁 {name} ontgrendeld! Tik hieronder op {claim} voor je gratis muziek-link.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "Tik op DRAAIEN – beurten zijn gratis en vullen zich na verloop van tijd aan.",
   "Voltooi rondes om te stijgen: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: kies een gratis streaminglink.",
@@ -93,7 +142,14 @@ nl: { name: "Nederlands", spin: "Draaien!", bullets: [
     ios3: "Open het vanaf je beginscherm: het werkt als een app.",
     note: "Dit is een webapp: geen download uit de appstore nodig."
   } },
-ru: { name: "Русский", spin: "Крутить!", bullets: [
+ru: { name: "Русский", spin: "Крутить!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Тройка: {label}! ✨",
+    prize: "🎁 {name} разблокирован! Нажмите {claim} ниже, чтобы получить бесплатную музыкальную ссылку.",
+    claim: "ЗАБРАТЬ"
+  },
+  bullets: [
   "Нажмите «КРУТИТЬ» — вращения бесплатны и восстанавливаются со временем.",
   "Проходите раунды и поднимайтесь: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = ДЖЕКПОТ: выберите бесплатную ссылку на стриминг.",
@@ -106,7 +162,14 @@ ru: { name: "Русский", spin: "Крутить!", bullets: [
     ios3: "Открывайте её с экрана «Домой» — она работает как приложение.",
     note: "Это веб-приложение — скачивать из App Store не нужно."
   } },
-uk: { name: "Українська", spin: "Крутити!", bullets: [
+uk: { name: "Українська", spin: "Крутити!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Трійка: {label}! ✨",
+    prize: "🎁 {name} розблоковано! Натисніть {claim} нижче, щоб отримати безкоштовне музичне посилання.",
+    claim: "ЗАБРАТИ"
+  },
+  bullets: [
   "Натисніть «КРУТИТИ» — обертання безкоштовні та відновлюються з часом.",
   "Проходьте раунди й піднімайтеся: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = ДЖЕКПОТ: оберіть безкоштовне посилання на стримінг.",
@@ -119,7 +182,14 @@ uk: { name: "Українська", spin: "Крутити!", bullets: [
     ios3: "Відкривайте її з екрана «Дім» — вона працює як застосунок.",
     note: "Це вебзастосунок — завантажувати з App Store не потрібно."
   } },
-pl: { name: "Polski", spin: "Zakręć!", bullets: [
+pl: { name: "Polski", spin: "Zakręć!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Trójka: {label}! ✨",
+    prize: "🎁 Odblokowano: {name}! Kliknij {claim} poniżej, aby odebrać darmowy link do muzyki.",
+    claim: "ODBIERZ"
+  },
+  bullets: [
   "Kliknij ZAKRĘĆ – zakręcenia są darmowe i odnawiają się z czasem.",
   "Ukończ rundy, aby awansować: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: wybierz darmowy link do streamingu.",
@@ -132,7 +202,14 @@ pl: { name: "Polski", spin: "Zakręć!", bullets: [
     ios3: "Otwieraj ją z ekranu początkowego — działa jak aplikacja.",
     note: "To aplikacja webowa — nie musisz pobierać jej ze sklepu z aplikacjami."
   } },
-tr: { name: "Türkçe", spin: "Çevir!", bullets: [
+tr: { name: "Türkçe", spin: "Çevir!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Üçlü {label}! ✨",
+    prize: "🎁 {name} açıldı! Ücretsiz müzik bağlantın için aşağıda {claim} düğmesine dokun.",
+    claim: "TALEP ET"
+  },
+  bullets: [
   "ÇEVİR'e dokun – çevirmeler ücretsizdir ve zamanla yenilenir.",
   "Turları geçerek yüksel: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: ücretsiz bir müzik bağlantısı seç.",
@@ -145,7 +222,14 @@ tr: { name: "Türkçe", spin: "Çevir!", bullets: [
     ios3: "Ana ekrandan aç: bir uygulama gibi çalışır.",
     note: "Bu bir web uygulaması — uygulama mağazasından indirmen gerekmez."
   } },
-ar: { name: "العربية", rtl: true, spin: "دوران!", bullets: [
+ar: { name: "العربية", rtl: true, spin: "دوران!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ثلاثة {label}! ✨",
+    prize: "🎁 تم فتح {name}! اضغط {claim} بالأسفل للحصول على رابط الموسيقى المجاني.",
+    claim: "استلام"
+  },
+  bullets: [
   "اضغط «دوران» — الدورات مجانية وتتجدد مع الوقت.",
   "أكمل الجولات للتقدم: Lobby Lights، ثم Midnight Strip، ثم 777 Skyline.",
   "777 = الجائزة الكبرى: اختر رابط بث مجاني.",
@@ -158,7 +242,14 @@ ar: { name: "العربية", rtl: true, spin: "دوران!", bullets: [
     ios3: "افتحها من الشاشة الرئيسية — تعمل كتطبيق.",
     note: "هذا تطبيق ويب — لا حاجة للتنزيل من متجر التطبيقات."
   } },
-hi: { name: "हिन्दी", spin: "स्पिन!", bullets: [
+hi: { name: "हिन्दी", spin: "स्पिन!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ट्रिपल {label}! ✨",
+    prize: "🎁 {name} अनलॉक हो गया! मुफ्त म्यूज़िक लिंक के लिए नीचे {claim} दबाएं।",
+    claim: "CLAIM"
+  },
+  bullets: [
   "स्पिन दबाएँ — स्पिन मुफ़्त हैं और समय के साथ फिर मिलते हैं।",
   "राउंड पूरे करके आगे बढ़ें: Lobby Lights → Midnight Strip → 777 Skyline।",
   "777 = जैकपॉट: मुफ़्त स्ट्रीमिंग लिंक चुनें।",
@@ -171,7 +262,14 @@ hi: { name: "हिन्दी", spin: "स्पिन!", bullets: [
     ios3: "इसे होम स्क्रीन से खोलें — यह ऐप की तरह चलेगा।",
     note: "यह एक वेब ऐप है — ऐप स्टोर से डाउनलोड की ज़रूरत नहीं।"
   } },
-bn: { name: "বাংলা", spin: "স্পিন!", bullets: [
+bn: { name: "বাংলা", spin: "স্পিন!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ট্রিপল {label}! ✨",
+    prize: "🎁 {name} আনলক হয়েছে! বিনামূল্যে মিউজিক লিঙ্ক পেতে নিচে {claim} চাপুন।",
+    claim: "CLAIM"
+  },
+  bullets: [
   "স্পিন চাপুন — স্পিন ফ্রি এবং সময়ের সাথে আবার পাওয়া যায়।",
   "রাউন্ড পার করে এগিয়ে যান: Lobby Lights → Midnight Strip → 777 Skyline।",
   "777 = জ্যাকপট: একটি ফ্রি স্ট্রিমিং লিংক বেছে নিন।",
@@ -184,7 +282,14 @@ bn: { name: "বাংলা", spin: "স্পিন!", bullets: [
     ios3: "হোম স্ক্রিন থেকে এটি খুলুন — এটি অ্যাপের মতো চলবে।",
     note: "এটি একটি ওয়েব অ্যাপ — অ্যাপ স্টোর থেকে ডাউনলোডের প্রয়োজন নেই।"
   } },
-ur: { name: "اردو", rtl: true, spin: "اسپن!", bullets: [
+ur: { name: "اردو", rtl: true, spin: "اسپن!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ٹرپل {label}! ✨",
+    prize: "🎁 {name} ان لاک ہو گیا! مفت میوزک لنک کے لیے نیچے {claim} دبائیں۔",
+    claim: "CLAIM"
+  },
+  bullets: [
   "اسپن دبائیں — اسپن مفت ہیں اور وقت کے ساتھ بحال ہوتے ہیں۔",
   "راؤنڈ مکمل کر کے آگے بڑھیں: Lobby Lights، پھر Midnight Strip، پھر 777 Skyline۔",
   "777 = جیک پاٹ: مفت اسٹریمنگ لنک منتخب کریں۔",
@@ -197,7 +302,14 @@ ur: { name: "اردو", rtl: true, spin: "اسپن!", bullets: [
     ios3: "اسے ہوم اسکرین سے کھولیں — یہ ایپ کی طرح چلے گی۔",
     note: "یہ ایک ویب ایپ ہے — ایپ اسٹور سے ڈاؤن لوڈ کی ضرورت نہیں۔"
   } },
-pa: { name: "ਪੰਜਾਬੀ", spin: "ਸਪਿਨ!", bullets: [
+pa: { name: "ਪੰਜਾਬੀ", spin: "ਸਪਿਨ!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ਟ੍ਰਿਪਲ {label}! ✨",
+    prize: "🎁 {name} ਅਨਲਾਕ ਹੋ ਗਿਆ! ਮੁਫ਼ਤ ਮਿਊਜ਼ਿਕ ਲਿੰਕ ਲਈ ਹੇਠਾਂ {claim} ਦਬਾਓ।",
+    claim: "CLAIM"
+  },
+  bullets: [
   "ਸਪਿਨ ਦਬਾਓ — ਸਪਿਨ ਮੁਫ਼ਤ ਹਨ ਅਤੇ ਸਮੇਂ ਨਾਲ ਮੁੜ ਮਿਲਦੇ ਹਨ।",
   "ਰਾਊਂਡ ਪੂਰੇ ਕਰਕੇ ਅੱਗੇ ਵਧੋ: Lobby Lights → Midnight Strip → 777 Skyline।",
   "777 = ਜੈਕਪਾਟ: ਮੁਫ਼ਤ ਸਟ੍ਰੀਮਿੰਗ ਲਿੰਕ ਚੁਣੋ।",
@@ -210,7 +322,14 @@ pa: { name: "ਪੰਜਾਬੀ", spin: "ਸਪਿਨ!", bullets: [
     ios3: "ਇਸਨੂੰ ਹੋਮ ਸਕਰੀਨ ਤੋਂ ਖੋਲ੍ਹੋ — ਇਹ ਐਪ ਵਾਂਗ ਚੱਲੇਗੀ।",
     note: "ਇਹ ਇੱਕ ਵੈੱਬ ਐਪ ਹੈ — ਐਪ ਸਟੋਰ ਤੋਂ ਡਾਊਨਲੋਡ ਦੀ ਲੋੜ ਨਹੀਂ।"
   } },
-ta: { name: "தமிழ்", spin: "SPIN!", bullets: [
+ta: { name: "தமிழ்", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ டிரிபிள் {label}! ✨",
+    prize: "🎁 {name} திறக்கப்பட்டது! இலவச இசை இணைப்பைப் பெற கீழே {claim} ஐ அழுத்தவும்.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "SPIN-ஐ அழுத்தவும் — சுழற்சிகள் இலவசம், நேரத்தில் மீண்டும் கிடைக்கும்.",
   "சுற்றுகளை முடித்து முன்னேறவும்: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = ஜாக்பாட்: இலவச ஸ்ட்ரீமிங் இணைப்பைத் தேர்வு செய்யவும்.",
@@ -223,7 +342,14 @@ ta: { name: "தமிழ்", spin: "SPIN!", bullets: [
     ios3: "இதை முகப்புத் திரையிலிருந்து திறவுங்கள் — இது ஒரு செயலியைப் போல் இயங்கும்.",
     note: "இது ஒரு இணையச் செயலி — ஆப் ஸ்டோரிலிருந்து பதிவிறக்கம் தேவையில்லை."
   } },
-te: { name: "తెలుగు", spin: "SPIN!", bullets: [
+te: { name: "తెలుగు", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ట్రిపుల్ {label}! ✨",
+    prize: "🎁 {name} అన్‌లాక్ అయింది! ఉచిత మ్యూజిక్ లింక్ కోసం కింద {claim} నొక్కండి.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "SPIN నొక్కండి — స్పిన్‌లు ఉచితం, కాలంతో మళ్లీ వస్తాయి.",
   "రౌండ్లు పూర్తి చేసి ముందుకు సాగండి: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = జాక్‌పాట్: ఉచిత స్ట్రీమింగ్ లింక్ ఎంచుకోండి.",
@@ -236,7 +362,14 @@ te: { name: "తెలుగు", spin: "SPIN!", bullets: [
     ios3: "దీన్ని మీ హోమ్ స్క్రీన్ నుండి తెరవండి — ఇది యాప్‌లా నడుస్తుంది.",
     note: "ఇది ఒక వెబ్ యాప్ — యాప్ స్టోర్ నుండి డౌన్‌లోడ్ అవసరం లేదు."
   } },
-zh: { name: "简体中文", spin: "旋转！", bullets: [
+zh: { name: "简体中文", spin: "旋转！",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ 三连 {label}！✨",
+    prize: "🎁 {name}已解锁！点击下方的{claim}获取免费音乐链接。",
+    claim: "领取"
+  },
+  bullets: [
   "点击旋转——旋转免费，随时间恢复。",
   "通关回合不断晋级：Lobby Lights → Midnight Strip → 777 Skyline。",
   "777 = 头奖：选择一个免费流媒体链接。",
@@ -249,7 +382,14 @@ zh: { name: "简体中文", spin: "旋转！", bullets: [
     ios3: "从主屏幕打开它，运行起来就像一款 App。",
     note: "这是网页应用，无需从应用商店下载。"
   } },
-"zh-TW": { name: "繁體中文", spin: "旋轉！", bullets: [
+"zh-TW": { name: "繁體中文", spin: "旋轉！",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ 三連 {label}！✨",
+    prize: "🎁 {name}已解鎖！點擊下方的{claim}獲取免費音樂連結。",
+    claim: "領取"
+  },
+  bullets: [
   "點擊旋轉——旋轉免費，隨時間恢復。",
   "通過回合不斷晉級：Lobby Lights → Midnight Strip → 777 Skyline。",
   "777 = 頭獎：選擇一個免費串流連結。",
@@ -264,7 +404,14 @@ zh: { name: "简体中文", spin: "旋转！", bullets: [
   } },
 };
 Object.assign(window.NN_I18N, {
-ja: { name: "日本語", spin: "スピン！", bullets: [
+ja: { name: "日本語", spin: "スピン！",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ {label}のトリプル！✨",
+    prize: "🎁 {name}をアンロック！無料の音楽リンクは下の{claim}をタップ。",
+    claim: "受け取る"
+  },
+  bullets: [
   "スピンをタップ——スピンは無料で、時間とともに回復します。",
   "ラウンドをクリアして昇格：Lobby Lights → Midnight Strip → 777 Skyline。",
   "777 = ジャックポット：無料のストリーミングリンクを選べます。",
@@ -277,7 +424,14 @@ ja: { name: "日本語", spin: "スピン！", bullets: [
     ios3: "ホーム画面から開けば、アプリのように動作します。",
     note: "これはウェブアプリです。App Store からのダウンロードは不要です。"
   } },
-ko: { name: "한국어", spin: "스핀!", bullets: [
+ko: { name: "한국어", spin: "스핀!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ 트리플 {label}! ✨",
+    prize: "🎁 {name} 잠금 해제! 무료 음악 링크는 아래 {claim}을 눌러주세요.",
+    claim: "받기"
+  },
+  bullets: [
   "스핀을 누르세요 — 스핀은 무료이며 시간이 지나면 충전됩니다.",
   "라운드를 클리어하고 승급하세요: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = 잭팟: 무료 스트리밍 링크를 선택하세요.",
@@ -290,7 +444,14 @@ ko: { name: "한국어", spin: "스핀!", bullets: [
     ios3: "홈 화면에서 열면 앱처럼 실행됩니다.",
     note: "이것은 웹 앱으로, 앱 스토어 다운로드가 필요 없습니다."
   } },
-vi: { name: "Tiếng Việt", spin: "Quay!", bullets: [
+vi: { name: "Tiếng Việt", spin: "Quay!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Bộ ba {label}! ✨",
+    prize: "🎁 Đã mở khóa {name}! Nhấn {claim} bên dưới để nhận link nhạc miễn phí.",
+    claim: "NHẬN"
+  },
+  bullets: [
   "Chạm QUAY — lượt quay miễn phí và hồi theo thời gian.",
   "Vượt qua các vòng để thăng hạng: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: chọn một liên kết nghe nhạc miễn phí.",
@@ -303,7 +464,14 @@ vi: { name: "Tiếng Việt", spin: "Quay!", bullets: [
     ios3: "Mở từ Màn hình chính — nó chạy như một ứng dụng.",
     note: "Đây là ứng dụng web — không cần tải từ cửa hàng ứng dụng."
   } },
-th: { name: "ไทย", spin: "หมุน!", bullets: [
+th: { name: "ไทย", spin: "หมุน!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ทริปเปิล {label}! ✨",
+    prize: "🎁 ปลดล็อก {name} แล้ว! แตะ{claim}ด้านล่างเพื่อรับลิงก์เพลงฟรี",
+    claim: "รับรางวัล"
+  },
+  bullets: [
   "แตะหมุน — หมุนฟรีและจะเติมใหม่ตามเวลา",
   "ผ่านด่านเพื่อเลื่อนขั้น: Lobby Lights → Midnight Strip → 777 Skyline",
   "777 = แจ็กพอต: เลือกลิงก์สตรีมเพลงฟรี",
@@ -316,7 +484,14 @@ th: { name: "ไทย", spin: "หมุน!", bullets: [
     ios3: "เปิดจากหน้าจอโฮมได้เลย ใช้งานเหมือนแอป",
     note: "นี่คือเว็บแอป ไม่ต้องดาวน์โหลดจาก App Store"
   } },
-id: { name: "Bahasa Indonesia", spin: "Putar!", bullets: [
+id: { name: "Bahasa Indonesia", spin: "Putar!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 {name} terbuka! Ketuk {claim} di bawah untuk link musik gratis.",
+    claim: "KLAIM"
+  },
+  bullets: [
   "Ketuk PUTAR — putaran gratis dan terisi lagi seiring waktu.",
   "Selesaikan ronde untuk naik level: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: pilih tautan streaming gratis.",
@@ -329,7 +504,14 @@ id: { name: "Bahasa Indonesia", spin: "Putar!", bullets: [
     ios3: "Buka dari layar utama — berjalan seperti aplikasi.",
     note: "Ini aplikasi web — tidak perlu unduh dari toko aplikasi."
   } },
-ms: { name: "Bahasa Melayu", spin: "Putar!", bullets: [
+ms: { name: "Bahasa Melayu", spin: "Putar!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 {name} telah dibuka! Ketik {claim} di bawah untuk pautan muzik percuma.",
+    claim: "TUNTUT"
+  },
+  bullets: [
   "Ketik PUTAR — putaran percuma dan diisi semula dari semasa ke semasa.",
   "Lengkapkan pusingan untuk naik tahap: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: pilih pautan penstriman percuma.",
@@ -342,7 +524,14 @@ ms: { name: "Bahasa Melayu", spin: "Putar!", bullets: [
     ios3: "Buka dari skrin utama — ia berfungsi seperti aplikasi.",
     note: "Ini aplikasi web — tidak perlu muat turun dari gedung aplikasi."
   } },
-tl: { name: "Tagalog", spin: "SPIN!", bullets: [
+tl: { name: "Tagalog", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 Na-unlock ang {name}! I-tap ang {claim} sa ibaba para sa libreng music link.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "Pindutin ang SPIN — libre ang spin at kusang nadadagdagan.",
   "Tapusin ang mga round para umakyat: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: pumili ng libreng streaming link.",
@@ -355,7 +544,14 @@ tl: { name: "Tagalog", spin: "SPIN!", bullets: [
     ios3: "Buksan ito mula sa home screen — tumatakbo ito tulad ng isang app.",
     note: "Ito ay isang web app — hindi kailangang i-download mula sa app store."
   } },
-sw: { name: "Kiswahili", spin: "SPIN!", bullets: [
+sw: { name: "Kiswahili", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 {name} imefunguliwa! Bonyeza {claim} hapa chini ili upate kiungo cha muziki bila malipo.",
+    claim: "CLAIM"
+  },
+  bullets: [
   "Gusa SPIN — mizunguko ni bure na hujazwa tena baada ya muda.",
   "Maliza raundi ili upande: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: chagua kiungo cha bure cha kusikiliza.",
@@ -368,7 +564,14 @@ sw: { name: "Kiswahili", spin: "SPIN!", bullets: [
     ios3: "Fungua kutoka skrini ya nyumbani — inafanya kazi kama programu.",
     note: "Hii ni programu ya wavuti — hakuna haja ya kupakua kutoka duka la programu."
   } },
-ha: { name: "Hausa", spin: "SPIN!", bullets: [
+ha: { name: "Hausa", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Uku {label}! ✨",
+    prize: "🎁 An buɗe {name}! Danna {claim} a ƙasa don samun mahaɗin kiɗa kyauta.",
+    claim: "KARƁA"
+  },
+  bullets: [
   "Danna SPIN — juyawa kyauta ne kuma suna dawowa da lokaci.",
   "Kammala zagaye domin hawa: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: zaɓi hanyar saurare kyauta.",
@@ -381,7 +584,14 @@ ha: { name: "Hausa", spin: "SPIN!", bullets: [
     ios3: "Buɗe shi daga babban allon — yana aiki kamar manhaja.",
     note: "Wannan manhajar yanar gizo ce — ba lallai ka sauke daga kantin manhajoji ba."
   } },
-yo: { name: "Yorùbá", spin: "SPIN!", bullets: [
+yo: { name: "Yorùbá", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Mẹ́ta {label}! ✨",
+    prize: "🎁 A ti {name} sílẹ̀! Tẹ {claim} ni ìsàlẹ̀ fún ọ̀nà orin ọ̀fẹ́.",
+    claim: "GBÀ"
+  },
+  bullets: [
   "Tẹ SPIN — ọfẹ ni awọn iyipo, wọn yoo pada wa lẹ́yìn ìgbà díẹ̀.",
   "Parí awọn iyipo láti gòkè: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: yan ọ̀nà ọ̀fẹ́ láti gbọ́ orin.",
@@ -394,7 +604,14 @@ yo: { name: "Yorùbá", spin: "SPIN!", bullets: [
     ios3: "Ṣí i láti ojú ìbòjú ilé rẹ — ó máa ṣiṣẹ́ bí app.",
     note: "Èyí jẹ́ web app — kò sí àìní láti ṣe download láti ilé ìtajà app."
   } },
-am: { name: "አማርኛ", spin: "SPIN!", bullets: [
+am: { name: "አማርኛ", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ ሦስት {label}! ✨",
+    prize: "🎁 {name} ተከፍቷል! ነጻ የሙዚቃ ማገናኛ ለማግኘት ከታች {claim} ይጫኑ።",
+    claim: "ውሰድ"
+  },
+  bullets: [
   "SPIN ን ይንኩ — ሽክርክሪቶች ነፃ ናቸው እና ከጊዜ በኋላ ይመለሳሉ።",
   "ዙሮችን ጨርሰው ይውጡ: Lobby Lights → Midnight Strip → 777 Skyline።",
   "777 = JACKPOT: ነፃ የዥረት አገናኝ ይምረጡ።",
@@ -407,7 +624,14 @@ am: { name: "አማርኛ", spin: "SPIN!", bullets: [
     ios3: "ከመነሻ ማያ ገጽዎ ይክፈቱት — እንደ መተግበሪያ ይሰራል።",
     note: "ይህ የድር መተግበሪያ ነው — ከመተግበሪያ መደብር ማውረድ አያስፈልግም።"
   } },
-fa: { name: "فارسی", rtl: true, spin: "چرخش!", bullets: [
+fa: { name: "فارسی", rtl: true, spin: "چرخش!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ سه‌تایی {label}! ✨",
+    prize: "🎁 {name} باز شد! برای دریافت لینک رایگان موسیقی، {claim} را در پایین بزنید.",
+    claim: "دریافت"
+  },
+  bullets: [
   "«چرخش» را بزنید — چرخش‌ها رایگان‌اند و به‌مرور پر می‌شوند.",
   "مراحل را کامل کنید تا بالا بروید: Lobby Lights، بعد Midnight Strip، بعد 777 Skyline.",
   "777 = جک‌پات: یک لینک پخش رایگان انتخاب کنید.",
@@ -420,7 +644,14 @@ fa: { name: "فارسی", rtl: true, spin: "چرخش!", bullets: [
     ios3: "از صفحه‌ی اصلی بازش کنید — مثل یک اپ اجرا می‌شود.",
     note: "این یک وب‌اپ است — نیازی به دانلود از اپ‌استور نیست."
   } },
-he: { name: "עברית", rtl: true, spin: "ספין!", bullets: [
+he: { name: "עברית", rtl: true, spin: "ספין!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ שלישייה {label}! ✨",
+    prize: "🎁 {name} נפתח! לחצו על {claim} למטה כדי לקבל קישור מוזיקה בחינם.",
+    claim: "קבל"
+  },
+  bullets: [
   "לחצו על ספין — הספינים בחינם ומתמלאים עם הזמן.",
   "עברו סיבובים כדי להתקדם: Lobby Lights, אחר כך Midnight Strip, אחר כך 777 Skyline.",
   "777 = ג'קפוט: בחרו קישור סטרימינג בחינם.",
@@ -433,7 +664,14 @@ he: { name: "עברית", rtl: true, spin: "ספין!", bullets: [
     ios3: "פתחו אותו ממסך הבית — הוא פועל כמו אפליקציה.",
     note: "זוהי אפליקציית ווב — אין צורך להוריד מחנות האפליקציות."
   } },
-el: { name: "Ελληνικά", spin: "Περιστροφή!", bullets: [
+el: { name: "Ελληνικά", spin: "Περιστροφή!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Τριάδα {label}! ✨",
+    prize: "🎁 Ξεκλειδώθηκε: {name}! Πατήστε {claim} παρακάτω για τον δωρεάν σύνδεσμο μουσικής.",
+    claim: "ΠΑΡΑΛΑΒΗ"
+  },
+  bullets: [
   "Πάτα ΠΕΡΙΣΤΡΟΦΗ — οι περιστροφές είναι δωρεάν και αναπληρώνονται με τον χρόνο.",
   "Ολοκλήρωσε γύρους για να ανέβεις: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = ΤΖΑΚΠΟΤ: διάλεξε έναν δωρεάν σύνδεσμο streaming.",
@@ -446,7 +684,14 @@ el: { name: "Ελληνικά", spin: "Περιστροφή!", bullets: [
     ios3: "Άνοιξέ το από την Αρχική οθόνη — λειτουργεί σαν εφαρμογή.",
     note: "Είναι μια διαδικτυακή εφαρμογή — δεν χρειάζεται λήψη από το App Store."
   } },
-sv: { name: "Svenska", spin: "SPINN!", bullets: [
+sv: { name: "Svenska", spin: "SPINN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Trippel {label}! ✨",
+    prize: "🎁 {name} upplåst! Tryck på {claim} nedan för din gratis musiklänk.",
+    claim: "HÄMTA"
+  },
+  bullets: [
   "Tryck på SPINN — snurr är gratis och fylls på med tiden.",
   "Klara rundor för att klättra: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: välj en gratis streaminglänk.",
@@ -459,7 +704,14 @@ sv: { name: "Svenska", spin: "SPINN!", bullets: [
     ios3: "Öppna det från hemskärmen — det fungerar som en app.",
     note: "Det här är en webbapp — ingen nedladdning från appbutiken behövs."
   } },
-no: { name: "Norsk", spin: "SPINN!", bullets: [
+no: { name: "Norsk", spin: "SPINN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Trippel {label}! ✨",
+    prize: "🎁 {name} er låst opp! Trykk {claim} nedenfor for gratis musikklink.",
+    claim: "HENT"
+  },
+  bullets: [
   "Trykk på SPINN — spinn er gratis og fylles opp over tid.",
   "Fullfør runder for å klatre: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: velg en gratis strømmelenke.",
@@ -472,7 +724,14 @@ no: { name: "Norsk", spin: "SPINN!", bullets: [
     ios3: "Åpne det fra Hjem-skjermen — det fungerer som en app.",
     note: "Dette er en webapp — ingen nedlasting fra appbutikken nødvendig."
   } },
-da: { name: "Dansk", spin: "SPIN!", bullets: [
+da: { name: "Dansk", spin: "SPIN!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triple {label}! ✨",
+    prize: "🎁 {name} er låst op! Tryk på {claim} nedenfor for at få dit gratis musiklink.",
+    claim: "HENT"
+  },
+  bullets: [
   "Tryk på SPIN — spins er gratis og fyldes op med tiden.",
   "Gennemfør runder for at stige: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: vælg et gratis streaminglink.",
@@ -485,7 +744,14 @@ da: { name: "Dansk", spin: "SPIN!", bullets: [
     ios3: "Åbn det fra hjemmeskærmen — det kører som en app.",
     note: "Dette er en webapp — ingen download fra appbutikken nødvendig."
   } },
-fi: { name: "Suomi", spin: "Pyöräytä!", bullets: [
+fi: { name: "Suomi", spin: "Pyöräytä!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Tripla {label}! ✨",
+    prize: "🎁 {name} avattu! Napauta alla {claim} saadaksesi ilmaisen musiikkilinkin.",
+    claim: "LUNASTA"
+  },
+  bullets: [
   "Napauta PYÖRÄYTÄ — pyöräytykset ovat ilmaisia ja täyttyvät ajan myötä.",
   "Läpäise kierroksia noustaksesi: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: valitse ilmainen suoratoistolinkki.",
@@ -498,7 +764,14 @@ fi: { name: "Suomi", spin: "Pyöräytä!", bullets: [
     ios3: "Avaa se kotinäytöltä — se toimii kuin sovellus.",
     note: "Tämä on verkkosovellus — sovelluskaupasta lataamista ei tarvita."
   } },
-ro: { name: "Română", spin: "Învârte!", bullets: [
+ro: { name: "Română", spin: "Învârte!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Triplă {label}! ✨",
+    prize: "🎁 {name} deblocat! Apasă {claim} mai jos pentru linkul tău gratuit de muzică.",
+    claim: "REVENDICĂ"
+  },
+  bullets: [
   "Apasă ÎNVÂRTE — învârtirile sunt gratuite și se reîncarcă în timp.",
   "Completează runde pentru a urca: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: alege un link de streaming gratuit.",
@@ -511,7 +784,14 @@ ro: { name: "Română", spin: "Învârte!", bullets: [
     ios3: "Deschide-l din ecranul de pornire — rulează ca o aplicație.",
     note: "Este o aplicație web — nu e nevoie de descărcare din magazinul de aplicații."
   } },
-hu: { name: "Magyar", spin: "Pörgess!", bullets: [
+hu: { name: "Magyar", spin: "Pörgess!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Tripla {label}! ✨",
+    prize: "🎁 {name} feloldva! Koppints a lenti {claim} gombra az ingyenes zenei linkedért.",
+    claim: "ÁTVÉTEL"
+  },
+  bullets: [
   "Nyomd meg a PÖRGETÉST — a pörgetések ingyenesek és idővel újratöltődnek.",
   "Teljesíts köröket a feljutáshoz: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: válassz egy ingyenes streaming linket.",
@@ -524,7 +804,14 @@ hu: { name: "Magyar", spin: "Pörgess!", bullets: [
     ios3: "Nyisd meg a főképernyőről — úgy működik, mint egy alkalmazás.",
     note: "Ez egy webalkalmazás — nem kell letölteni az alkalmazásboltból."
   } },
-cs: { name: "Čeština", spin: "Točit!", bullets: [
+cs: { name: "Čeština", spin: "Točit!",
+  win: {
+    jackpot: "🎰 JACKPOT! 777 🎰",
+    triple: "✨ Trojice {label}! ✨",
+    prize: "🎁 Odemčeno: {name}! Klepni na {claim} níže a získej hudební odkaz zdarma.",
+    claim: "VYZVEDNOUT"
+  },
+  bullets: [
   "Klepni na TOČIT — točení je zdarma a časem se doplňuje.",
   "Dokonči kola a postupuj: Lobby Lights → Midnight Strip → 777 Skyline.",
   "777 = JACKPOT: vyber si odkaz na streamování zdarma.",

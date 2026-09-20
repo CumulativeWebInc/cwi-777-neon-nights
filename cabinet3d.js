@@ -847,6 +847,11 @@ function makeWebGLCabinet() {
       const r = S.canvas.getBoundingClientRect();
       return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
     },
+    // QA hook: last spins value the cabinet received via setSpins (iPhone
+    // spin-count regression: proves the 3D meter path carried the decrement)
+    _debugMeterValue() {
+      return typeof S.spinsLeft === "number" ? S.spinsLeft : null;
+    },
     // QA hook: single-button spec proof (count/centering/size/label) — non-enumerable
     _debugSpinInfo() {
       if (!S.spinBtn || !S.camera) return null;
@@ -869,7 +874,7 @@ function makeWebGLCabinet() {
   };
   // QA hooks are non-enumerable: hidden from Object.keys() so the public API
   // surface stays exactly the documented set, but still callable by the harness.
-  for (const k of ["_debugSpinCenter", "_debugSpinInfo", "_debugPerf"]) {
+  for (const k of ["_debugSpinCenter", "_debugSpinInfo", "_debugPerf", "_debugMeterValue"]) {
     const desc = Object.getOwnPropertyDescriptor(CAB, k);
     if (desc) Object.defineProperty(CAB, k, { ...desc, enumerable: false });
   }

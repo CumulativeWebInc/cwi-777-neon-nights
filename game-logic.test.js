@@ -166,6 +166,38 @@ function rng32(seed) {
   ok(st2.spins === 40, "no regen above cap");
 })();
 
+/* --- spin regen clock: fast-forward at cap so a spent spin visibly decrements ---
+   iPhone bug (2026-09-20): with spins parked at 40 for minutes, lastRegen went
+   stale; spending one spin then ran regenSpins in refresh() and the cap-time
+   banked up instantly refunded the spin — the counter sat at 40 forever. */
+(function () {
+  const SEC = 1000;
+  // Repro: parked at cap 40 for 5 minutes, spend one spin, immediate regen must NOT refund it.
+  const st = L.newState();
+  st.spins = 40; st.lastRegen = Date.now() - 300 * SEC;
+  L.regenSpins(st, Date.now());           // background tick at the cap
+  ok(st.spins === 40, "cap stays 40 while parked");
+  const res = L.spin(st, rng32(7));
+  L.applySpinResult(st, res);
+  L.regenSpins(st, Date.now());           // the refresh() that runs right after the spin
+  ok(st.spins === 39, "spin from 40 decrements to 39 — no instant refund (iPhone fix)");
+  // Sub-period remainder is preserved: 50s elapsed grants 1 spin, keeps 5s credit.
+  const st3 = L.newState();
+  st3.spins = 30; st3.lastRegen = Date.now() - 50 * SEC;
+  L.regenSpins(st3, Date.now());
+  ok(st3.spins === 31, "partial period grants only full periods (50s -> +1)");
+  // ...and the leftover credit still accrues: 40 more seconds later = 1 more spin.
+  L.regenSpins(st3, Date.now() + 40 * SEC);
+  ok(st3.spins === 32, "remainder credit accrues (+40s after 50s -> +1 more)");
+  // Cap bank: at 39 with banked full periods, the NEXT regen tops to 40 — not the current tick.
+  const st4 = L.newState();
+  st4.spins = 39; st4.lastRegen = Date.now() - 200 * SEC;
+  L.regenSpins(st4, Date.now());
+  ok(st4.spins === 40, "banked periods grant +1 to reach cap (39 -> 40)");
+  L.regenSpins(st4, Date.now());
+  ok(st4.spins === 40, "still 40 on immediate re-tick (clock fully fast-forwarded)");
+})();
+
 /* --- leaf retirement (2026-09-20 visual redo): no leaf anywhere --- */
 (function () {
   const ids = C.symbols.map(s => s.id);
