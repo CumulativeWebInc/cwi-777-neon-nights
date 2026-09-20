@@ -43,6 +43,22 @@
       list.innerHTML = entry.bullets.map(b => `<li>${b}</li>`).join("");
       if (entry.rtl) list.setAttribute("dir", "rtl"); else list.removeAttribute("dir");
     }
+    // Install guide renders in the player's language (falls back to English
+    // for locales that haven't shipped their install strings yet).
+    const inst = (entry && entry.install) || (I18N.en && I18N.en.install) || {};
+    const it = $("installTitle");
+    if (it && inst.title) {
+      it.textContent = inst.title;
+      const steps = $("installSteps");
+      if (steps) {
+        const ios = isIOS();
+        const arr = ios ? [inst.ios1, inst.ios2, inst.ios3] : [inst.android, inst.ios3];
+        steps.innerHTML = arr.filter(Boolean).map(s => `<li>${s}</li>`).join("");
+        if (entry.rtl) steps.setAttribute("dir", "rtl"); else steps.removeAttribute("dir");
+      }
+      const note = $("installNote");
+      if (note) note.textContent = inst.note || "";
+    }
     const pk = $("langPicker");
     if (pk && pk.value !== code) pk.value = code;
   }
@@ -58,7 +74,7 @@
   /* ---------- audio ---------- */
   const audio = new Audio(C.audioFile);
   audio.loop = true; audio.preload = "auto";
-  let audioReady = false, userGestured = false, triedFull = false;
+  let audioReady = false, userGestured = false, triedFull = false, audioUnlocked = false;
   audio.addEventListener("canplay", () => { audioReady = true; });
   audio.addEventListener("error", () => {
     // Loop file failed (e.g. blocked decode) — fall back to the full-quality file once.
@@ -71,11 +87,52 @@
     if (!userGestured || S.muted || !audioReady) return;
     audio.play().catch(() => {});
   }
-  document.addEventListener("pointerdown", function once() {
-    userGestured = true; tryPlay();
-  }, { once: false });
+  function firstGesture() {
+    userGestured = true;
+    if (!audioUnlocked) {
+      audioUnlocked = true;
+      // First gesture: unlock synchronously INSIDE the handler. Deliberately
+      // not gated on audioReady/canplay — the play() call itself carries the
+      // user activation (the iPhone post-mortem: gating on canplay wasted the
+      // first tap). The element goes audible as soon as data arrives; mute
+      // state is still respected, and visibility/mute pauses are unchanged.
+      if (!S.muted) audio.play().catch(() => {});
+    }
+    tryPlay();
+  }
+  // iOS Safari can report pointerdown late or not at all in some embedded
+  // webviews; listen on both so the first tap always unlocks the music.
+  document.addEventListener("pointerdown", firstGesture, { passive: true });
+  document.addEventListener("touchstart", firstGesture, { passive: true });
+  // Playback-state diagnostics for QA (cheap object, no PII).
+  window.__nnAudioState = function () {
+    return {
+      ready: audioReady, gestured: userGestured, unlocked: audioUnlocked,
+      triedFull: triedFull, muted: S.muted, hidden: document.hidden,
+      paused: audio.paused, ended: audio.ended,
+      currentTime: Math.round(audio.currentTime * 10) / 10,
+      readyState: audio.readyState, error: !!audio.error,
+    };
+  };
+  let visRetryTimer = null;
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) audio.pause(); else tryPlay();
+    if (document.hidden) {
+      audio.pause();
+      if (visRetryTimer) { clearInterval(visRetryTimer); visRetryTimer = null; }
+    } else {
+      // iOS interruptions (calls, alarms, silent switch) can leave the
+      // element paused even after we return — retry play a few times so the
+      // music actually resumes instead of one hopeful attempt.
+      tryPlay();
+      let n = 0;
+      if (visRetryTimer) clearInterval(visRetryTimer);
+      visRetryTimer = setInterval(() => {
+        tryPlay();
+        if (!audio.paused || S.muted || ++n >= 5) {
+          clearInterval(visRetryTimer); visRetryTimer = null;
+        }
+      }, 1000);
+    }
   });
 
   /* ---------- helpers ---------- */
@@ -346,6 +403,50 @@
     });
     refresh();
   }
+
+  /* ---------- install UI: native prompt + iOS guided walkthrough ----------
+     Translated into the player's language (see applyLang). PWA only — the UI
+     never claims App Store or Google Play availability. */
+  function isIOS() {
+    try {
+      const ua = navigator.userAgent || "";
+      return /iphone|ipad|ipod/i.test(ua) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    } catch (e) { return false; }
+  }
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const b = $("installBtn");
+    if (b) b.classList.remove("hidden");
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    const b = $("installBtn");
+    if (b) b.classList.add("hidden");
+  });
+  function openInstall() {
+    applyLang(lang); // re-render in case the language changed since page load
+    $("installGoBtn").classList.toggle("hidden", !deferredPrompt);
+    $("installModal").classList.remove("hidden");
+  }
+  const iBtn = $("installBtn");
+  if (iBtn) {
+    // On iOS there is no beforeinstallprompt — the walkthrough is the install
+    // path, so the button is always visible. Everywhere else it appears when
+    // the browser fires beforeinstallprompt.
+    if (isIOS() && !navigator.standalone) iBtn.classList.remove("hidden");
+    iBtn.addEventListener("click", openInstall);
+  }
+  const goBtn = $("installGoBtn");
+  if (goBtn) goBtn.addEventListener("click", () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; }).catch(() => {});
+    $("installModal").classList.add("hidden");
+  });
+  window.NN_INSTALL_TEST = { isIOS, openInstall }; // QA wiring hook
 
   /* ---------- modals / buttons ---------- */
   document.querySelectorAll("[data-close]").forEach(b =>

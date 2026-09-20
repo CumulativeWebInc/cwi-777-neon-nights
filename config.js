@@ -74,9 +74,14 @@ const CONFIG = {
   // Jackpot (777) prize: winner picks a free streaming link. All URLs verified.
   jackpotLinks: [
     { platform: "Spotify",     url: "https://open.spotify.com/track/4XP56LZjeS0TJUd30kpGSK" },
-    { platform: "Apple Music", url: "https://music.apple.com/us/album/neon-nights-pt-777/1660915130?i=1660915131" },
-    { platform: "Amazon Music",url: "https://music.amazon.com/albums/B0BQRC5NY5?marketplaceId=ATVPDKIKX0DER&musicTerritory=US" },
-    { platform: "Deezer",      url: "https://www.deezer.com/album/388911647" },
+    { platform: "Spotify",     url: "https://open.spotify.com/artist/2f9j460EwjfvjYp3trBcb7" }, // Black-supplied 2026-09-20, canonical (no ?si=/?utm_source=). Artist ID matches the verified artist ID.
+    { platform: "Apple Music", url: "https://music.apple.com/us/artist/that-boy-hi-hat/1590210881" }, // Black-supplied 2026-09-20. (Old album URL: https://music.apple.com/us/album/neon-nights-pt-777/1660915130?i=1660915131)
+    { platform: "Amazon Music",url: "https://music.amazon.com/artists/B09JFCWZYG" }, // Black-supplied 2026-09-20 from his Amazon Music app share (bot-walled for fetch; treated as his verified link). Canonical, no ?ref= token. (Old album URL: https://music.amazon.com/albums/B0BQRC5NY5?marketplaceId=ATVPDKIKX0DER&musicTerritory=US)
+    { platform: "Deezer",      url: "https://www.deezer.com/us/artist/148421152" }, // verified 2026-09-20: That Boy Hi Hat artist page (artist ID matches known seed; discography: Idol or Icon, The Alternative Theory, Post Trap Futurism: The Logo Effect). Canonical, no utm params. (Old album URL: https://www.deezer.com/album/388911647)
+    { platform: "YouTube",     url: "https://www.youtube.com/watch?v=3L5eUDui-00" }, // verified 2026-09-20 (oEmbed: "Neon Nights pt. 777" — That Boy Hi Hat - Topic)
+    { platform: "YouTube Music", url: "https://music.youtube.com/channel/UCdlSWhZXKKNPhjXDknHzzpQ" }, // verified 2026-09-20 (Black-supplied, live title-confirmed "That Boy Hi Hat"; canonical, no ?si= token). Re-sent youtube.com/channel form w/ ?si= same day — canonical music.youtube.com form kept.
+    { platform: "Tidal",       url: "https://tidal.com/track/267845274" }, // verified 2026-09-20 via TIDAL's own search: "Neon Nights pt. 777" by That Boy Hi Hat, 1-track single, 2022-12-23, 3:47, Explicit, label CUMULATIVE WEB INC
+    { platform: "Pandora",     url: "https://www.pandora.com/artist/that-boy-hi-hat/ARd7j9fggX32x6q" }, // verified 2026-09-20: Black's short link https://pandora.app.link/OIHcaPZYA6b resolves (via its own deep-link metadata) to this canonical artist page. Canonical, no utm/part params.
     { platform: "All platforms", url: "https://distrokid.com/hyperfollow/thatboyhihat/neon-nights-pt-777" },
   ],
 

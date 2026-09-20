@@ -117,3 +117,118 @@ In-browser link check confirmed the rendered payout anchors are byte-identical t
 - Added: `game/cabinet.js` (canvas renderer), `game/cabinet-anim.test.js`, `game/art/redo-rest.png`, `game/art/redo-spin.png`, `game/art/redo-jackpot.png`.
 - Changed: `game/config.js` (leaf retired, bell 3→6), `game/game.js` (canvas spin wiring, no-leaf rests/teaser, NN_GAME handle), `game/index.html` (canvas element, toolbar, sr-only fallback), `game/styles.css` (cabinet/canvas presentation), `game/sw.js` (`nn777-v2`, precaches `cabinet.js` + 3 screenshots), `game/game-logic.test.js` (leaf-retirement proofs).
 - Behavior preserved: 3 stages/9 rounds, Encore round, 41-language how-to, metrics/issuance ledger, score formula/codes, payout screen, listening gates/prizes, mute-pauses-accrual, 200-spin pity cap, all no-gambling/no-cash language.
+
+---
+
+## nn777-v4 — Install UI (all 41 languages), YouTube payout, audio hardening (2026-09-20)
+
+Black's add: "fine as long as it's instructions and a translation for this info too."
+
+**Install UI**
+- New `installModal` in `index.html`: title + steps + PWA honesty note, all rendered from `NN_I18N[<lang>].install` via `applyLang` (English fallback for any locale missing strings).
+- New 📲 Install button in the cabinet toolbar. On iOS (no `beforeinstallprompt`) it is always visible and opens the guided walkthrough (Share → Add to Home Screen → open from home screen); on Android/desktop Chrome/Edge it appears when `beforeinstallprompt` fires and the INSTALL button fires the native prompt; `appinstalled` hides the button.
+- iOS detection: iPhone/iPad/iPod UA or MacIntel+touch. Steps differ by platform: iOS shows the 3-step walkthrough; elsewhere shows the native-prompt hint + "open from home screen" line.
+- Never claims App Store/Play Store availability. The note honestly says PWA — "no app-store download needed."
+- `game.js` exposes `window.NN_INSTALL_TEST = { isIOS, openInstall }` as a QA wiring hook.
+
+**i18n (41/41 locales, 6 keys each)**
+- Added `install: { title, android, ios1, ios2, ios3, note }` to every locale in `game/i18n.js` (40 translated by a dedicated agent into `/tmp/nn777-install-strings.json`, zh-TW added with Taiwan iOS wording "加入主畫面"; en written directly).
+- All 5 how-to bullets per locale preserved (verified: no locale has !=5 bullets).
+
+**Payout**
+- `config.js` `jackpotLinks`: added YouTube `https://www.youtube.com/watch?v=3L5eUDui-00` (verified 2026-09-20: oEmbed "Neon Nights pt. 777" — That Boy Hi Hat - Topic; watch page 200).
+- Tidal: NO URL added. No verified direct Tidal track URL exists anywhere checked (search engines, DistroKid HyperFollow wall, Tidal unauthenticated API 401, Songlink). Guessing a Tidal ID is explicitly forbidden — pending browser-capable verification.
+
+**Audio hardening**
+- Added explicit `touchstart` listener alongside `pointerdown` for first-gesture unlock (some iOS webviews report pointerdown late).
+- `visibilitychange` resume now retries `tryPlay()` up to 5× at 1s intervals after returning from background (covers iOS call/alarm interruptions).
+- Playback-state diagnostics on `window.__nnAudioState` (ready/gestured/unlocked/muted/paused/readyState/error — no PII).
+
+**PWA**
+- New `game/icons/icon-180.png` (resized from icon-192); `apple-touch-icon` now points at it.
+- `manifest.webmanifest`: 180/192/512 normal entries + separate maskable 192/512 (previous `"purpose":"any maskable"` was a single invalid purpose value — split).
+- `game/VERSION.json` (build `nn777-v4`) + `game/CHANGELOG.md` added; `index.html` NN_BUILD and `sw.js` cache tag bumped to `nn777-v4`; `icon-180.png` added to the SW precache list.
+
+**Tests**
+- New `game/install-i18n.test.js`: 1540/1540 pass — 41 locales × 6 non-empty keys, no gambling/store-availability claims, YouTube present, no invented Tidal, manifest icon coverage, VERSION/CHANGELOG/build-tag sync, apple-touch-icon check.
+- Regression: `game-logic.test.js` 50/50, `payout-metrics.test.js` 33/33, `node --check` green on i18n.js + game.js.
+
+**Still owed (not pushed)**: mobile-emulation touch test, Lighthouse PWA audit, 150-spin soak, Tidal verification, Pages deploy + poll, Black's actual-iPhone gate.
+
+### Tidal payout added (2026-09-20)
+- Black himself verified the official That Boy Hi Hat Tidal artist page: `https://tidal.com/artist/28839612` (live HTTP 200, title "That Boy Hi Hat on TIDAL"). Added as the Tidal jackpot option in `game/config.js`; test now asserts the verified artist URL and forbids any guessed `tidal.com/track/` or `/album/` URL.
+- Exact track page for "Neon Nights pt. 777" still pending from a browser hunt; if found, it will replace the artist page.
+
+### Tidal track page verified (2026-09-20)
+- Browser hunt via TIDAL's own search confirmed the exact track page: `https://tidal.com/track/267845274` — "Neon Nights pt. 777" by That Boy Hi Hat, 1-track single, released 2022-12-23, 3:47, Explicit, label CUMULATIVE WEB INC. Replaced the artist page as the Tidal jackpot option in `game/config.js`. Test now requires exactly this URL as the only Tidal URL present.
+- The resolver's Tidal gap for this track is closed.
+
+### YouTube Music payout added (2026-09-20)
+- Black supplied the official YouTube Music artist channel, fetched live and title-confirmed "That Boy Hi Hat": `https://music.youtube.com/channel/UCdlSWhZXKKNPhjXDknHzzpQ` (canonical form, no `?si=` share token). Added as "YouTube Music" alongside the existing YouTube track-video option in `game/config.js`. Test asserts the URL and rejects any share-token URLs. YouTube discovery gap closed.
+
+### Amazon Music artist page (2026-09-20)
+- Black supplied from his own Amazon Music app share: `https://music.amazon.com/artists/B09JFCWZYG` (canonical, no `?ref=` token). Fetch hit Amazon's bot wall, so this is treated as his verified link per his standing rule (his material is ground truth). Replaced the album URL as the Amazon Music jackpot option; old URL recorded in the config comment. Test asserts it is the single Amazon URL present.
+
+### Payout lineup refresh (2026-09-20)
+- Spotify: added artist page `https://open.spotify.com/artist/2f9j460EwjfvjYp3trBcb7` (Black-supplied, canonical, no ?si=/?utm_source=; artist ID matches the verified artist ID). Kept alongside the existing track link.
+- Apple Music: option is now the Black-supplied artist page `https://music.apple.com/us/artist/that-boy-hi-hat/1590210881` (old album URL recorded in comment).
+- Deezer: option is now `https://www.deezer.com/us/artist/148421152` — resolved from Black's short link, verified live as the That Boy Hi Hat artist page (artist ID 148421152 matches the known seed; discography shows Idol or Icon, The Alternative Theory, Post Trap Futurism: The Logo Effect). Canonical, no utm params.
+- Pandora: ADDED — Black's short link `https://pandora.app.link/OIHcaPZYA6b` resolves via its own deep-link metadata to canonical artist page `https://www.pandora.com/artist/that-boy-hi-hat/ARd7j9fggX32x6q` (direct fetch hits Pandora's datacenter bot wall → /restricted, expected). This closes the long-standing Pandora omission (verified direct URL now found).
+- YouTube: Black re-sent the channel in youtube.com/channel form with a ?si= token — same channel ID; the canonical `https://music.youtube.com/channel/UCdlSWhZXKKNPhjXDknHzzpQ` stays on the payout screen. No change.
+- Test hardened: payout-URL checks now scope to the jackpotLinks array (bonus links share domains) and assert each option is the single canonical verified URL, no share tokens.
+
+---
+
+## 3D rebuild (2026-09-20) — Three.js cabinet
+
+### Why rebuilt
+Black rejected the Canvas-2D version: it failed on his iPhone and did not resemble the reference video. The 3D rebuild targets "a product Black would release."
+
+### Root causes (2D failure)
+1. **iPhone WebGL context failure** — the 2D canvas path assumed WebGL availability; on Black's iPhone the context creation failed and the page went blank with no fallback.
+2. **No visible fallback** — when the 3D/WebGL path failed, users saw a dead page instead of a playable DOM fallback.
+3. **Reference mismatch** — flat 2D rendering could not reproduce the chrome-cabinet, neon-marquee, cylindrical-reel look of the reference video.
+
+### What the 3D build does
+- **Three.js 0.160.0 vendored locally** (`game/vendor/three/`) — zero runtime CDN dependencies; import map pins `three` and `three/addons/`.
+- **PBR chrome cabinet** with RoomEnvironment/PMREM reflections for true metallic surfaces.
+- **Dark casino setting** with bokeh sprites; orange TubeGeometry edge lights tracing the cabinet.
+- **NEON NIGHTS marquee** (emissive text) + **JACKPOT sign** with flare modes.
+- **Three cylindrical 10-cell reels** — symbols drawn in texture space, always upright; only cherries, lemons, bells, red 7s (no leaf, per spec).
+- **Seven physical buttons**; red-button raycasting + CDP touch-tap support.
+- **Spin choreography**: staggered start, anticipation slowdown, settle bounce, motion-blur ghosts, camera push-in/relax.
+- **Celebration**: token pour (220 pooled), spark particles, token mound, @CUMULATIVEWEB watermark.
+- **Post**: EffectComposer → RenderPass → UnrealBloomPass → OutputPass; mobile DPR cap 1.5, desktop 2.
+- **Low-FPS kill-switch**: honest 2-second raw-delta sampling; composer disengages below 50 FPS (verified engaging at ~0.4 FPS under SwiftShader).
+- **DOM fallback**: when WebGL is unavailable, a visible (never sr-only) DOM reel cabinet boots and plays; verified 4/4.
+- **Boot watchdog**: 9s timer — if the module graph fails, a visible "Tap to retry" UI appears (verified via network-blocked cabinet3d.js).
+- **Public API** (`window.NN_CABINET`): exactly `init, setRest, spin, celebrate, endCelebrate, setSpins, setSignFlare, onSpinRequest, fpsStats` (enumerable). QA hooks `_debugRedCenter`/`_debugPerf` are non-enumerable; `_debugExposure`, `celebrating`, `settled`, `domFallback` removed.
+
+### Service worker
+- Cache `nn777-v4` (bumped from v3 to force refresh of the 3D assets).
+- Installs on window load; `controllerchange` → reload; `updatefound` → `installed` → update toast with SKIP_WAITING.
+- Cache hygiene: only OK responses cached; 404s never cached (verified with bogus asset).
+- **Real update verified**: deployed byte-different sw.js to staging, `r.update()` → new SW installed → toast surfaced → restored.
+
+### QA receipts (2026-09-20, staging https://cumulativewebinc.github.io/nn777-qa-stage/)
+| Suite | Result |
+|---|---|
+| Standard | **13/13 pass** — boot, WebGL (SwiftShader), zero errors, red-button touch → spin → settle (totalSpins 0→1), kill-switch honest (0.4 FPS, composer off), 41 i18n × 5 bullets, SW v4 active, cache hygiene, 404 not cached, update toast + SKIP_WAITING |
+| Resilience | **6/6 pass** — config.js byte-identical (6,588B, 16 links all resolve), module-failure → retry UI, clean boot, WebGL with non-same-origin blocked, real SW update → toast |
+| Fallback (no WebGL) | **4/4 pass** — boots, WebGL truly absent, DOM fallback visible, spin settles |
+| game-logic.test.js | 50 passed |
+| payout-metrics.test.js | 33 passed |
+| cabinet3d-anim.test.mjs | 48 passed |
+| sw.js | syntax OK |
+
+### Honest limitations
+- **Host has no GPU** (/dev/dri absent, no NVIDIA) — Chromium runs SwiftShader (~0.3–0.6 FPS). This host **cannot prove real-iPhone FPS or ≥55 FPS**. The valid host-side proof is honest low-FPS detection and composer disengagement, both verified.
+- **First-gesture audio**: verified unlocked synchronously in `pointerdown` to the extent Chromium permits; real iOS Safari behavior needs on-device confirmation.
+- **150-spin soak**: deferred to production verification (staging suite covers single-spin settle; soak is a production gate).
+
+### Files
+- `game/cabinet3d.js` (WebGL + DOM cabinets, exact 9-method API)
+- `game/cabinet-anim.js`, `game/cabinet3d-anim.test.mjs`
+- `game/vendor/three/**` (0.160.0, local)
+- `game/.nojekyll`, `game/sw.js` (v4), `game/index.html`
+- `qa/qa3d.js` (standard + resilience), `qa/qa3d-fallback.js`, `qa/deploy.js`, `qa/deploy3d.js`

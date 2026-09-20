@@ -47,9 +47,10 @@ body{
   background:linear-gradient(90deg,var(--neon),var(--gold)); box-shadow:0 0 10px var(--neon);
   transition:width .4s}
 
-/* cabinet shell is canvas-rendered (cabinet.js). The DOM reel/button rules below
-   only style the screen-reader fallback + modals; the visible cabinet lives
-   on #cabinetCanvas. */
+/* cabinet shell is 3D-rendered (cabinet3d.js, Three.js). The DOM rules below
+   style the screen-reader fallback + modals; the visible cabinet lives
+   on #cabinetCanvas. If WebGL is unavailable the fallback becomes VISIBLE
+   (.dom-visible) and fully playable — never a blank page. */
 .cabinet-fallback .reel{position:absolute}
 .spin-btn{font-size:24px; font-weight:900; letter-spacing:3px; color:#2a0d00; padding:14px;
   border:none; border-radius:14px; cursor:pointer;
@@ -132,3 +133,46 @@ ol.howto[dir="rtl"] { margin: 0 1.1rem 0.8rem 0; }
 #scorePanel .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; align-items: center; }
 #scorePanel input { background: #141428; color: #fff; border: 1px solid #ffd16655; border-radius: 8px; padding: 6px 8px; font-size: 0.85rem; }
 #scorePanel #importCode { flex: 1; min-width: 12rem; }
+
+/* ---------- visible DOM fallback (no-WebGL path) ---------- */
+.cabinet-fallback.dom-visible{position:relative; overflow:hidden; border-radius:18px;
+  background:linear-gradient(180deg,#2a0d0d,#140608 30%,#0a0507);
+  border:2px solid #ff8c1a; box-shadow:0 0 26px rgba(255,140,26,.35), inset 0 0 40px rgba(0,0,0,.6);
+  padding:14px; margin-bottom:6px}
+.cabinet-fallback.dom-visible .jackpot-sign{text-align:center; font-size:30px; font-weight:900;
+  letter-spacing:2px; color:#ffb3ab; background:#1c0505; border-radius:10px; padding:8px;
+  text-shadow:0 0 8px #ff2a1a, 0 0 24px #ff2a1a; margin-bottom:12px}
+.cabinet-fallback.dom-visible .jackpot-sign.flaring{color:#fff;
+  text-shadow:0 0 10px #ff2a1a, 0 0 34px #ff2a1a, 0 0 60px #ff2a1a;
+  animation:signflare .5s infinite alternate}
+@keyframes signflare{from{filter:brightness(1)}to{filter:brightness(1.45)}}
+.cabinet-fallback.dom-visible .reels{display:flex; gap:8px; justify-content:center; margin-bottom:12px}
+.cabinet-fallback.dom-visible .reel{position:relative; width:110px; height:216px; overflow:hidden;
+  background:linear-gradient(180deg,#efe9db,#fbf7ec 50%,#ddd5c2); border-radius:10px;
+  border:2px solid #8a8a92; box-shadow:inset 0 8px 18px rgba(0,0,0,.25)}
+.cabinet-fallback.dom-visible .reel .strip{position:absolute; top:0; left:0; width:100%}
+.cabinet-fallback.dom-visible .reel .cell{height:72px; display:flex; align-items:center; justify-content:center}
+.cabinet-fallback.dom-visible .reel .cell .sym{width:56px; height:56px}
+.cabinet-fallback.dom-visible .reel .winline{position:absolute; left:0; right:0; top:50%; height:3px;
+  background:#ff2222; box-shadow:0 0 8px #ff2222; transform:translateY(-50%)}
+.cabinet-fallback.dom-visible .controls{display:flex; gap:12px; align-items:center; justify-content:center}
+.cabinet-fallback.dom-visible .meters{display:flex; gap:10px; color:var(--gold); font-weight:800}
+.dom-tokens{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+.dom-tokens i{position:absolute; top:-16px; width:12px; height:12px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #ffe9a8, #d9a821);
+  box-shadow:0 0 8px #ffd34d; animation:domtokenfall 2.6s ease-in forwards}
+@keyframes domtokenfall{to{transform:translateY(560px) rotate(540deg); opacity:.9}}
+
+/* ---------- boot-failure retry UI ---------- */
+.boot-retry{position:fixed; inset:0; z-index:80; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px; text-align:center; padding:24px;
+  background:rgba(5,2,3,.96)}
+.boot-retry.hidden{display:none}
+.boot-retry h2{color:#ffe9c9; margin:0}
+.boot-retry p{color:var(--muted); max-width:340px}
+
+/* ---------- 3D canvas sizing ---------- */
+#cabinet{position:relative; width:100%; aspect-ratio:480/880}
+#cabinetCanvas{display:block; width:100%!important; height:100%!important; border-radius:18px}
+.dom-fallback-active{aspect-ratio:auto}
+.dom-fallback-active #cabinetCanvas{display:none}

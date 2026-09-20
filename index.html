@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#140608">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="777 Neon Nights">
@@ -83,6 +83,7 @@
     <div class="cabinet-toolbar">
       <button id="muteBtn" class="icon-btn" aria-label="mute">🔊</button>
       <button id="encoreBtn" class="icon-btn locked" aria-label="encore round">🎰</button>
+      <button id="installBtn" class="icon-btn hidden" aria-label="install">📲</button>
       <select id="langPicker" class="lang-picker" aria-label="language"></select>
     </div>
     <div class="listenbar">
@@ -177,21 +178,126 @@
   </div>
 </div>
 
+<!-- Install guide modal: translated into the player's language. Android/desktop
+     fires the native prompt; iOS gets the Share → Add to Home Screen walkthrough. -->
+<div class="modal hidden" id="installModal">
+  <div class="modal-card">
+    <h2 id="installTitle">Install this game</h2>
+    <ol class="howto" id="installSteps"></ol>
+    <p class="fine" id="installNote"></p>
+    <div class="payout-actions">
+      <button id="installGoBtn" class="spin-btn small hidden">📲 INSTALL</button>
+      <button class="close-btn" data-close="installModal">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast hidden" id="toast"></div>
+
+<!-- Boot-failure recovery UI: shown by the watchdog if the module graph fails
+     to load (stale CDN, blocked vendor file). Never a blank dead page. -->
+<div class="boot-retry hidden" id="bootRetry" role="alert">
+  <h2>Couldn't start the cabinet</h2>
+  <p>The game files didn't finish loading (this can happen right after an update).
+     Your progress is saved on this device.</p>
+  <button id="bootRetryBtn" class="spin-btn small" onclick="location.reload()">↻ Tap to retry</button>
+  <p class="fine">Free promo game. No gambling. No cash prizes.</p>
+</div>
+
+<!-- Boot reliability: any uncaught error becomes a VISIBLE toast, never a silent blank page. -->
+<script>
+window.NN_BUILD = "nn777-v4";
+window.__nnErrors = [];
+window.addEventListener("error", function (e) {
+  try {
+    window.__nnErrors.push(String((e && e.message) || "error"));
+    var t = document.getElementById("toast");
+    if (t) { t.textContent = "⚠️ " + ((e && e.message) || "Something hiccuped — reloading usually fixes it."); t.classList.remove("hidden"); }
+  } catch (x) {}
+});
+window.addEventListener("unhandledrejection", function (e) {
+  try {
+    window.__nnErrors.push(String((e && e.reason && e.reason.message) || e.reason || "rejection"));
+  } catch (x) {}
+});
+// Boot watchdog: if the module graph failed (e.g. a stale CDN served index.html
+// without its JS), NN_GAME or NN_CABINET stays undefined -> show a retry UI,
+// never a blank dead page.
+setTimeout(function () {
+  try {
+    if (!window.NN_GAME || !window.NN_CABINET) {
+      var r = document.getElementById("bootRetry");
+      if (r) r.classList.remove("hidden");
+      var cv = document.getElementById("cabinetCanvas");
+      if (cv) cv.setAttribute("aria-label", "777 Neon Nights failed to load. Use the retry button below.");
+    } else {
+      window.NN_READY = true;
+    }
+  } catch (x) {}
+}, 9000);
+</script>
 
 <script src="config.js"></script>
 <script src="logic.js"></script>
 <script src="i18n.js"></script>
 <script src="metrics.js"></script>
 <script src="scores.js"></script>
-<script src="cabinet.js"></script>
-<script src="game.js"></script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
 }
+</script>
+<script type="module" src="cabinet-anim.js"></script>
+<script type="module" src="cabinet3d.js"></script>
+<script type="module" src="game.js"></script>
+<script>
+// Service worker: nn777-v3. Never caches error responses; non-atomic install.
+// Version handshake: when a new SW is waiting, show an "Update available —
+// tap to reload" toast instead of letting a phone sit on a stale build.
+(function () {
+  if (!("serviceWorker" in navigator)) return;
+  function showUpdateToast(reg) {
+    try {
+      var t = document.getElementById("toast");
+      if (!t) return;
+      t.innerHTML = "";
+      var s = document.createElement("span");
+      s.textContent = "✨ Update available — tap to reload";
+      var b = document.createElement("button");
+      b.className = "link-btn"; b.textContent = "Reload";
+      b.style.marginLeft = "10px";
+      b.onclick = function () {
+        try {
+          if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        } catch (x) {}
+        setTimeout(function () { location.reload(); }, 600);
+      };
+      t.appendChild(s); t.appendChild(b);
+      t.classList.remove("hidden");
+      window.__nnUpdateToastShown = true;
+    } catch (x) {}
+  }
+  window.NN_SW_TEST = { showUpdateToast: showUpdateToast }; // QA wiring hook
+  var reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (!reloaded) { reloaded = true; location.reload(); }
+  });
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").then(function (reg) {
+      if (reg.waiting) showUpdateToast(reg);
+      reg.addEventListener("updatefound", function () {
+        var sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener("statechange", function () {
+          if (sw.state === "installed" && navigator.serviceWorker.controller) showUpdateToast(reg);
+        });
+      });
+    }).catch(function () {});
+  });
+})();
 </script>
 </body>
 </html>

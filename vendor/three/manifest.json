@@ -1,0 +1,50 @@
+{
+  "version": "0.160.0",
+  "core": "build/three.module.min.js",
+  "files": [
+    {
+      "src": "examples/jsm/postprocessing/EffectComposer.js",
+      "bytes": 4651
+    },
+    {
+      "src": "examples/jsm/postprocessing/MaskPass.js",
+      "bytes": 2231
+    },
+    {
+      "src": "examples/jsm/postprocessing/OutputPass.js",
+      "bytes": 2398
+    },
+    {
+      "src": "examples/jsm/postprocessing/Pass.js",
+      "bytes": 1706
+    },
+    {
+      "src": "examples/jsm/postprocessing/RenderPass.js",
+      "bytes": 1915
+    },
+    {
+      "src": "examples/jsm/postprocessing/ShaderPass.js",
+      "bytes": 1576
+    },
+    {
+      "src": "examples/jsm/postprocessing/UnrealBloomPass.js",
+      "bytes": 12406
+    },
+    {
+      "src": "examples/jsm/shaders/CopyShader.js",
+      "bytes": 571
+    },
+    {
+      "src": "examples/jsm/shaders/LuminosityHighPassShader.js",
+      "bytes": 1192
+    },
+    {
+      "src": "examples/jsm/shaders/OutputShader.js",
+      "bytes": 1393
+    },
+    {
+      "src": "examples/jsm/environments/RoomEnvironment.js",
+      "bytes": 3735
+    }
+  ]
+}
