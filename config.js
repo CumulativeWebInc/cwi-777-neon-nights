@@ -19,11 +19,33 @@ const CONFIG = {
   pitySpins: 200,
   // Neon Credits: fun points — NO money value, redeemable only for free music links.
   // A jackpot (1000) reaches the link price instantly; smaller wins accumulate.
-  creditAwards: { jackpot: 1000, triple: 50, prize: 25 },
+  // Song replays (+25 per full loop) and one-time like/share/follow actions
+  // (+25 each) keep the game-over loop earning without spending.
+  creditAwards: { jackpot: 1000, triple: 50, prize: 25, replay: 25, like: 25, share: 25, follow: 25 },
   creditLinkPrice: 1000,
+  // Game-over refill: 10 spins for 25 credits (never purchasable with money).
+  spinBuy: { price: 25, spins: 10 },
+  // Canonical game URL used in share payloads.
+  gameUrl: "https://cumulativewebinc.github.io/cwi-777-neon-nights/",
+  // "Like the song" opens one of these allowlisted TRACK pages in a new tab
+  // (once-ever +25). Track-level URLs only — every one below is already
+  // allowlisted in jackpotLinks (asserted by tests). Apple Music and
+  // YouTube Music have no track-level URL in the verified allowlist, so no
+  // track link is offered there — URLs are never invented.
+  likeLinks: [
+    { platform: "Spotify", url: "https://open.spotify.com/track/4XP56LZjeS0TJUd30kpGSK" },
+    { platform: "YouTube", url: "https://www.youtube.com/watch?v=3L5eUDui-00" },
+    { platform: "TIDAL",   url: "https://tidal.com/track/267845274" },
+  ],
+  // "Follow That Boy Hi Hat" opens one of these allowlisted ARTIST pages
+  // (once-ever +25). Both URLs are in jackpotLinks (asserted by tests).
+  followLinks: [
+    { platform: "Spotify",     url: "https://open.spotify.com/artist/2f9j460EwjfvjYp3trBcb7" },
+    { platform: "Apple Music", url: "https://music.apple.com/us/artist/that-boy-hi-hat/1590210881" },
+  ],
 
   // Free-spin economy (never purchasable)
-  spinsStart: 30, spinCap: 40, spinRegenSec: 45,
+  spinsStart: 40, spinCap: 40, spinRegenSec: 45,
 
   stages: [
     { id: "lobby", name: "Lobby Lights", theme: "orange",

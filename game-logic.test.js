@@ -222,5 +222,81 @@ function rng32(seed) {
   ok(!bad, "spin() never lands leaf on reels or as triple (n=2000)");
 })();
 
+/* --- v8.2 GAME OVER economy: gameOver / buySpins / awardOnce / earnOptions /
+       shouldSilence / replayTick (pure, no DOM) --- */
+(function () {
+  const st = L.newState();
+  st.spins = 0;
+  ok(L.gameOver(st) === true, "gameOver true exactly at zero spins");
+  st.spins = 1;
+  ok(L.gameOver(st) === false, "gameOver false with spins left");
+
+  // buySpins: deduct 25, add 10, refuse below 25, never negative
+  const b1 = L.newState(); b1.spins = 0; b1.credits = 25;
+  const r1 = L.buySpins(b1);
+  ok(r1.ok === true, "buySpins ok at exactly 25 credits");
+  ok(b1.credits === 0 && b1.spins === 10, "buySpins deducts 25 and adds 10 spins");
+  const b2 = L.newState(); b2.spins = 0; b2.credits = 24;
+  const r2 = L.buySpins(b2);
+  ok(r2.ok === false && r2.reason === "insufficient", "buySpins refuses below 25");
+  ok(b2.credits === 24 && b2.spins === 0, "refused purchase changes nothing");
+  const b3 = L.newState(); b3.spins = 38; b3.credits = 100;
+  L.buySpins(b3);
+  ok(b3.spins === 40, "buySpins caps at spinCap (40)");
+
+  // awardOnce: once ever, no double-pay, persists ids
+  const a1 = L.newState(); a1.credits = 0;
+  const w1 = L.awardOnce(a1, "like-song", 25);
+  ok(w1.awarded === true && a1.credits === 25, "awardOnce pays first time");
+  const w2 = L.awardOnce(a1, "like-song", 25);
+  ok(w2.awarded === false && a1.credits === 25, "awardOnce re-click never double-pays");
+  const w3 = L.awardOnce(a1, "follow-artist", 25);
+  ok(w3.awarded === true && a1.credits === 50, "follow awardOnce pays once ever (+25)");
+  const w4 = L.awardOnce(a1, "follow-artist", 25);
+  ok(w4.awarded === false && a1.credits === 50, "follow re-click never double-pays");
+  ok(a1.creditsAwarded.includes("like-song") && a1.creditsAwarded.includes("follow-artist"),
+    "creditsAwarded persists the once-ever ids");
+
+  // earnOptions: earn panel only below 25, hidden once claimed
+  const e1 = L.newState(); e1.credits = 0;
+  const o1 = L.earnOptions(e1);
+  ok(o1.canBuy === false && o1.showLike && o1.showShare && o1.showFollow,
+    "earnOptions: like/share/follow shown below 25 credits");
+  const e2 = L.newState(); e2.credits = 25;
+  const o2 = L.earnOptions(e2);
+  ok(o2.canBuy === true && !o2.showLike && !o2.showShare && !o2.showFollow,
+    "earnOptions: earn panel hidden when credits >= 25");
+  const e3 = L.newState(); e3.credits = 0; e3.creditsAwarded = ["like-song", "share-song", "follow-artist"];
+  const o3 = L.earnOptions(e3);
+  ok(!o3.showLike && !o3.showShare && !o3.showFollow,
+    "earnOptions: claimed once-ever actions stay hidden");
+
+  // shouldSilence: exactly game-over + zero credits
+  const s1 = L.newState(); s1.spins = 0; s1.credits = 0;
+  ok(L.shouldSilence(s1) === true, "shouldSilence at game-over + 0 credits");
+  const s2 = L.newState(); s2.spins = 0; s2.credits = 25;
+  ok(L.shouldSilence(s2) === false, "no silence at game-over with credits left (song keeps playing)");
+  const s3 = L.newState(); s3.spins = 5; s3.credits = 0;
+  ok(L.shouldSilence(s3) === false, "no silence with spins left even at 0 credits");
+
+  // replayTick: wrap after hearing to the end counts once; seeks never count
+  const rs = L.newReplayState();
+  const DUR = 120;
+  for (let t = 0; t <= DUR; t += 10) ok(L.replayTick(rs, t, DUR, false) === false, "no award mid-play");
+  ok(L.replayTick(rs, 2, DUR, false) === true, "completed loop awards exactly once");
+  ok(L.replayTick(rs, 3, DUR, false) === false, "no double award on the same wrap");
+  const rs2 = L.newReplayState();
+  L.replayTick(rs2, 110, DUR, false);
+  ok(L.replayTick(rs2, 5, DUR, true) === false, "seeking never awards (backward seek != wrap)");
+  const rs3 = L.newReplayState();
+  L.replayTick(rs3, 40, DUR, false);
+  ok(L.replayTick(rs3, 2, DUR, false) === false, "wrap without hearing to the end does not award");
+
+  // sharePath
+  ok(L.sharePath({ share: () => {} }) === "native", "sharePath native");
+  ok(L.sharePath({ clipboard: { writeText: () => {} } }) === "clipboard", "sharePath clipboard fallback");
+  ok(L.sharePath({}) === "none", "sharePath none");
+})();
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

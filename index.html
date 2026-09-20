@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="777 Neon Nights">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=nn777-v8.2">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -78,7 +78,7 @@
       <div class="controls">
         <button id="spinBtn" class="spin-btn">SPIN</button>
         <div class="meters">
-          <div class="meter"><span class="meter-label">SPINS</span><span id="spinsLeft">30</span></div>
+          <div class="meter"><span class="meter-label">SPINS</span><span id="spinsLeft">40</span></div>
         </div>
       </div>
     </div>
@@ -132,6 +132,54 @@
   </footer>
 </div>
 
+<!-- GAME OVER modal (v8.2): machine marquee shows GAME OVER via CAB.showPrize.
+     In silence (0 spins + 0 credits) the close button is hidden and backdrop
+     clicks don't dismiss — like/share/follow are the only way forward. -->
+<div class="modal hidden" id="gameoverModal">
+  <div class="modal-card gold">
+    <h2 class="neon-gold" id="gameoverTitle">💀 GAME OVER</h2>
+    <p id="gameoverMsg"></p>
+    <div class="credit-box" id="gameoverCreditBox">
+      <div class="credit-earn" id="gameoverScore"></div>
+      <p class="fine" id="gameoverDisclaimer"></p>
+    </div>
+    <div class="payout-actions">
+      <button id="buySpinsBtn" class="spin-btn small"></button>
+    </div>
+    <p class="fine" id="buySpinsNote"></p>
+    <div id="earnPanel">
+      <h3 class="earn-title" id="earnTitle"></h3>
+      <p class="fine" id="earnIntro"></p>
+      <div id="likeSection">
+        <p class="earn-label" id="likeLabel"></p>
+        <div class="earn-btns" id="likeBtns"></div>
+        <p class="fine" id="likeHint"></p>
+      </div>
+      <div id="followSection">
+        <p class="earn-label" id="followLabel"></p>
+        <div class="earn-btns" id="followBtns"></div>
+        <p class="fine" id="followHint"></p>
+      </div>
+      <div id="shareSection">
+        <button id="shareBtn" class="earn-btn share"></button>
+        <p class="fine" id="shareHint"></p>
+      </div>
+    </div>
+    <div class="payout-actions">
+      <button id="gameoverClose" class="close-btn"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Owner-only metrics dashboard: rendered ONLY when ?metrics=1 is in the URL.
+     Never linked from the normal UI. Read-only aggregate counts. -->
+<section class="panel hidden" id="metricsDash">
+  <h2>Owner metrics</h2>
+  <p class="fine">Read-only. Anonymous device id only — no PII.</p>
+  <div class="stats" id="metricsGrid"></div>
+  <p class="fine" id="metricsTotals"></p>
+</section>
+
 <!-- Bonus / Encore round modal -->
 <div class="modal hidden" id="bonusModal">
   <div class="modal-card gold">
@@ -177,7 +225,8 @@
     <h3 class="howto-title" id="howtoTitle">Quick how-to</h3>
     <ol class="howto" id="howtoList"></ol>
     <ul class="rules">
-      <li>Free promo game for <b>Neon Nights Pt. 777</b>. Spins are free and regenerate over time. Nothing can be bought.</li>
+      <li>Free promo game for <b>Neon Nights Pt. 777</b>. Spins are free and regenerate over time. Nothing can be bought with money.</li>
+      <li>At <b>0 spins</b> the machine calls <b>GAME OVER</b>: keep the music playing — every full song replay earns <b>+25 Neon Credits</b>. <b>10 spins for 25 credits</b>. At 0 credits the song stops — like, share or follow to earn your way back.</li>
       <li><b>No gambling:</b> no real-money wagering, no cash prizes, prizes have no cash value.</li>
       <li><b>777</b> on the middle row = jackpot: pick a free streaming link.</li>
       <li>Clear rounds to climb <b>Lobby Lights &rarr; Midnight Strip &rarr; 777 Skyline</b>.</li>
@@ -219,7 +268,7 @@
      scripts whose failures surface as masked "Script error.") are logged, never toasted:
      their bug must not masquerade as ours. -->
 <script>
-window.NN_BUILD = "nn777-v8.1";
+window.NN_BUILD = "nn777-v8.2";
 window.__nnErrors = [];
 function __nnLogError(kind, msg, file, line, col) {
   try {
@@ -268,11 +317,11 @@ setTimeout(function () {
 }, 9000);
 </script>
 
-<script src="config.js"></script>
-<script src="logic.js"></script>
-<script src="i18n.js"></script>
-<script src="metrics.js"></script>
-<script src="scores.js"></script>
+<script src="config.js?v=nn777-v8.2"></script>
+<script src="logic.js?v=nn777-v8.2"></script>
+<script src="i18n.js?v=nn777-v8.2"></script>
+<script src="metrics.js?v=nn777-v8.2"></script>
+<script src="scores.js?v=nn777-v8.2"></script>
 <script type="importmap">
 {
   "imports": {
@@ -281,9 +330,9 @@ setTimeout(function () {
   }
 }
 </script>
-<script type="module" src="cabinet-anim.js"></script>
-<script type="module" src="cabinet3d.js"></script>
-<script type="module" src="game.js"></script>
+<script type="module" src="cabinet-anim.js?v=nn777-v8.2"></script>
+<script type="module" src="cabinet3d.js?v=nn777-v8.2"></script>
+<script type="module" src="game.js?v=nn777-v8.2"></script>
 <script>
 // Service worker: nn777-v8. Never caches error responses; non-atomic install.
 // Version handshake: when a new SW is waiting, show an "Update available —

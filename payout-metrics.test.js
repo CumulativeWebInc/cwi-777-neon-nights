@@ -45,33 +45,30 @@ ok(board.length === 10, "board capped at 10");
 ok(board[0].score >= board[9].score, "board sorted desc");
 ok(SC.add("bogus", "X").ok === false, "unverified code not added");
 
-// --- metrics: schema, anonymity, local-only default ---
-const e1 = M.log("game_start", { lang: "en" });
-ok(e1.event === "game_start" && typeof e1.t === "string" && typeof e1.sid === "string", "event schema");
-ok(!("email" in e1) && !("name" in e1) && !("ip" in e1), "no PII fields");
-M.log("spin", {}); M.log("jackpot_win", {});
-ok(M.getLog().length === 3, "log accumulates");
-const rec = M.recordLinkIssued("Spotify", "https://open.spotify.com/track/x", "777 Jackpot");
-ok(rec.service === "Spotify" && typeof rec.t === "string", "issuance record");
-ok(M.getLedger().length === 1 && M.getLedger()[0].url.includes("spotify"), "ledger persists");
-ok(M.getLog().some(e => e.event === "link_issued" && e.service === "Spotify"), "link_issued event logged");
-ok(M.endpoint() === null, "no endpoint by default");
+// --- metrics: schema, anonymity, local-only (v8.2 API: store-based record/events) ---
+M.clearMetrics(global.localStorage);
+M.record(global.localStorage, "game_start", { lang: "en" });
+const evs1 = M.events(global.localStorage);
+const e1 = evs1[evs1.length - 1];
+ok(e1.name === "game_start" && typeof e1.t === "number", "event schema");
+ok(!("email" in e1) && !("ip" in e1) && !("phone" in e1) && !("device" in e1), "no PII fields");
+M.record(global.localStorage, "spin", {}); M.record(global.localStorage, "jackpot_win", {});
+ok(M.events(global.localStorage).length === 3, "log accumulates");
+let threwUnknown = false;
+try { M.record(global.localStorage, "link_issued", {}); } catch (e) { threwUnknown = true; }
+ok(threwUnknown, "unknown event rejected, never silently logged");
+ok(M.counts(global.localStorage).byEvent.spin === 1, "dashboard counts spins");
 
-M.flush().then(res => {
-  ok(res.sent === false && res.reason === "no-endpoint-configured", "flush honest with no endpoint");
-  ok(M.getOutbox().length === 4, "outbox retained locally when no endpoint");
+// --- listening-prize claims carry music links (iPhone 2026-09-20 fix) ---
+// Source-level check: claimPrizeUI must hand the payout modal a links array
+// drawn from the verified jackpotLinks allowlist (install-i18n pins the URLs).
+const fs = require("fs"), path = require("path");
+const gameSrc = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");
+const claimBody = (gameSrc.match(/function claimPrizeUI\(id\) \{([\s\S]*?)\n  \}\n/) || [null, ""])[1];
+ok(claimBody.length > 0, "claimPrizeUI body found");
+ok(/showPayout\(\{[\s\S]*links:/.test(claimBody), "claimPrizeUI passes links to the payout modal");
+ok(claimBody.includes("C.jackpotLinks"), "claimPrizeUI music links come from the verified jackpotLinks allowlist");
+ok(/title:\s*winText\("prize"/.test(claimBody), "claimPrizeUI title names the won prize (translated)");
 
-  // --- listening-prize claims carry music links (iPhone 2026-09-20 fix) ---
-  // Source-level check: claimPrizeUI must hand the payout modal a links array
-  // drawn from the verified jackpotLinks allowlist (install-i18n pins the URLs).
-  const fs = require("fs"), path = require("path");
-  const gameSrc = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");
-  const claimBody = (gameSrc.match(/function claimPrizeUI\(id\) \{([\s\S]*?)\n  \}\n/) || [null, ""])[1];
-  ok(claimBody.length > 0, "claimPrizeUI body found");
-  ok(/showPayout\(\{[\s\S]*links:/.test(claimBody), "claimPrizeUI passes links to the payout modal");
-  ok(claimBody.includes("C.jackpotLinks"), "claimPrizeUI music links come from the verified jackpotLinks allowlist");
-  ok(/title:\s*winText\("prize"/.test(claimBody), "claimPrizeUI title names the won prize (translated)");
-
-  console.log(`\n${pass} passed, ${fail} failed`);
-  process.exit(fail ? 1 : 0);
-});
+console.log(`\n${pass} passed, ${fail} failed`);
+process.exit(fail ? 1 : 0);

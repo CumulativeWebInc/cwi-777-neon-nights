@@ -5,8 +5,20 @@ import { spinLabelFor } from './cabinet-anim.js';
   const C = window.NN_CONFIG;
   const L = window.NN_LOGIC; // set below from logic.js browser export
   const M = window.NN_METRICS;
+  const metric = (name, data) => { try { M.record(localStorage, name, data || {}); } catch (e) {} };
   const SC = window.NN_SCORES;
   const CAB = window.NN_CABINET; // canvas cabinet renderer (cabinet.js)
+  /* ---------- cabinet safety: a 3D-cabinet exception must NEVER swallow the
+     DOM banner + payout modal (v8.2 hardening — Black's +50-with-no-announcement
+     was a throwing CAB.showPrize). Every CAB call goes through cabSafe: the error
+     is logged to metrics (cabinet_error) and the DOM flow continues. ---------- */
+  function cabSafe(what, fn) {
+    if (!CAB) return null;
+    try { return fn(CAB); } catch (e) {
+      metric("cabinet_error", { what, error: String((e && e.message) || e).slice(0, 200) });
+      return null;
+    }
+  }
   const $ = (id) => document.getElementById(id);
   const CELL = 72, VISIBLE = 3;
 
@@ -92,9 +104,44 @@ import { spinLabelFor } from './cabinet-anim.js';
     } else { audioReady = false; }
   });
   function tryPlay() {
-    if (!userGestured || S.muted || !audioReady) return;
+    if (!userGestured || S.muted || !audioReady || silenced) return;
     audio.play().catch(() => {});
   }
+  // v8.2 — SILENCE IS THE TRIGGER: in GAME OVER with zero Neon Credits the
+  // song must STOP (pause, not just quiet). Any way forward (replay credit,
+  // like/share/follow award, bought or regenerated spins) lifts the silence
+  // and the music resumes via tryPlay().
+  let silenced = false;
+  function updateSilence() {
+    const should = L.shouldSilence(S);
+    if (should && !silenced) {
+      silenced = true;
+      try { audio.pause(); } catch (e) {}
+      metric("song_silence", { credits: S.credits });
+    } else if (!should && silenced) {
+      silenced = false;
+      tryPlay();
+    }
+  }
+  // v8.2 — song-replay detector: each completed loop banks +25 Neon Credits.
+  // Wrapped (backward) timeupdates after hearing the track to the end count;
+  // seeks never count (see logic.js replayTick).
+  let replaySt = L.newReplayState();
+  let seekingNow = false;
+  audio.addEventListener("seeking", () => { seekingNow = true; });
+  audio.addEventListener("seeked", () => { seekingNow = false; });
+  audio.addEventListener("emptied", () => { replaySt = L.newReplayState(); });
+  audio.addEventListener("play", () => { metric("song_play", {}); });
+  audio.addEventListener("timeupdate", () => {
+    if (S.muted || audio.paused || !audioReady) return;
+    if (L.replayTick(replaySt, audio.currentTime, audio.duration, seekingNow)) {
+      const n = C.creditAwards.replay;
+      bankCredits(n, "replay");
+      metric("song_replay", { award: n, balance: S.credits });
+      toast(creditsText("replay", { n }));
+      refresh();
+    }
+  });
   function firstGesture() {
     userGestured = true;
     if (!audioUnlocked) {
@@ -179,18 +226,18 @@ import { spinLabelFor } from './cabinet-anim.js';
   function creditScoreLine() {
     return "⭐ " + creditsText("score") + ": " + S.credits;
   }
-  function bankCredits(n) {
+  function bankCredits(n, via) {
     n = Math.max(0, n | 0);
     if (!n) return S.credits;
     S.credits += n; save();
-    M.log("credit_earn", { award: n, balance: S.credits });
+    metric("credit_earn", { amount: n, balance: S.credits, via: via || "win" });
     return S.credits;
   }
-  function spendCredits(n) {
+  function spendCredits(n, via) {
     n = Math.max(0, n | 0);
     if (S.credits < n) return false;
     S.credits -= n; save();
-    M.log("credit_redeem", { spent: n, balance: S.credits });
+    metric("credit_spend", { amount: n, balance: S.credits, via: via || "redeem" });
     return true;
   }
   // Persistent on-screen win announcement + toast, naming the prize.
@@ -205,7 +252,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       bankCredits(C.creditAwards.prize);
     }
     $("winBanner").textContent = msg;
-    if (CAB) CAB.showPrize(msg, creditScoreLine()); // prize name + credit score ON THE MACHINE (all 41 languages)
+    cabSafe("showPrize", c => c.showPrize(msg, creditScoreLine())); // prize name + credit score ON THE MACHINE (all 41 languages)
     toast(msg);
   }
   function randSym() {
@@ -229,9 +276,10 @@ import { spinLabelFor } from './cabinet-anim.js';
 
   // Canvas cabinet owns the visible reels/buttons; the DOM strips above stay
   // as the screen-reader fallback (unchanged ids, unchanged behavior).
-  if (CAB && CAB.init()) {
-    CAB.setRest([["lemon", "cherry", "bell"], ["bell", "cherry", "bell"], ["cherry", "seven", "lemon"]]);
-    CAB.onSpinRequest(() => { const b = $("spinBtn"); if (b && !b.disabled) b.click(); });
+  const cabReady = !!cabSafe("init", c => c.init());
+  if (cabReady) {
+    cabSafe("setRest", c => c.setRest([["lemon", "cherry", "bell"], ["bell", "cherry", "bell"], ["cherry", "seven", "lemon"]]));
+    cabSafe("onSpinRequest", c => c.onSpinRequest(() => { const b = $("spinBtn"); if (b && !b.disabled) b.click(); }));
   }
 
   /* Visible reel animation is owned by the canvas cabinet (cabinet.js):
@@ -242,9 +290,10 @@ import { spinLabelFor } from './cabinet-anim.js';
   /* ---------- UI refresh ---------- */
   function refresh() {
     L.regenSpins(S);
+    updateSilence(); // v8.2: GAME OVER + 0 credits => song stops. Silence is the trigger.
     $("spinsLeft").textContent = S.spins;
     $("spinBtn").disabled = !L.canSpin(S);
-    if (CAB) CAB.setSpins(S.spins, L.canSpin(S));
+    cabSafe("setSpins", c => c.setSpins(S.spins, L.canSpin(S)));
     $("listenTime").textContent = fmt(S.listeningSec);
     // stage / round
     const st = C.stages[S.stageIdx];
@@ -299,6 +348,9 @@ import { spinLabelFor } from './cabinet-anim.js';
       <div>Encore wins<br><b>${S.bonusWins}</b></div>`;
     // mute icon
     $("muteBtn").textContent = S.muted ? "🔇" : "🔊";
+    // v8.2: GAME OVER modal follows the spin bank (rising edge shows it).
+    if (L.gameOver(S)) maybeShowGameOver();
+    else if (goKey !== null) { goKey = null; hideGameOver(); }
     save();
   }
 
@@ -311,33 +363,39 @@ import { spinLabelFor } from './cabinet-anim.js';
     userGestured = true; tryPlay();
     spinning = true; $("spinBtn").disabled = true;
     $("winBanner").textContent = "";
-    if (CAB) CAB.clearPrize(); // new pull: the machine's prize readout resets
-    if (CAB) CAB.setSignFlare(1);   // JACKPOT! sign flares while reels spin
+    cabSafe("clearPrize", c => c.clearPrize()); // new pull: the machine's prize readout resets
+    cabSafe("setSignFlare", c => c.setSignFlare(1));   // JACKPOT! sign flares while reels spin
     const res = L.spin(S, Math.random);
     L.applySpinResult(S, res);
     const allStopped = () => finishSpin(res);
-    if (CAB) CAB.spin(res.rows).then(allStopped);
+    const spinPromise = cabSafe("spin", c => c.spin(res.rows));
+    if (spinPromise && typeof spinPromise.then === "function")
+      spinPromise.then(allStopped, (e) => { // rejected 3D spin: log, then finish on the DOM fallback
+        metric("cabinet_error", { what: "spin_reject", error: String((e && e.message) || e).slice(0, 200) });
+        allStopped();
+      });
     else setTimeout(allStopped, 2400); // no-canvas fallback keeps game playable
     refresh();
-    M.log("spin", { totalSpins: S.totalSpins, spinsLeft: S.spins });
+    metric("spin", { totalSpins: S.totalSpins, spinsLeft: S.spins,
+      middle: res.middle.join(","), triple: res.triple || null, jackpot: !!res.jackpot });
   }
 
   function finishSpin(res) {
     spinning = false;
     if (res.jackpot) {
       // Golden token pour on the canvas, then the credit-claim payout screen.
-      if (CAB) CAB.celebrate();
+      cabSafe("celebrate", c => c.celebrate());
       bankCredits(C.creditAwards.jackpot); // +1000: jackpot reaches the link price instantly
       $("winBanner").textContent = winText("jackpot");
-      if (CAB) CAB.showPrize(winText("jackpot"), creditScoreLine()); // prize name + credit score ON THE MACHINE
-      setTimeout(() => { if (CAB) CAB.endCelebrate(); openJackpot(); }, 2400);
+      cabSafe("showPrize", c => c.showPrize(winText("jackpot"), creditScoreLine())); // prize name + credit score ON THE MACHINE
+      setTimeout(() => { cabSafe("endCelebrate", c => c.endCelebrate()); openJackpot(); }, 2400);
     } else {
-      if (CAB) CAB.setSignFlare(0);
+      cabSafe("setSignFlare", c => c.setSignFlare(0));
       if (res.triple) {
         const label = C.symbols.find(s => s.id === res.triple).label;
         bankCredits(C.creditAwards.triple); // +50 Neon Credits per triple
         $("winBanner").textContent = winText("triple", { label });
-        if (CAB) CAB.showPrize($("winBanner").textContent, creditScoreLine()); // triple + credit score ON THE MACHINE
+        cabSafe("showPrize", c => c.showPrize($("winBanner").textContent, creditScoreLine())); // triple + credit score ON THE MACHINE
         if (res.triple === "bell" && L.bonusUnlocked(S))
           toast("🔔 Triple bell! The Encore Round is calling — tap 🎰");
         setTimeout(() => openTriplePayout(label), 1200);
@@ -347,8 +405,8 @@ import { spinLabelFor } from './cabinet-anim.js';
     doneRounds.forEach(id => {
       const meta = findRound(id);
       toast(`✅ Round complete: ${meta.name}${S.stageIdx < 3 && L.currentRound(S) ? "" : ""}`);
-      if (id === "r3") { toast("🌃 Welcome to the Midnight Strip — Stage 2 unlocked"); M.log("stage_unlock", { stage: 2, name: "Midnight Strip" }); }
-      if (id === "r6") { toast("🌃 Welcome to the 777 Skyline — Stage 3 unlocked. Encore Round available!"); M.log("stage_unlock", { stage: 3, name: "777 Skyline" }); }
+      if (id === "r3") { toast("🌃 Welcome to the Midnight Strip — Stage 2 unlocked"); metric("stage_unlock", { stage: 2, name: "Midnight Strip" }); }
+      if (id === "r6") { toast("🌃 Welcome to the 777 Skyline — Stage 3 unlocked. Encore Round available!"); metric("stage_unlock", { stage: 3, name: "777 Skyline" }); }
     });
     announceNewPrizes();
     refresh();
@@ -390,8 +448,8 @@ import { spinLabelFor } from './cabinet-anim.js';
             toast("⏳ " + creditsText("need", { n: price - S.credits }));
             return;
           }
-          M.recordLinkIssued(l.label, l.url, opts.title);
-          M.log("prize_claim", { kind: opts.kind, via: l.label, credits: true });
+          
+          metric("prize_claim", { kind: opts.kind, via: l.label, credits: true });
           toast(`✅ Link issued: ${l.label} — enjoy the music 🎶`);
           refresh();
           setTimeout(() => $("payoutModal").classList.add("hidden"), 600);
@@ -405,7 +463,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       const a = document.createElement("a");
       a.href = f; a.download = f.split("/").pop();
       a.textContent = "⬇ " + f.split("/").pop();
-      a.addEventListener("click", () => M.log("prize_claim", { kind: opts.kind, file: f.split("/").pop() }));
+      a.addEventListener("click", () => metric("prize_claim", { kind: opts.kind, file: f.split("/").pop() }));
       files.appendChild(a);
     });
     $("payoutScore").textContent = SC.computeScore(S).score;
@@ -424,7 +482,7 @@ import { spinLabelFor } from './cabinet-anim.js';
           toast("⏳ " + creditsText("need", { n: price - S.credits }));
           return;
         }
-        M.log("credit_cashin_open", { kind: opts.kind, balance: S.credits });
+        metric("credit_cashin_open", { kind: opts.kind, balance: S.credits });
         creditBox.style.display = "none";
         actions.style.display = "none";
         $("payoutWhat").innerHTML = "<b>" + creditsText("choose") + "</b>";
@@ -432,7 +490,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       };
       saveBtn.textContent = creditsText("save");
       saveBtn.onclick = () => {
-        M.log("credit_save", { kind: opts.kind, balance: S.credits });
+        metric("credit_save", { kind: opts.kind, balance: S.credits });
         $("payoutModal").classList.add("hidden");
         refresh();
       };
@@ -443,7 +501,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       actions.style.display = "";
       saveBtn.textContent = opts.claimLabel || "CLOSE";
       saveBtn.onclick = () => {
-        M.log("prize_claim", { kind: opts.kind + "-close" });
+        metric("prize_claim", { kind: opts.kind + "-close" });
         $("payoutModal").classList.add("hidden");
       };
       renderLinks();
@@ -455,7 +513,7 @@ import { spinLabelFor } from './cabinet-anim.js';
 
   /* ---------- jackpot ---------- */
   function openJackpot() {
-    M.log("jackpot_win", { spinsSinceJackpot: S.spinsSinceJackpot, totalSpins: S.totalSpins });
+    metric("jackpot_win", { spinsSinceJackpot: S.spinsSinceJackpot, totalSpins: S.totalSpins });
     showPayout({
       kind: "jackpot",
       title: winText("jackpot"),
@@ -507,7 +565,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     setTimeout(() => {
       S.bonusLastPlayed = Date.now(); S.bonusWins++;
       save();
-      M.log("encore_play", { bonusWins: S.bonusWins });
+      metric("encore_play", { bonusWins: S.bonusWins });
       $("bonusModal").classList.add("hidden");
       showPayout({
         kind: "encore",
@@ -591,7 +649,26 @@ import { spinLabelFor } from './cabinet-anim.js';
   document.querySelectorAll("[data-close]").forEach(b =>
     b.addEventListener("click", () => $(b.dataset.close).classList.add("hidden")));
   document.querySelectorAll(".modal").forEach(m =>
-    m.addEventListener("click", e => { if (e.target === m) m.classList.add("hidden"); }));
+    m.addEventListener("click", e => {
+      // The GAME OVER modal never closes on backdrop click — in silence the
+      // earn actions are the only way forward.
+      if (e.target === m && m.id !== "gameoverModal") m.classList.add("hidden");
+    }));
+  // v8.2 GAME OVER actions
+  $("buySpinsBtn").addEventListener("click", () => {
+    const r = L.buySpins(S);
+    if (!r.ok) {
+      toast(creditsText("needSpins", { n: Math.max(0, C.spinBuy.price - S.credits) }));
+      return;
+    }
+    save();
+    metric("credit_spend", { amount: C.spinBuy.price, balance: S.credits, via: "spin_buy" });
+    metric("spin_buy", { price: C.spinBuy.price, spins: C.spinBuy.spins, balance: S.credits });
+    toast(creditsText("boughtSpins", { n: C.spinBuy.spins }));
+    refresh();
+  });
+  $("shareBtn").addEventListener("click", doShare);
+  $("gameoverClose").addEventListener("click", () => $("gameoverModal").classList.add("hidden"));
   $("spinBtn").addEventListener("click", doSpin);
   $("rulesBtn").addEventListener("click", () => $("rulesModal").classList.remove("hidden"));
   $("muteBtn").addEventListener("click", () => {
@@ -618,9 +695,133 @@ import { spinLabelFor } from './cabinet-anim.js';
     L.listenTick(S, audible);
     announceNewPrizes();
     const minute = Math.floor(S.listeningSec / 60);
-    if (minute > lastMinute) { lastMinute = minute; M.log("listen_minute", { minute }); }
+    if (minute > lastMinute) { lastMinute = minute; metric("listen_minute", { minute }); }
     refresh();
   }, 1000);
+
+  /* ---------- v8.2 GAME OVER + Earn panel ---------- */
+  // Modal visibility key: re-render whenever the game-over economy changes
+  // (balance, awarded once-ever actions, language). Rising edge (null -> key)
+  // records exactly one game_over metric per game-over entry.
+  let goKey = null;
+  function maybeShowGameOver() {
+    if (!L.gameOver(S)) { goKey = null; return; }
+    const key = S.spins + ":" + S.credits + ":" + lang + ":" + S.creditsAwarded.join(",");
+    if (goKey === null) metric("game_over", { credits: S.credits });
+    if (goKey !== key) { goKey = key; showGameOver(); }
+  }
+  function showGameOver() {
+    const price = C.spinBuy.price, n = C.spinBuy.spins;
+    $("gameoverTitle").textContent = "💀 " + creditsText("gameover");
+    $("gameoverMsg").textContent = creditsText("gameoverMsg");
+    $("gameoverScore").textContent = creditScoreLine();
+    $("gameoverDisclaimer").textContent = creditsText("disclaimer");
+    const opts = L.earnOptions(S);
+    const buyBtn = $("buySpinsBtn");
+    buyBtn.textContent = creditsText("buySpins", { n, price });
+    buyBtn.disabled = !opts.canBuy;
+    $("buySpinsNote").textContent = opts.canBuy ? ""
+      : creditsText("needSpins", { n: Math.max(0, price - S.credits) });
+    // Earn panel: like / follow / share — only while credits < 25.
+    $("earnTitle").textContent = creditsText("earnTitle");
+    $("earnIntro").textContent = creditsText("earnIntro");
+    const showEarn = opts.showLike || opts.showShare || opts.showFollow;
+    $("earnPanel").classList.toggle("hidden", !showEarn);
+    renderEarnLinks("like", opts.showLike, C.likeLinks, "❤️ ", doLike, "likeSong", "likeHint");
+    renderEarnLinks("follow", opts.showFollow, C.followLinks, "➕ ", doFollow, "followTitle", "followHint");
+    $("shareSection").classList.toggle("hidden", !opts.showShare);
+    if (opts.showShare) {
+      $("shareBtn").textContent = creditsText("shareSong");
+      $("shareHint").textContent = creditsText("shareHint");
+    }
+    // In silence (0 spins + 0 credits) the close button is hidden: the earn
+    // actions are the only way forward. Backdrop clicks never dismiss this modal.
+    const closeBtn = $("gameoverClose");
+    closeBtn.textContent = creditsText("keepListening");
+    closeBtn.style.display = silenced ? "none" : "";
+    // Machine marquee shows GAME OVER on the cabinet (3D + DOM fallback).
+    cabSafe("showPrize", c => c.showPrize(creditsText("gameover"), creditScoreLine()));
+    $("gameoverModal").classList.remove("hidden");
+  }
+  function renderEarnLinks(section, show, links, icon, handler, labelKey, hintKey) {
+    $(section + "Section").classList.toggle("hidden", !show);
+    if (!show) return;
+    $(section + "Label").textContent = creditsText(labelKey);
+    const wrap = $(section + "Btns");
+    wrap.innerHTML = "";
+    links.forEach(l => {
+      const a = document.createElement("a");
+      a.href = l.url; a.target = "_blank"; a.rel = "noopener";
+      a.className = "earn-btn";
+      a.textContent = icon + l.platform;
+      a.addEventListener("click", () => handler(l.url));
+      wrap.appendChild(a);
+    });
+    $(section + "Hint").textContent = creditsText(hintKey);
+  }
+  function hideGameOver() {
+    $("gameoverModal").classList.add("hidden");
+    cabSafe("clearPrize", c => c.clearPrize());
+  }
+  // Once-ever credit award (anti-farming): like/share/follow each pay +25
+  // exactly once, ever — re-clicks can never double-pay.
+  function grantOnce(id, amount, eventName) {
+    const r = L.awardOnce(S, id, amount);
+    if (r.awarded) {
+      save();
+      metric("credit_earn", { amount, balance: S.credits, via: id });
+      metric(eventName, { amount, balance: S.credits });
+    }
+    return r.awarded;
+  }
+  // LIKE: opens the allowlisted track page (native app via universal link)
+  // AND restarts the song — the award lifts credits above zero, so
+  // updateSilence() clears the silence flag and tryPlay() resumes the music.
+  function doLike(url) {
+    metric("like_tap", { platform: url });
+    try { window.open(url, "_blank", "noopener"); } catch (e) {}
+    if (grantOnce("like-song", C.creditAwards.like, "like_award"))
+      toast(creditsText("liked", { n: C.creditAwards.like }));
+    refresh();
+  }
+  // FOLLOW: same once-ever pattern on the allowlisted artist pages.
+  function doFollow(url) {
+    metric("follow_tap", { platform: url });
+    try { window.open(url, "_blank", "noopener"); } catch (e) {}
+    if (grantOnce("follow-artist", C.creditAwards.follow, "follow_award"))
+      toast(creditsText("followed", { n: C.creditAwards.follow }));
+    refresh();
+  }
+  function sharePayload() {
+    return {
+      title: "777 Neon Nights",
+      text: "Free slot game for “Neon Nights Pt. 777” by That Boy Hi Hat — listen here: " + C.likeLinks[0].url,
+      url: C.gameUrl,
+    };
+  }
+  // SHARE: real Web Share API (native iOS sheet) with clipboard fallback.
+  // Awards only on a completed share or a successful copy — never on cancel.
+  function doShare() {
+    metric("share_tap", {});
+    const path = L.sharePath(navigator);
+    const data = sharePayload();
+    if (path === "native" && navigator.share) {
+      navigator.share(data).then(() => {
+        if (grantOnce("share-song", C.creditAwards.share, "share_award"))
+          toast(creditsText("shared", { n: C.creditAwards.share }));
+        refresh();
+      }).catch(() => metric("share_cancel", {}));
+    } else if (path === "clipboard" && navigator.clipboard) {
+      const txt = data.title + " — " + data.text + " " + data.url;
+      navigator.clipboard.writeText(txt).then(() => {
+        if (grantOnce("share-song", C.creditAwards.share, "share_award"))
+          toast(creditsText("shared", { n: C.creditAwards.share }));
+        refresh();
+      }, () => toast("Copy failed — long-press to copy"));
+    } else {
+      toast("Sharing isn't available in this browser");
+    }
+  }
 
   /* ---------- high scores + metrics panel ---------- */
   function renderBoard() {
@@ -636,7 +837,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     const code = SC.encode(S);
     const name = ($("scoreName") && $("scoreName").value.trim()) || "Player";
     const r = SC.add(code, name);
-    if (r.ok) { M.log("score_submit", { score: r.score }); toast(`🏆 Score saved: ${r.score}`); renderBoard(); }
+    if (r.ok) { metric("score_submit", { score: r.score }); toast(`🏆 Score saved: ${r.score}`); renderBoard(); }
     else toast("Score code invalid — not saved");
   }
   function copyScoreCode() {
@@ -655,19 +856,47 @@ import { spinLabelFor } from './cabinet-anim.js';
     else toast(`❌ Score code invalid (${r.reason}) — not added`);
   });
   $("exportMetricsBtn").addEventListener("click", () => {
-    const p = M.exportAll();
-    $("metricsNote").textContent = `${p.events.length} events, ${p.linkLedger.length} links issued. Endpoint: ${p.endpoint}`;
+    const payload = {
+      exportedAt: new Date().toISOString(), game: "neon-nights-777",
+      counts: M.counts(localStorage), events: M.events(localStorage),
+      note: "Anonymous device id only. No PII collected.",
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "neon-nights-777-metrics.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    $("metricsNote").textContent = `${payload.events.length} events exported.`;
   });
+  // Owner-only metrics dashboard: rendered ONLY when ?metrics=1 is present.
+  // Never linked from the normal UI. Read-only aggregate counts.
+  function renderMetricsDash() {
+    const dash = $("metricsDash");
+    if (!dash) return;
+    let show = false;
+    try { show = new URLSearchParams(location.search).get("metrics") === "1"; } catch (e) {}
+    dash.classList.toggle("hidden", !show);
+    if (!show) return;
+    const c = M.counts(localStorage);
+    $("metricsGrid").innerHTML = M.EVENTS.map(e =>
+      `<div>${e}<br><b>${c.byEvent[e] || 0}</b></div>`).join("");
+    $("metricsTotals").textContent =
+      `events: ${c.totalEvents} · credits earned: ${c.creditsEarned} · credits spent: ${c.creditsSpent} · device: ${c.deviceId}`;
+  }
 
   refresh();
   buildPicker();
   applyLang(lang);
   renderBoard();
-  M.log("game_start", { lang });
-  if (!M.endpoint()) $("metricsNote").textContent = "Metrics are local-only (no endpoint configured). Export anytime.";
+  renderMetricsDash();
+  metric("game_start", { lang });
+  $("metricsNote").textContent = "Metrics are local-only (no endpoint configured). Export anytime.";
   // Headless-QA handle: drives the real UI path (spin/refresh/state) for tests.
   // spinning() reports the true in-flight state — the spin button is
   // re-enabled synchronously by refresh() mid-spin, so button.disabled is
   // NOT a settle signal (a spin started while spinning=true is ignored).
-  window.NN_GAME = { spin: doSpin, refresh, state: () => S, spinning: () => spinning };
+  window.NN_GAME = { spin: doSpin, refresh, state: () => S, spinning: () => spinning,
+    silenced: () => silenced, gameOverShown: () => !$("gameoverModal").classList.contains("hidden"),
+    metrics: () => M.counts(localStorage), metricsDashVisible: () => !$("metricsDash").classList.contains("hidden") };
 })();

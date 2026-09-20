@@ -1,5 +1,33 @@
 # 777 Neon Nights — Changelog
 
+## nn777-v8.2 (2026-09-20) — GAME OVER loop (Black's order)
+1. **GAME OVER at 0 spins**: the machine marquee shows GAME OVER on the
+   cabinet (3D + DOM fallback) and a modal opens: credit balance, replay
+   guidance, buy-spins and the Earn panel. 40 starting spins.
+2. **Silence is the trigger**: GAME OVER + 0 Neon Credits stops the song
+   (pause, not just quiet). Any way forward restores the music.
+3. **Song replays earn**: every completed full loop banks +25 Neon Credits
+   (seeks never award; one award per completed loop).
+4. **Earn panel** (only while credits < 25, all once ever via persisted
+   `creditsAwarded`): LIKE opens an allowlisted track deep link
+   (Spotify/YouTube/TIDAL — every URL asserted in jackpotLinks, never
+   invented) and restarts the song +25; SHARE uses the real Web Share API
+   (native iOS sheet, clipboard fallback), +25 on completed share/copy;
+   FOLLOW opens an allowlisted artist page (Spotify/Apple Music) +25.
+   Dead-simple 3-step micro-instructions, big tap targets, all 41 languages.
+5. **Refill**: 10 spins for 25 Neon Credits; refused below 25, never negative.
+6. **Owner metrics**: anonymous event log in localStorage (`nn777-metrics`,
+   capped 500) — song plays/replays, like/share/follow taps+awards,
+   game-overs, spins, spin buys, credits earned/spent, unique players
+   (persisted device id). Read-only owner dashboard at `?metrics=1`
+   (never linked in the normal UI).
+7. **Link-check QA**: every outbound like/follow/share URL is live-checked
+   (200/30x required; 404/dead fails the build, geo-blocked/login-walled
+   flagged, never shipped silently).
+All prior constraints hold: single green Spin button, one spin per tap,
+200-spin pity cap, 40-spin cap, 9 rounds/3 stages, persistent credits,
+free/no-cash/no-gambling framing, 10 allowlisted music platforms.
+
 ## nn777-v8 (2026-09-20) — Neon Credits system (Black's order)
 Fun points — **no money value, redeemable only for free music links**
 (the claim modal carries the no-money-value disclaimer in all 41 languages).

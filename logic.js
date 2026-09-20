@@ -81,6 +81,78 @@ function regenSpins(state, nowMs = Date.now()) {
 
 function canSpin(state) { return state.spins > 0; }
 
+/** Game over: the spin bank is exhausted. Pure. */
+function gameOver(state) { return state.spins <= 0; }
+
+/** Buy spins with Neon Credits (never money). Returns { ok: true } or
+    { ok: false, reason: "insufficient" }. Never negative, caps at spinCap. */
+function buySpins(state) {
+  const price = NN_CONFIG.spinBuy.price, n = NN_CONFIG.spinBuy.spins;
+  if (!(state.credits >= price)) return { ok: false, reason: "insufficient" };
+  state.credits = Math.max(0, state.credits - price);
+  state.spins = Math.min(NN_CONFIG.spinCap, state.spins + n);
+  return { ok: true };
+}
+
+/** Once-ever credit award (anti-farming): records the id in
+    state.creditsAwarded, which persists via save(). Returns
+    { awarded: true, balance } on the first call, { awarded: false } after —
+    so re-clicks can never double-pay. */
+function awardOnce(state, id, amount) {
+  if (!Array.isArray(state.creditsAwarded)) state.creditsAwarded = [];
+  if (state.creditsAwarded.includes(id)) return { awarded: false, balance: state.credits };
+  amount = Math.max(0, amount | 0);
+  state.creditsAwarded.push(id);
+  state.credits = Math.max(0, (state.credits | 0) + amount);
+  return { awarded: true, balance: state.credits };
+}
+
+/** Which earn options the game-over panel shows. The like/share/follow buttons
+    only appear while the player can't afford the spin refill. */
+function earnOptions(state) {
+  const afford = state.credits >= NN_CONFIG.spinBuy.price;
+  const awarded = Array.isArray(state.creditsAwarded) ? state.creditsAwarded : [];
+  return {
+    canBuy: afford,
+    showLike: !afford && !awarded.includes("like-song"),
+    showShare: !afford && !awarded.includes("share-song"),
+    showFollow: !afford && !awarded.includes("follow-artist"),
+  };
+}
+
+/** Silence trigger (pure, testable): in GAME OVER with zero credits the
+    song must STOP — pause, not just quiet. Silence is the trigger. */
+function shouldSilence(state) {
+  return gameOver(state) && !(state.credits > 0);
+}
+
+/** Share-path decision (pure, testable): "native" | "clipboard" | "none". */
+function sharePath(nav) {
+  if (nav && typeof nav.share === "function") return "native";
+  if (nav && nav.clipboard && typeof nav.clipboard.writeText === "function") return "clipboard";
+  return "none";
+}
+
+/** Song-replay detector (pure, testable). With audio.loop=true a completed
+    loop shows as currentTime wrapping back near zero. Counts only when the
+    track was heard nearly to the end (maxTime within 3s of duration) and
+    never while seeking — a backward seek looks identical to a wrap. */
+function newReplayState() { return { lastTime: 0, maxTime: 0 }; }
+function replayTick(st, currentTime, duration, seeking) {
+  if (!isFinite(currentTime) || currentTime < 0) return false;
+  if (seeking) { st.lastTime = currentTime; return false; }
+  const wrapped = currentTime < st.lastTime - 1; // 1s hysteresis against float noise
+  let completed = false;
+  if (wrapped) {
+    completed = isFinite(duration) && duration > 0 && st.maxTime >= duration - 3;
+    st.maxTime = currentTime;
+  } else if (currentTime > st.maxTime) {
+    st.maxTime = currentTime;
+  }
+  st.lastTime = currentTime;
+  return completed;
+}
+
 function currentRound(state) {
   const st = NN_CONFIG.stages[state.stageIdx];
   if (!st) return null;
@@ -159,6 +231,7 @@ function bonusAvailable(state, nowMs = Date.now()) {
 }
 
 const NN_LOGIC_API = { CONFIG: NN_CONFIG, pickSymbol, spin, newState, regenSpins, canSpin,
+  gameOver, shouldSilence, buySpins, awardOnce, earnOptions, sharePath, newReplayState, replayTick,
   currentRound, roundProgress, advanceRounds, applySpinResult, listenTick,
   unlockedPrizes, claimPrize, bonusUnlocked, bonusAvailable, totalWeight };
 if (typeof module !== "undefined") {

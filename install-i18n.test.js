@@ -105,7 +105,42 @@ for (const loc of locales) {
   }
 }
 
-/* ---- payout links: verified entries, no invented Tidal ---- */
+/* ---- v8.2 GAME OVER / Earn: 18 keys in every locale, no gambling claims ---- */
+const GAMEOVER_KEYS = ["gameover","gameoverMsg","replay","buySpins","needSpins","boughtSpins",
+  "keepListening","earnTitle","earnIntro","likeSong","likeHint","shareSong","shareHint",
+  "liked","shared","followTitle","followHint","followed"];
+for (const loc of locales) {
+  const c = I18N[loc] && I18N[loc].credits;
+  if (!c) continue;
+  for (const k of GAMEOVER_KEYS) {
+    ok(typeof c[k] === "string" && c[k].trim().length > 0, `${loc}: credits.${k} non-empty`);
+  }
+  for (const k of GAMEOVER_KEYS) {
+    if (k === "gameover" || typeof c[k] !== "string") continue;
+    for (const re of NO_GAMBLE) {
+      ok(!re.test(c[k]), `${loc}: credits.${k} carries no gambling claims`);
+    }
+  }
+  for (const k of ["replay","liked","shared","followed","needSpins"]) {
+    ok(c[k].includes("{n}"), `${loc}: credits.${k} carries the award ({n})`);
+  }
+  ok(c.buySpins.includes("{n}") && c.buySpins.includes("{price}"),
+    `${loc}: credits.buySpins carries {n} and {price}`);
+}
+
+/* ---- v8.2 earn deep links: like/follow URLs must ALL be in jackpotLinks ---- */
+const CFG = require(path.join(here, "config.js"));
+const allowSet = new Set(CFG.jackpotLinks.map(l => l.url));
+for (const l of CFG.likeLinks) {
+  ok(allowSet.has(l.url), `like link ${l.platform} is allowlisted (no invented URLs): ${l.url}`);
+}
+for (const l of CFG.followLinks) {
+  ok(allowSet.has(l.url), `follow link ${l.platform} is allowlisted (no invented URLs): ${l.url}`);
+}
+ok(CFG.likeLinks.length >= 1, "at least one like deep link configured");
+ok(CFG.followLinks.length >= 1, "at least one follow deep link configured");
+ok(CFG.creditAwards.follow === 25, "follow award is +25");
+ok(CFG.creditAwards.like === 25 && CFG.creditAwards.share === 25, "like/share awards are +25");
 const cfgSrc = fs.readFileSync(path.join(here, "config.js"), "utf8");
 ok(cfgSrc.includes("https://www.youtube.com/watch?v=3L5eUDui-00"), "YouTube payout link present (verified 2026-09-20)");
 // Tidal: only the TIDAL-search-verified track page may appear. No other Tidal URL.
@@ -155,7 +190,7 @@ for (const f of ["icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png
 
 /* ---- VERSION / CHANGELOG in sync with build ---- */
 const ver = JSON.parse(fs.readFileSync(path.join(here, "VERSION.json"), "utf8"));
-ok(/^nn777-v\d+$/.test(ver.build), `VERSION.json build tag shape (${ver.build})`);
+ok(/^nn777-v\d+(\.\d+)?$/.test(ver.build), `VERSION.json build tag shape (${ver.build})`);
 const idx = fs.readFileSync(path.join(here, "index.html"), "utf8");
 ok(idx.includes(`window.NN_BUILD = "${ver.build}"`), `index.html NN_BUILD matches VERSION.json (${ver.build})`);
 const sw = fs.readFileSync(path.join(here, "sw.js"), "utf8");

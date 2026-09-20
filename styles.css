@@ -204,3 +204,17 @@ body.jackpot-lights::after{
 .credit-ask{font-size:16px;font-weight:800;color:#fff;margin:10px 0 4px}
 .payout-actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
 .spin-btn.small.ghost{background:transparent;border:2px solid var(--neon);color:var(--neon);box-shadow:none}
+
+/* ---- v8.2 GAME OVER / Earn panel ---- */
+.earn-title{margin:14px 0 4px; font-size:16px; letter-spacing:2px; color:var(--gold)}
+.earn-label{margin:10px 0 6px; font-size:13px; font-weight:800; letter-spacing:1px; color:var(--neon-soft)}
+.earn-btns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+.earn-btn{display:inline-block; min-width:120px; min-height:52px; padding:14px 20px;
+  font-size:17px; font-weight:900; border-radius:14px; text-align:center;
+  background:linear-gradient(180deg,#1f6f3a,#14532a); color:#fff; text-decoration:none;
+  border:2px solid #2ea050; box-shadow:0 0 14px rgba(46,160,80,.45); cursor:pointer}
+.earn-btn:active{transform:translateY(2px)}
+.earn-btn.share{background:linear-gradient(180deg,#7a4fd0,#5b34a8); border-color:#9a7bff;
+  box-shadow:0 0 14px rgba(154,123,255,.45); width:100%}
+#buySpinsNote{min-height:18px; text-align:center}
+#gameoverMsg{margin:6px 0}
