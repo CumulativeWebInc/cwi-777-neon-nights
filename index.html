@@ -39,16 +39,6 @@
       <circle cx="50" cy="78" r="9" fill="#ffdc78" stroke="#96700f" stroke-width="3"/>
       <rect x="40" y="40" width="7" height="26" rx="3" fill="#fff0be" opacity="0.85"/>
     </symbol>
-    <symbol id="sym-leaf" viewBox="0 0 100 100">
-      <g fill="#2eaa50" stroke="#1d7a38" stroke-width="1.5">
-        <path d="M50 88 L44 52 L50 18 L56 52 Z"/>
-        <path d="M50 84 L28 48 L38 34 L52 58 Z"/>
-        <path d="M50 84 L72 48 L62 34 L48 58 Z"/>
-        <path d="M50 78 L18 62 L24 50 L50 66 Z"/>
-        <path d="M50 78 L82 62 L76 50 L50 66 Z"/>
-      </g>
-      <rect x="47" y="70" width="6" height="22" fill="#1d7a38"/>
-    </symbol>
     <symbol id="sym-disc" viewBox="0 0 100 100">
       <circle cx="50" cy="50" r="34" fill="#1a1a22" stroke="#ffd34d" stroke-width="4"/>
       <circle cx="50" cy="50" r="22" fill="none" stroke="#ffd34d" stroke-width="1.5" opacity="0.6"/>
@@ -59,7 +49,7 @@
 </svg>
 
 <div id="app">
-  <header class="marquee">
+  <header class="marquee sr-only">
     <div class="marquee-title">777 NEON NIGHTS</div>
     <div class="marquee-sub">Neon Nights Pt. 777 &bull; That Boy Hi Hat</div>
   </header>
@@ -71,21 +61,29 @@
   </div>
 
   <main class="cabinet" id="cabinet">
-    <div class="jackpot-sign" id="jackpotSign">JACKPOT!</div>
-    <div class="reels" id="reels">
-      <div class="reel" data-reel="0"><div class="strip"></div><div class="winline"></div></div>
-      <div class="reel" data-reel="1"><div class="strip"></div><div class="winline"></div></div>
-      <div class="reel" data-reel="2"><div class="strip"></div><div class="winline"></div></div>
-    </div>
-    <div class="winbanner" id="winBanner"></div>
-    <div class="controls">
-      <button id="spinBtn" class="spin-btn">SPIN</button>
-      <div class="meters">
-        <div class="meter"><span class="meter-label">SPINS</span><span id="spinsLeft">30</span></div>
-        <button id="muteBtn" class="icon-btn" aria-label="mute">🔊</button>
-        <button id="encoreBtn" class="icon-btn locked" aria-label="encore round">🎰</button>
-        <select id="langPicker" class="lang-picker" aria-label="language"></select>
+    <canvas id="cabinetCanvas" tabindex="0" role="application"
+      aria-label="777 Neon Nights slot cabinet. Press Enter on the red button to spin."></canvas>
+    <!-- Screen-reader fallback: same ids, same behavior, visually hidden.
+         The canvas above is the visible cabinet; these stay in sync. -->
+    <div class="cabinet-fallback sr-only" aria-hidden="false">
+      <div class="jackpot-sign" id="jackpotSign">JACKPOT!</div>
+      <div class="reels" id="reels">
+        <div class="reel" data-reel="0"><div class="strip"></div><div class="winline"></div></div>
+        <div class="reel" data-reel="1"><div class="strip"></div><div class="winline"></div></div>
+        <div class="reel" data-reel="2"><div class="strip"></div><div class="winline"></div></div>
       </div>
+      <div class="controls">
+        <button id="spinBtn" class="spin-btn">SPIN</button>
+        <div class="meters">
+          <div class="meter"><span class="meter-label">SPINS</span><span id="spinsLeft">30</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="winbanner" id="winBanner" role="status"></div>
+    <div class="cabinet-toolbar">
+      <button id="muteBtn" class="icon-btn" aria-label="mute">🔊</button>
+      <button id="encoreBtn" class="icon-btn locked" aria-label="encore round">🎰</button>
+      <select id="langPicker" class="lang-picker" aria-label="language"></select>
     </div>
     <div class="listenbar">
       <span>🎧 <span id="listenTime">0:00</span> listening</span>
@@ -186,6 +184,7 @@
 <script src="i18n.js"></script>
 <script src="metrics.js"></script>
 <script src="scores.js"></script>
+<script src="cabinet.js"></script>
 <script src="game.js"></script>
 <script>
 if ("serviceWorker" in navigator) {

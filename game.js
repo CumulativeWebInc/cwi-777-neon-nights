@@ -5,6 +5,7 @@
   const L = window.NN_LOGIC; // set below from logic.js browser export
   const M = window.NN_METRICS;
   const SC = window.NN_SCORES;
+  const CAB = window.NN_CABINET; // canvas cabinet renderer (cabinet.js)
   const $ = (id) => document.getElementById(id);
   const CELL = 72, VISIBLE = 3;
 
@@ -103,32 +104,29 @@
     reelEls[i].innerHTML = symbols3.map(s => `<div class="cell">${symSVG(s)}</div>`).join("");
     reelEls[i].style.transform = "translateY(0px)";
   }
-  // initial rest position
+  // initial rest position (no leaf — retired 2026-09-20 visual redo)
   setReelStatic(0, ["lemon", "cherry", "bell"]);
-  setReelStatic(1, ["bell", "leaf", "cherry"]);
+  setReelStatic(1, ["bell", "cherry", "bell"]);
   setReelStatic(2, ["cherry", "seven", "lemon"]);
 
-  function animateReel(i, resultCol, durationMs, done) {
-    const filler = 14 + i * 7;
-    const seq = [];
-    for (let k = 0; k < filler; k++) seq.push(randSym());
-    seq.push(...resultCol);
-    const strip = reelEls[i];
-    strip.style.transition = "none";
-    strip.innerHTML = seq.map(s => `<div class="cell">${symSVG(s)}</div>`).join("");
-    strip.style.transform = "translateY(0px)";
-    void strip.offsetHeight; // reflow
-    const target = -((seq.length - VISIBLE) * CELL);
-    strip.style.transition = `transform ${durationMs}ms cubic-bezier(.12,.8,.24,1)`;
-    strip.style.transform = `translateY(${target}px)`;
-    setTimeout(done, durationMs + 60);
+  // Canvas cabinet owns the visible reels/buttons; the DOM strips above stay
+  // as the screen-reader fallback (unchanged ids, unchanged behavior).
+  if (CAB && CAB.init()) {
+    CAB.setRest([["lemon", "cherry", "bell"], ["bell", "cherry", "bell"], ["cherry", "seven", "lemon"]]);
+    CAB.onSpinRequest(() => { const b = $("spinBtn"); if (b && !b.disabled) b.click(); });
   }
+
+  /* Visible reel animation is owned by the canvas cabinet (cabinet.js):
+     camera push-in, motion blur, left-to-right settle bounce, near-miss
+     anticipation, jackpot token pour. The DOM strips above remain as the
+     screen-reader fallback and are left at their rest positions. */
 
   /* ---------- UI refresh ---------- */
   function refresh() {
     L.regenSpins(S);
     $("spinsLeft").textContent = S.spins;
     $("spinBtn").disabled = !L.canSpin(S);
+    if (CAB) CAB.setSpins(S.spins, L.canSpin(S));
     $("listenTime").textContent = fmt(S.listeningSec);
     // stage / round
     const st = C.stages[S.stageIdx];
@@ -195,30 +193,31 @@
     userGestured = true; tryPlay();
     spinning = true; $("spinBtn").disabled = true;
     $("winBanner").textContent = "";
-    $("jackpotSign").classList.add("flash");
+    if (CAB) CAB.setSignFlare(1);   // JACKPOT! sign flares while reels spin
     const res = L.spin(S, Math.random);
     L.applySpinResult(S, res);
-    let stopped = 0;
-    for (let i = 0; i < 3; i++) {
-      animateReel(i, res.rows[i], 1100 + i * 550, () => {
-        if (++stopped === 3) finishSpin(res);
-      });
-    }
+    const allStopped = () => finishSpin(res);
+    if (CAB) CAB.spin(res.rows).then(allStopped);
+    else setTimeout(allStopped, 2400); // no-canvas fallback keeps game playable
     refresh();
     M.log("spin", { totalSpins: S.totalSpins, spinsLeft: S.spins });
   }
 
   function finishSpin(res) {
     spinning = false;
-    $("jackpotSign").classList.remove("flash");
     if (res.jackpot) {
+      // Golden token pour on the canvas, then the unchanged payout screen.
+      if (CAB) CAB.celebrate();
       $("winBanner").textContent = "🎰 JACKPOT! 777 🎰";
-      openJackpot();
-    } else if (res.triple) {
-      const label = C.symbols.find(s => s.id === res.triple).label;
-      $("winBanner").textContent = `✨ Triple ${label}! ✨`;
-      if (res.triple === "leaf" && L.bonusUnlocked(S))
-        toast("🍃 Triple leaf! The Encore Round is calling — tap 🎰");
+      setTimeout(() => { if (CAB) CAB.endCelebrate(); openJackpot(); }, 2400);
+    } else {
+      if (CAB) CAB.setSignFlare(0);
+      if (res.triple) {
+        const label = C.symbols.find(s => s.id === res.triple).label;
+        $("winBanner").textContent = `✨ Triple ${label}! ✨`;
+        if (res.triple === "bell" && L.bonusUnlocked(S))
+          toast("🔔 Triple bell! The Encore Round is calling — tap 🎰");
+      }
     }
     const doneRounds = L.advanceRounds(S);
     doneRounds.forEach(id => {
@@ -417,4 +416,6 @@
   renderBoard();
   M.log("game_start", { lang });
   if (!M.endpoint()) $("metricsNote").textContent = "Metrics are local-only (no endpoint configured). Export anytime.";
+  // Headless-QA handle: drives the real UI path (spin/refresh/state) for tests.
+  window.NN_GAME = { spin: doSpin, refresh, state: () => S };
 })();

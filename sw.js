@@ -1,6 +1,6 @@
 /* 777 Neon Nights — service worker. Precaches all game assets; cache-first for
    assets, network-first for navigation with cache fallback (offline play). */
-const CACHE = "nn777-v1";
+const CACHE = "nn777-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const ASSETS = [
   "./i18n.js",
   "./metrics.js",
   "./scores.js",
+  "./cabinet.js",
   "./game.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -20,6 +21,9 @@ const ASSETS = [
   "./art/marquee-777.png",
   "./art/cabinet-777.png",
   "./art/badge-777.png",
+  "./art/redo-rest.png",
+  "./art/redo-spin.png",
+  "./art/redo-jackpot.png",
 ];
 
 self.addEventListener("install", (e) => {

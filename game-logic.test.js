@@ -166,5 +166,29 @@ function rng32(seed) {
   ok(st2.spins === 40, "no regen above cap");
 })();
 
+/* --- leaf retirement (2026-09-20 visual redo): no leaf anywhere --- */
+(function () {
+  const ids = C.symbols.map(s => s.id);
+  ok(!ids.includes("leaf"), "leaf absent from symbol set");
+  ok(!C.symbols.some(s => /leaf/i.test(s.label || "")), "no leaf label in symbols");
+  const sum = C.symbols.reduce((a, s) => a + s.weight, 0);
+  ok(sum === 18, "symbol weights still sum to 18 (leaf weight moved to bell)");
+  ok(C.symbols.every(s => s.weight > 0), "every symbol weight positive");
+  ok(C.symbols.find(s => s.id === "bell").weight === 6, "bell carries leaf's old weight (3+3)");
+  // 20k draws: leaf never picked
+  const rng = rng32(777);
+  let sawLeaf = false;
+  for (let i = 0; i < 20000; i++) if (L.pickSymbol(rng) === "leaf") { sawLeaf = true; break; }
+  ok(!sawLeaf, "pickSymbol never returns leaf (n=20000)");
+  // 2k full spins: leaf never on reels, never a triple
+  const st = L.newState();
+  let bad = false;
+  for (let i = 0; i < 2000; i++) {
+    const r = L.spin(st, rng32(1000 + i));
+    if (r.rows.flat().includes("leaf") || r.triple === "leaf") { bad = true; break; }
+  }
+  ok(!bad, "spin() never lands leaf on reels or as triple (n=2000)");
+})();
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

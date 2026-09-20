@@ -10,9 +10,11 @@ const CONFIG = {
     { id: "seven",  weight: 3, label: "7" },
     { id: "cherry", weight: 5, label: "Cherries" },
     { id: "lemon",  weight: 4, label: "Lemon" },
-    { id: "bell",   weight: 3, label: "Bell" },
-    { id: "leaf",   weight: 3, label: "Leaf" },
+    { id: "bell",   weight: 6, label: "Bell" },
   ],
+  // 2026-09-20 visual redo: the "leaf" symbol was retired (reference look is
+  // classic fruit/bell/7s; no leaf on reels). Its weight moved to "bell" —
+  // triple-bell is now the Encore teaser. Total weight unchanged (18).
   // Jackpot = three 7s on the middle row. Pity guarantees one by this many spins.
   pitySpins: 200,
 
