@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-21T12:45:05.719Z",
+  "generated_at": "2026-09-21T13:01:46.868Z",
   "sink": "https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD",
   "totals": {
-    "unique_devices": 1,
-    "beacons_received": 6,
+    "unique_devices": 3,
+    "beacons_received": 8,
     "beacons_invalid": 0,
-    "game_starts": 1,
-    "spins": 8,
+    "game_starts": 3,
+    "spins": 37,
     "spin_buys": 0,
     "jackpot_wins": 1,
     "prizes_claimed": 1,
@@ -19,9 +19,9 @@
     "links_issued_by_event": {
       "prize_claim": 1
     },
-    "credits_earned": 1025,
+    "credits_earned": 1100,
     "credits_spent": 1000,
-    "song_plays": 3,
+    "song_plays": 5,
     "song_replays": 0,
     "like_taps": 0,
     "like_awards": 0,
@@ -34,16 +34,20 @@
   "per_day": {
     "2026-09-21": {
       "devices": [
-        "d-uqm27l3omub8abj7"
+        "d-uqm27l3omub8abj7",
+        "d-7wh1xg5umub8pd2z",
+        "d-nk7q8fbgmub8ztfq"
       ],
-      "spins": 8,
+      "spins": 37,
       "prizes": 1,
       "jackpots": 1
     }
   },
   "first_seen": "2026-09-21T12:45:05.717Z",
-  "last_seen": "2026-09-21T12:45:05.719Z",
+  "last_seen": "2026-09-21T13:01:46.867Z",
   "_device_list": [
-    "d-uqm27l3omub8abj7"
+    "d-uqm27l3omub8abj7",
+    "d-7wh1xg5umub8pd2z",
+    "d-nk7q8fbgmub8ztfq"
   ]
 }
