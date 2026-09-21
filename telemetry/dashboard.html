@@ -87,6 +87,24 @@ game's live beacons. Empty is honest — it means no player has beaconed yet.</p
     }
     h += "</div></div>";
 
+    // Winner prize choices — which song + which provider each winner picked
+    h += '<div class=\"grid\" style=\"margin-top:10px\"><div class=\"card wide\"><div class=\"k\">🏆 Winner prize choices</div>';
+    var claims = t.prize_claims || [];
+    if (!claims.length) h += '<p class=\"fine\">None yet.</p>';
+    else {
+      h += "<table><tr><th>When</th><th>Provider</th><th>Song</th><th>Prize</th></tr>";
+      claims.slice(-25).reverse().forEach(function (cl) {
+        h += "<tr><td>" + (cl.at ? esc(new Date(cl.at).toLocaleString()) : "—") +
+             "</td><td>" + esc(cl.provider || "—") +
+             "</td><td>" + esc(cl.song || "—") +
+             "</td><td>" + esc(cl.kind || "prize") + "</td></tr>";
+      });
+      h += "</table>";
+      h += '<p class=\"fine\">' + num(claims.length) + " prize link" + (claims.length === 1 ? "" : "s") +
+           ' issued. Newest first.</p>';
+    }
+    h += "</div></div>";
+
     // Links issued
     h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Links issued to players (url → times)</div>';
     var links = t.links_issued || {};
