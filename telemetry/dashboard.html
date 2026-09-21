@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>777 Neon Nights — Player Telemetry</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, system-ui, "SF Pro Text", sans-serif;
+         background: #0b0714; color: #f4ecff; padding: 16px; }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  .sub { color: #b9a8d9; font-size: 13px; margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { background: #17102a; border: 1px solid #2c2150; border-radius: 12px;
+          padding: 12px; }
+  .card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+             color: #9d8cc7; }
+  .card .v { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .wide { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #241b40; }
+  th { color: #9d8cc7; font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  td.url { word-break: break-all; font-size: 12px; color: #cdbcf5; }
+  .empty { text-align: center; color: #9d8cc7; padding: 40px 16px; font-size: 14px; }
+  .row { display: flex; gap: 10px; margin: 14px 0; }
+  button { flex: 1; background: #6c2bd9; color: #fff; border: 0; border-radius: 10px;
+           padding: 12px; font-size: 15px; font-weight: 600; }
+  button:active { transform: scale(.98); }
+  .fine { font-size: 11px; color: #8a7bb0; margin-top: 12px; }
+  .err { background: #3a1420; border: 1px solid #7a2440; color: #ffb3c7;
+         border-radius: 10px; padding: 12px; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>🎰 777 Neon Nights — Player Telemetry</h1>
+<p class="sub" id="updated">Loading…</p>
+<div id="body"></div>
+<div class="row">
+  <button id="exportBtn" type="button">⬇ Export JSON</button>
+  <button id="refreshBtn" type="button">↻ Refresh</button>
+</div>
+<p class="fine">Anonymous aggregates only: random per-device ids, counts, and public
+issued-link URLs. No names, no IPs stored. Totals refresh every 2 hours from the
+game's live beacons. Empty is honest — it means no player has beaconed yet.</p>
+
+<script>
+(function () {
+  "use strict";
+  var data = null;
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function num(n) { return typeof n === "number" ? n.toLocaleString("en-US") : "0"; }
+  function card(k, v) {
+    return '<div class="card"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + "</div></div>";
+  }
+  function render() {
+    var body = document.getElementById("body");
+    if (!data || !data.totals) {
+      body.innerHTML = '<div class="empty">No player data yet.<br>Beacons appear here as players play the live game.</div>';
+      return;
+    }
+    var t = data.totals;
+    var h = '<div class="grid">';
+    h += card("Unique players", num(t.unique_devices));
+    h += card("Total spins", num(t.spins));
+    h += card("Jackpot wins", num(t.jackpot_wins));
+    h += card("Prizes claimed", num(t.prizes_claimed));
+    h += card("Credits earned", num(t.credits_earned));
+    h += card("Credits spent", num(t.credits_spent));
+    h += card("Song plays", num(t.song_plays));
+    h += card("Song replays", num(t.song_replays));
+    h += "</div>";
+
+    // Prizes by type
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Prizes claimed by type</div>';
+    var kinds = t.prizes_claimed_by_type || {};
+    var kk = Object.keys(kinds);
+    if (!kk.length) h += '<p class="fine">None yet.</p>';
+    else {
+      h += "<table><tr><th>Prize type</th><th>Claims</th></tr>";
+      kk.sort().forEach(function (k) { h += "<tr><td>" + esc(k) + "</td><td>" + num(kinds[k]) + "</td></tr>"; });
+      h += "</table>";
+    }
+    h += "</div></div>";
+
+    // Links issued
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Links issued to players (url → times)</div>';
+    var links = t.links_issued || {};
+    var lk = Object.keys(links).sort(function (a, b) { return links[b] - links[a]; });
+    if (!lk.length) h += '<p class="fine">None yet.</p>';
+    else {
+      h += "<table><tr><th>Link</th><th>Issued</th></tr>";
+      lk.forEach(function (u) { h += '<tr><td class="url">' + esc(u) + "</td><td>" + num(links[u]) + "</td></tr>"; });
+      h += "</table>";
+    }
+    h += "</div></div>";
+
+    // Engagement
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Engagement</div><table>';
+    [["Game starts", t.game_starts], ["Spin buys (25 credits)", t.spin_buys],
+     ["Game overs", t.game_overs], ["Like taps / awards", t.like_taps + " / " + t.like_awards],
+     ["Share taps / awards", t.share_taps + " / " + t.share_awards],
+     ["Follow taps / awards", t.follow_taps + " / " + t.follow_awards]].forEach(function (r) {
+      h += "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td></tr>";
+    });
+    h += "</table></div></div>";
+
+    // Per day
+    var days = Object.keys(data.per_day || {}).sort().reverse();
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Per day</div>';
+    if (!days.length) h += '<p class="fine">None yet.</p>';
+    else {
+      h += "<table><tr><th>Day</th><th>Devices</th><th>Spins</th><th>Prizes</th><th>Jackpots</th></tr>";
+      days.slice(0, 30).forEach(function (d) {
+        var p = data.per_day[d];
+        h += "<tr><td>" + esc(d) + "</td><td>" + (p.devices ? p.devices.length : 0) +
+             "</td><td>" + num(p.spins) + "</td><td>" + num(p.prizes) +
+             "</td><td>" + num(p.jackpots) + "</td></tr>";
+      });
+      h += "</table>";
+    }
+    h += "</div></div>";
+    body.innerHTML = h;
+
+    document.getElementById("updated").textContent =
+      "Last updated: " + (data.generated_at ? new Date(data.generated_at).toLocaleString() : "—") +
+      (data.first_seen ? " • first beacon " + new Date(data.first_seen).toLocaleDateString() : "");
+  }
+  function load() {
+    document.getElementById("updated").textContent = "Loading…";
+    fetch("summary.json", { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (j) { data = j; render(); }).catch(function (e) {
+      document.getElementById("body").innerHTML =
+        '<div class="err">Could not load summary.json (' + esc(e.message) +
+        '). The collector may not have run yet — totals appear after the first 2h collect.</div>';
+      document.getElementById("updated").textContent = "No data yet.";
+    });
+  }
+  document.getElementById("refreshBtn").addEventListener("click", load);
+  document.getElementById("exportBtn").addEventListener("click", function () {
+    if (!data) return;
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "nn777-telemetry-" + new Date().toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+  load();
+})();
+</script>
+</body>
+</html>
