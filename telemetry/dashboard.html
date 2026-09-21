@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>777 Neon Nights — Player Telemetry</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
@@ -17,12 +18,19 @@
   .card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
              color: #9d8cc7; }
   .card .v { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .card .v small { font-size: 12px; font-weight: 400; color: #9d8cc7; }
   .wide { grid-column: 1 / -1; }
+  .hero { border-color: #6c2bd9; box-shadow: 0 0 18px rgba(108,43,217,.35); }
+  .hero .v { color: #ffd6f5; }
+  .chart-wrap { position: relative; height: 230px; margin-top: 8px; }
+  .chart-wrap canvas { max-width: 100%; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #241b40; }
   th { color: #9d8cc7; font-weight: 600; font-size: 11px; text-transform: uppercase; }
   td.url { word-break: break-all; font-size: 12px; color: #cdbcf5; }
   .empty { text-align: center; color: #9d8cc7; padding: 40px 16px; font-size: 14px; }
+  .banner { background: #140d26; border: 1px dashed #4a357a; border-radius: 10px;
+            padding: 12px; font-size: 13px; color: #cdbcf5; margin: 0 0 12px; }
   .row { display: flex; gap: 10px; margin: 14px 0; }
   button { flex: 1; background: #6c2bd9; color: #fff; border: 0; border-radius: 10px;
            padding: 12px; font-size: 15px; font-weight: 600; }
@@ -30,6 +38,13 @@
   .fine { font-size: 11px; color: #8a7bb0; margin-top: 12px; }
   .err { background: #3a1420; border: 1px solid #7a2440; color: #ffb3c7;
          border-radius: 10px; padding: 12px; font-size: 13px; }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .wide { grid-column: 1 / -1; }
+    .charts2 { grid-template-columns: 1fr 1fr; }
+    .charts2 .wide { grid-column: auto; }
+    body { max-width: 1100px; margin: 0 auto; }
+  }
 </style>
 </head>
 <body>
@@ -42,94 +57,220 @@
 </div>
 <p class="fine">Anonymous aggregates only: random per-device ids, counts, and public
 issued-link URLs. No names, no IPs stored. Totals refresh every 2 hours from the
-game's live beacons. Empty is honest — it means no player has beaconed yet.</p>
+game's live beacons. This page auto-refreshes every 5 minutes. Empty is honest —
+it means no player has beaconed yet. Prizes are promotional music links only;
+they carry no cash value.</p>
 
 <script>
 (function () {
   "use strict";
   var data = null;
+  var charts = [];
+
+  var NEON = {
+    magenta: "#ff2fd1",
+    cyan: "#22d3ee",
+    gold: "#f5c542",
+    purple: "#8b5cf6",
+    green: "#34d399",
+    pink: "#f472b6",
+    violet: "#a78bfa",
+    teal: "#2dd4bf"
+  };
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
   function num(n) { return typeof n === "number" ? n.toLocaleString("en-US") : "0"; }
-  function card(k, v) {
-    return '<div class="card"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + "</div></div>";
+  function sumValues(obj) {
+    var s = 0;
+    if (obj) Object.keys(obj).forEach(function (k) {
+      if (typeof obj[k] === "number") s += obj[k];
+    });
+    return s;
   }
+  function card(k, v, hero) {
+    return '<div class="card' + (hero ? ' hero' : '') + '"><div class="k">' +
+      esc(k) + '</div><div class="v">' + v + "</div></div>";
+  }
+  function destroyCharts() {
+    charts.forEach(function (c) { try { c.destroy(); } catch (e) {} });
+    charts = [];
+  }
+  function barChart(id, labels, datasets, stacked) {
+    var el = document.getElementById(id);
+    if (!el || typeof Chart === "undefined") return;
+    var c = new Chart(el.getContext("2d"), {
+      type: "bar",
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "top", labels: { boxWidth: 12 } } },
+        scales: {
+          x: { stacked: !!stacked, grid: { color: "rgba(44,33,80,.35)" } },
+          y: { stacked: !!stacked, beginAtZero: true, grid: { color: "rgba(44,33,80,.35)" },
+               ticks: { precision: 0 } }
+        }
+      }
+    });
+    charts.push(c);
+  }
+  function ds(label, values, color) {
+    return {
+      label: label, data: values,
+      backgroundColor: color, borderColor: color, borderWidth: 1,
+      borderRadius: 4
+    };
+  }
+
   function render() {
+    destroyCharts();
     var body = document.getElementById("body");
     if (!data || !data.totals) {
       body.innerHTML = '<div class="empty">No player data yet.<br>Beacons appear here as players play the live game.</div>';
       return;
     }
     var t = data.totals;
-    var h = '<div class="grid">';
-    h += card("Unique players", num(t.unique_devices));
-    h += card("Total spins", num(t.spins));
-    h += card("Jackpot wins", num(t.jackpot_wins));
-    h += card("Prizes claimed", num(t.prizes_claimed));
-    h += card("Credits earned", num(t.credits_earned));
-    h += card("Credits spent", num(t.credits_spent));
-    h += card("Song plays", num(t.song_plays));
-    h += card("Song replays", num(t.song_replays));
+    var allZero = ["unique_devices","spins","game_starts","prizes_claimed","song_plays"]
+      .every(function (k) { return (t[k] || 0) === 0; });
+
+    var h = "";
+    if (allZero) {
+      h += '<div class="banner">🌑 Empty is honest — no player has beaconed yet. ' +
+        'Charts below will light up with real data as players play the live game.</div>';
+    }
+
+    // Hero stat cards
+    h += '<div class="grid">';
+    h += card("Unique players", num(t.unique_devices), true);
+    h += card("Game starts", num(t.game_starts), true);
+    h += card("Total spins", num(t.spins), true);
+    h += card("Music links issued", num(sumValues(t.links_issued)), true);
     h += "</div>";
 
-    // Prizes by type
-    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Prizes claimed by type</div>';
-    var kinds = t.prizes_claimed_by_type || {};
-    var kk = Object.keys(kinds);
-    if (!kk.length) h += '<p class="fine">None yet.</p>';
-    else {
-      h += "<table><tr><th>Prize type</th><th>Claims</th></tr>";
-      kk.sort().forEach(function (k) { h += "<tr><td>" + esc(k) + "</td><td>" + num(kinds[k]) + "</td></tr>"; });
-      h += "</table>";
-    }
-    h += "</div></div>";
+    // Chart 1 — gameplay bars
+    h += '<div class="grid charts2" style="margin-top:10px">' +
+      '<div class="card"><div class="k">🎮 Gameplay</div>' +
+      '<div class="chart-wrap"><canvas id="chGame"></canvas></div></div>';
 
-    // Links issued
-    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Links issued to players (url → times)</div>';
+    // Chart 2 — engagement bars
+    h += '<div class="card"><div class="k">🎵 Engagement</div>' +
+      '<div class="chart-wrap"><canvas id="chEng"></canvas></div></div></div>';
+
+    // Chart 3 — per-day trend bars
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide">' +
+      '<div class="k">📈 Last 14 days — spins & prizes claimed</div>' +
+      '<div class="chart-wrap"><canvas id="chTrend"></canvas></div></div></div>';
+
+    // Chart 4 — prize-type breakdown
+    var kinds = t.prizes_claimed_by_type || {};
+    var kk = Object.keys(kinds).sort();
+    h += '<div class="grid charts2" style="margin-top:10px">' +
+      '<div class="card"><div class="k">🏆 Prizes claimed by type</div>';
+    if (!kk.length) {
+      h += '<p class="fine">None yet — prize types appear here as players claim them.</p>';
+    } else {
+      h += '<div class="chart-wrap"><canvas id="chPrize"></canvas></div>';
+    }
+    h += "</div>";
+
+    // Links issued table (detail)
+    h += '<div class="card"><div class="k">🔗 Music links issued to players</div>';
     var links = t.links_issued || {};
     var lk = Object.keys(links).sort(function (a, b) { return links[b] - links[a]; });
     if (!lk.length) h += '<p class="fine">None yet.</p>';
     else {
       h += "<table><tr><th>Link</th><th>Issued</th></tr>";
-      lk.forEach(function (u) { h += '<tr><td class="url">' + esc(u) + "</td><td>" + num(links[u]) + "</td></tr>"; });
+      lk.forEach(function (u) {
+        h += '<tr><td class="url">' + esc(u) + "</td><td>" + num(links[u]) + "</td></tr>";
+      });
       h += "</table>";
     }
     h += "</div></div>";
 
-    // Engagement
-    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Engagement</div><table>';
-    [["Game starts", t.game_starts], ["Spin buys (25 credits)", t.spin_buys],
-     ["Game overs", t.game_overs], ["Like taps / awards", t.like_taps + " / " + t.like_awards],
-     ["Share taps / awards", t.share_taps + " / " + t.share_awards],
-     ["Follow taps / awards", t.follow_taps + " / " + t.follow_awards]].forEach(function (r) {
-      h += "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td></tr>";
-    });
-    h += "</table></div></div>";
+    // Engagement detail table
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide">' +
+      '<div class="k">📊 Engagement detail</div><table>' +
+      "<tr><th>Metric</th><th>Taps</th><th>Awards</th></tr>" +
+      "<tr><td>Song plays / replays</td><td>" + num(t.song_plays) +
+        "</td><td>" + num(t.song_replays) + "</td></tr>" +
+      "<tr><td>Likes</td><td>" + num(t.like_taps) +
+        "</td><td>" + num(t.like_awards) + "</td></tr>" +
+      "<tr><td>Shares</td><td>" + num(t.share_taps) +
+        "</td><td>" + num(t.share_awards) + "</td></tr>" +
+      "<tr><td>Follows</td><td>" + num(t.follow_taps) +
+        "</td><td>" + num(t.follow_awards) + "</td></tr>" +
+      "<tr><td>Spin buys (25 Neon Credits)</td><td colspan='2'>" + num(t.spin_buys) + "</td></tr>" +
+      "<tr><td>Game overs</td><td colspan='2'>" + num(t.game_overs) + "</td></tr>" +
+      "</table></div></div>";
 
-    // Per day
+    // Per-day table (detail)
     var days = Object.keys(data.per_day || {}).sort().reverse();
-    h += '<div class="grid" style="margin-top:10px"><div class="card wide"><div class="k">Per day</div>';
+    h += '<div class="grid" style="margin-top:10px"><div class="card wide">' +
+      '<div class="k">🗓 Per day</div>';
     if (!days.length) h += '<p class="fine">None yet.</p>';
     else {
       h += "<table><tr><th>Day</th><th>Devices</th><th>Spins</th><th>Prizes</th><th>Jackpots</th></tr>";
       days.slice(0, 30).forEach(function (d) {
         var p = data.per_day[d];
-        h += "<tr><td>" + esc(d) + "</td><td>" + (p.devices ? p.devices.length : 0) +
-             "</td><td>" + num(p.spins) + "</td><td>" + num(p.prizes) +
-             "</td><td>" + num(p.jackpots) + "</td></tr>";
+        var devs = 0;
+        if (p.devices && p.devices.length) devs = p.devices.length;
+        else if (typeof p.unique_devices === "number") devs = p.unique_devices;
+        h += "<tr><td>" + esc(d) + "</td><td>" + num(devs) +
+             "</td><td>" + num(p.spins) + "</td><td>" +
+             num(typeof p.prizes_claimed === "number" ? p.prizes_claimed : p.prizes) +
+             "</td><td>" + num(typeof p.jackpot_wins === "number" ? p.jackpot_wins : p.jackpots) +
+             "</td></tr>";
       });
       h += "</table>";
     }
     h += "</div></div>";
+
     body.innerHTML = h;
+
+    // Build charts after DOM insert
+    Chart.defaults.color = "#b9a8d9";
+    Chart.defaults.borderColor = "rgba(44,33,80,.35)";
+
+    barChart("chGame",
+      ["Spins", "Jackpot wins", "Prizes claimed", "Credits earned", "Credits spent"],
+      [{ label: "Count",
+         data: [t.spins || 0, t.jackpot_wins || 0, t.prizes_claimed || 0,
+                t.credits_earned || 0, t.credits_spent || 0],
+         backgroundColor: [NEON.magenta, NEON.gold, NEON.cyan, NEON.green, NEON.purple],
+         borderWidth: 1, borderRadius: 4 }]);
+
+    barChart("chEng",
+      ["Song plays", "Song replays", "Like taps", "Share taps", "Follow taps"],
+      [{ label: "Count",
+         data: [t.song_plays || 0, t.song_replays || 0, t.like_taps || 0,
+                t.share_taps || 0, t.follow_taps || 0],
+         backgroundColor: [NEON.cyan, NEON.teal, NEON.pink, NEON.violet, NEON.gold],
+         borderWidth: 1, borderRadius: 4 }]);
+
+    var last14 = Object.keys(data.per_day || {}).sort().slice(-14);
+    barChart("chTrend", last14,
+      [ds("Spins", last14.map(function (d) { return data.per_day[d].spins || 0; }), NEON.magenta),
+       ds("Prizes claimed", last14.map(function (d) {
+         var p = data.per_day[d];
+         return (typeof p.prizes_claimed === "number" ? p.prizes_claimed : p.prizes) || 0;
+       }), NEON.gold)]);
+
+    if (kk.length) {
+      barChart("chPrize", kk,
+        [{ label: "Claims",
+           data: kk.map(function (k) { return kinds[k] || 0; }),
+           backgroundColor: NEON.cyan, borderWidth: 1, borderRadius: 4 }]);
+    }
 
     document.getElementById("updated").textContent =
       "Last updated: " + (data.generated_at ? new Date(data.generated_at).toLocaleString() : "—") +
       (data.first_seen ? " • first beacon " + new Date(data.first_seen).toLocaleDateString() : "");
   }
+
   function load() {
     document.getElementById("updated").textContent = "Loading…";
     fetch("summary.json", { cache: "no-store" }).then(function (r) {
@@ -142,6 +283,7 @@ game's live beacons. Empty is honest — it means no player has beaconed yet.</p
       document.getElementById("updated").textContent = "No data yet.";
     });
   }
+
   document.getElementById("refreshBtn").addEventListener("click", load);
   document.getElementById("exportBtn").addEventListener("click", function () {
     if (!data) return;
@@ -152,6 +294,10 @@ game's live beacons. Empty is honest — it means no player has beaconed yet.</p
     document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   });
+
+  // Auto-refresh every 5 minutes
+  setInterval(load, 5 * 60 * 1000);
+
   load();
 })();
 </script>
