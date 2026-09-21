@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-21T17:30:49.815Z",
+  "generated_at": "2026-09-21T17:40:51.236Z",
   "sink": "https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD",
   "totals": {
     "unique_devices": 5,
-    "beacons_received": 10,
+    "beacons_received": 13,
     "beacons_invalid": 0,
-    "game_starts": 5,
-    "spins": 37,
+    "game_starts": 6,
+    "spins": 73,
     "spin_buys": 0,
     "jackpot_wins": 1,
     "prizes_claimed": 1,
@@ -28,9 +28,9 @@
         "kind": "jackpot"
       }
     ],
-    "credits_earned": 1100,
+    "credits_earned": 1175,
     "credits_spent": 1000,
-    "song_plays": 5,
+    "song_plays": 6,
     "song_replays": 0,
     "like_taps": 0,
     "like_awards": 0,
@@ -49,13 +49,13 @@
         "d-p5zmo1mdmuba3x3i",
         "d-9cmmrgf8muba4ipt"
       ],
-      "spins": 37,
+      "spins": 73,
       "prizes": 1,
       "jackpots": 1
     }
   },
   "first_seen": "2026-09-21T12:45:05.717Z",
-  "last_seen": "2026-09-21T13:30:52.096Z",
+  "last_seen": "2026-09-21T17:40:51.234Z",
   "_device_list": [
     "d-uqm27l3omub8abj7",
     "d-7wh1xg5umub8pd2z",
