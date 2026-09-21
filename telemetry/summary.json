@@ -1,21 +1,27 @@
 {
-  "generated_at": "2026-09-21T10:45:18.302Z",
+  "generated_at": "2026-09-21T12:45:05.719Z",
   "sink": "https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD",
   "totals": {
-    "unique_devices": 0,
-    "beacons_received": 0,
+    "unique_devices": 1,
+    "beacons_received": 6,
     "beacons_invalid": 0,
-    "game_starts": 0,
-    "spins": 0,
+    "game_starts": 1,
+    "spins": 8,
     "spin_buys": 0,
-    "jackpot_wins": 0,
-    "prizes_claimed": 0,
-    "prizes_claimed_by_type": {},
-    "links_issued": {},
-    "links_issued_by_event": {},
-    "credits_earned": 0,
-    "credits_spent": 0,
-    "song_plays": 0,
+    "jackpot_wins": 1,
+    "prizes_claimed": 1,
+    "prizes_claimed_by_type": {
+      "jackpot": 1
+    },
+    "links_issued": {
+      "https://open.spotify.com/track/4XP56LZjeS0TJUd30kpGSK": 1
+    },
+    "links_issued_by_event": {
+      "prize_claim": 1
+    },
+    "credits_earned": 1025,
+    "credits_spent": 1000,
+    "song_plays": 3,
     "song_replays": 0,
     "like_taps": 0,
     "like_awards": 0,
@@ -25,8 +31,19 @@
     "follow_awards": 0,
     "game_overs": 0
   },
-  "per_day": {},
-  "first_seen": null,
-  "last_seen": null,
-  "_device_list": []
+  "per_day": {
+    "2026-09-21": {
+      "devices": [
+        "d-uqm27l3omub8abj7"
+      ],
+      "spins": 8,
+      "prizes": 1,
+      "jackpots": 1
+    }
+  },
+  "first_seen": "2026-09-21T12:45:05.717Z",
+  "last_seen": "2026-09-21T12:45:05.719Z",
+  "_device_list": [
+    "d-uqm27l3omub8abj7"
+  ]
 }
