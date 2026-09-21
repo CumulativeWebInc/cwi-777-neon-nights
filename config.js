@@ -27,6 +27,19 @@ const CONFIG = {
   spinBuy: { price: 25, spins: 10 },
   // Canonical game URL used in share payloads.
   gameUrl: "https://cumulativewebinc.github.io/cwi-777-neon-nights/",
+  // Remote player telemetry (v8.3, Black's order 2026-09-21): batched anonymous
+  // per-device metric deltas beaconed to the owner's ntfy sink so real player
+  // totals exist (unique players, spins, prizes, issued link URLs). Payloads
+  // carry ONLY a random device id + counts + public issued-link URLs — no PII.
+  // Sink: community ntfy server (ntfy.envs.net) — reachable from this VM and
+  // from players' phones, no account, $0. Operator could log raw messages, but
+  // they are anonymous aggregates. Unguessable topic (2026-09-21).
+  telemetry: {
+    enabled: true,
+    base: "https://ntfy.envs.net",
+    topic: "nn777-tele-cwi-YdFlqrKbnqYD",
+    flushMs: 60000, // flush every 60s + on pagehide/hidden + immediately on jackpot/prize_claim
+  },
   // "Like the song" opens one of these allowlisted TRACK pages in a new tab
   // (once-ever +25). Track-level URLs only — every one below is already
   // allowlisted in jackpotLinks (asserted by tests). Apple Music and

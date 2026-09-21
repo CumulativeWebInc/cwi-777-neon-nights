@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="777 Neon Nights">
-<link rel="stylesheet" href="styles.css?v=nn777-v8.2.1">
+<link rel="stylesheet" href="styles.css?v=nn777-v8.3">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -268,7 +268,7 @@
      scripts whose failures surface as masked "Script error.") are logged, never toasted:
      their bug must not masquerade as ours. -->
 <script>
-window.NN_BUILD = "nn777-v8.2.1";
+window.NN_BUILD = "nn777-v8.3";
 window.__nnErrors = [];
 function __nnLogError(kind, msg, file, line, col) {
   try {
@@ -285,7 +285,7 @@ window.addEventListener("error", function (e) {
     // A masked cross-origin failure ("Script error." with no attributable file) can never
     // come from our same-origin scripts — log it, don't alarm the player.
     var masked = msg === "Script error." && !file;
-    var ours = !masked && (!file || file.indexOf(location.host) !== -1 || /(^|\/)(game|logic|i18n|config|metrics|scores|cabinet-anim|cabinet3d)\.js$/.test(file));
+    var ours = !masked && (!file || file.indexOf(location.host) !== -1 || /(^|\/)(game|logic|i18n|config|metrics|telemetry|scores|cabinet-anim|cabinet3d)\.js$/.test(file));
     var t = document.getElementById("toast");
     if (t && ours) {
       var where = file && line ? " (" + String(file).split("/").pop() + ":" + line + ")" : "";
@@ -317,11 +317,12 @@ setTimeout(function () {
 }, 9000);
 </script>
 
-<script src="config.js?v=nn777-v8.2.1"></script>
-<script src="logic.js?v=nn777-v8.2.1"></script>
-<script src="i18n.js?v=nn777-v8.2.1"></script>
-<script src="metrics.js?v=nn777-v8.2.1"></script>
-<script src="scores.js?v=nn777-v8.2.1"></script>
+<script src="config.js?v=nn777-v8.3"></script>
+<script src="logic.js?v=nn777-v8.3"></script>
+<script src="i18n.js?v=nn777-v8.3"></script>
+<script src="metrics.js?v=nn777-v8.3"></script>
+    <script src="telemetry.js?v=nn777-v8.3"></script>
+<script src="scores.js?v=nn777-v8.3"></script>
 <script type="importmap">
 {
   "imports": {
@@ -330,9 +331,9 @@ setTimeout(function () {
   }
 }
 </script>
-<script type="module" src="cabinet-anim.js?v=nn777-v8.2.1"></script>
-<script type="module" src="cabinet3d.js?v=nn777-v8.2.1"></script>
-<script type="module" src="game.js?v=nn777-v8.2.1"></script>
+<script type="module" src="cabinet-anim.js?v=nn777-v8.3"></script>
+<script type="module" src="cabinet3d.js?v=nn777-v8.3"></script>
+<script type="module" src="game.js?v=nn777-v8.3"></script>
 <script>
 // Service worker: nn777-v8. Never caches error responses; non-atomic install.
 // Version handshake: when a new SW is waiting, show an "Update available —

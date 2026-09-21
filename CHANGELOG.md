@@ -1,5 +1,39 @@
 # 777 Neon Nights — Changelog
 
+## nn777-v8.3 (2026-09-21) — real player telemetry (Black's order)
+Black posted the game on X and asked the honest question: do we actually have
+real player data? We did not — metrics.js was localStorage-only. Now:
+1. **game/telemetry.js** (new): every `metric()` call in game.js mirrors into a
+   batched anonymous beacon — random per-device id (from metrics.js), per-event
+   counts for a 60s window, credit-earn/spend amount sums, and the exact issued
+   link URL on every `prize_claim` (credit-link, file, encore), `like_tap`,
+   `follow_tap` (metrics.js stores those URLs under the legacy `platform` key;
+   telemetry normalizes to `url`).
+2. **Flush**: every 60s, on `pagehide`/`visibilitychange` hidden, and
+   immediately on `jackpot_win` and `prize_claim`. `sendBeacon` preferred,
+   `fetch(keepalive)` fallback. Silent failure — gameplay never blocks.
+3. **Sink**: `https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD` (community ntfy
+   server — reachable from the VM and from players' phones, $0, no account).
+   Payloads are anonymous aggregates only (device id, counts, public issued-link
+   URLs) — no PII. ntfy.sh was proxy-blocked from the VM; envs.net verified
+   reachable with a full POST→poll roundtrip on 2026-09-21.
+4. **telemetry/collect.js** (VM, zero deps): polls the sink every 2h (12h ntfy
+   retention), appends raw batches to `telemetry/raw/YYYY-MM-DD.jsonl`,
+   regenerates `telemetry/summary.json` (unique_devices, spins, jackpot_wins,
+   prizes_claimed_by_type, links_issued url→count, credits earned/spent, song
+   plays/replays, engagement, per-day), idempotent via watermark, and pushes
+   changed files to the live site.
+5. **telemetry/dashboard.html**: owner dashboard Black opens on his iPhone —
+   https://cumulativewebinc.github.io/cwi-777-neon-nights/telemetry/dashboard.html
+   — reads the pushed summary.json, shows all totals + per-day, with an
+   export-JSON button. Empty state is honest: "no player data yet".
+6. Cron `nn777-telemetry-collect` (every 2h, goal:cwi-agent-company) runs the
+   collector. 30-day kill/rework metrics (review 2026-10-20) can now read REAL
+   remote totals instead of local exports.
+All prior constraints hold: single green Spin button, one spin per tap,
+200-spin pity cap, 40-spin cap, 9 rounds/3 stages, persistent credits,
+free/no-cash/no-gambling framing, anonymous-only telemetry.
+
 ## nn777-v8.2.1 (2026-09-20) — double-tap spin fix (Black's bug report)
 - Root cause (ATHENA, measured in code): the green `.spin-btn` had no
   `touch-action:manipulation` and the viewport was scalable, so iOS Safari

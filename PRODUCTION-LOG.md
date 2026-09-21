@@ -3,6 +3,34 @@
 **Product:** 777 Neon Nights — free promo slot game for "Neon Nights Pt. 777" by That Boy Hi Hat (Cumulative Web Inc).
 **Shipped:** 2026-09-20. **Version:** 1.0.0. **Build cost:** $0.
 
+## v8.3 — real player telemetry (2026-09-21, Black's order)
+
+Black posted the game on X and asked: do we have real player data? Answer was
+no — metrics.js was localStorage-only. Shipped the same morning:
+
+- **Game beacon** (`game/telemetry.js`): every `metric()` call mirrors into a
+  batched anonymous delta (random device id, per-event counts, credit sums,
+  issued-link URL on every prize claim / like tap / follow tap). Flush 60s +
+  pagehide/hidden + immediate on jackpot_win and prize_claim. sendBeacon →
+  fetch(keepalive) fallback. Silent failure; gameplay never blocks.
+- **Sink**: `https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD` (community ntfy
+  server, $0, no account; verified POST→poll roundtrip from the VM on
+  2026-09-21; ntfy.sh itself is proxy-blocked from the VM). Anonymous
+  aggregates only — no PII. 12h message retention → 2h collector cadence.
+- **Collector** (`telemetry/collect.js`, zero deps): polls sink, appends
+  `telemetry/raw/YYYY-MM-DD.jsonl`, regenerates `telemetry/summary.json`
+  (unique devices, spins, wins by type, prizes claimed by type, links issued
+  url→count, credits earned/spent, song plays/replays, engagement, per-day),
+  idempotent via watermark, pushes changes to the live site. End-to-end
+  verified 2026-09-21 with 3 test beacons (3 devices, 21 spins, 6 prize claims,
+  url→count exact) — test state reset afterwards, zero invented data retained.
+- **Owner dashboard**: https://cumulativewebinc.github.io/cwi-777-neon-nights/telemetry/dashboard.html
+  (Black's iPhone; reads pushed summary.json; export-JSON button; honest empty
+  state until the first real player beacons).
+- **Cron** `nn777-telemetry-collect` (every 2h, goal:cwi-agent-company).
+
+Unit tests: 7810 passed, 0 failed (incl. new telemetry.test.js 38/38).
+
 ## What shipped
 
 - **Live game (PWA):** https://cumulativewebinc.github.io/cwi-777-neon-nights/

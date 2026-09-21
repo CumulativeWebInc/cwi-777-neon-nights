@@ -5,8 +5,18 @@ import { spinLabelFor } from './cabinet-anim.js';
   const C = window.NN_CONFIG;
   const L = window.NN_LOGIC; // set below from logic.js browser export
   const M = window.NN_METRICS;
-  const metric = (name, data) => { try { M.record(localStorage, name, data || {}); } catch (e) {} };
+  const metric = (name, data) => {
+    try { M.record(localStorage, name, data || {}); } catch (e) {}
+    try { if (window.NN_TELE && window.NN_TELE.ingest) window.NN_TELE.ingest(name, data || {}); } catch (e) {}
+  };
   const SC = window.NN_SCORES;
+  // Remote telemetry beacon (v8.3): start once; every metric() call mirrors
+  // into it. Silent on any failure — gameplay never depends on the network.
+  try {
+    if (window.NN_TELEMETRY && C.telemetry) {
+      window.NN_TELE = window.NN_TELEMETRY.start(C.telemetry, localStorage, window);
+    }
+  } catch (e) { window.NN_TELE = null; }
   const CAB = window.NN_CABINET; // canvas cabinet renderer (cabinet.js)
   /* ---------- cabinet safety: a 3D-cabinet exception must NEVER swallow the
      DOM banner + payout modal (v8.2 hardening — Black's +50-with-no-announcement
@@ -449,7 +459,7 @@ import { spinLabelFor } from './cabinet-anim.js';
             return;
           }
           
-          metric("prize_claim", { kind: opts.kind, via: l.label, credits: true });
+          metric("prize_claim", { kind: opts.kind, via: l.label, url: l.url, credits: true });
           toast(`✅ Link issued: ${l.label} — enjoy the music 🎶`);
           refresh();
           setTimeout(() => $("payoutModal").classList.add("hidden"), 600);
@@ -463,7 +473,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       const a = document.createElement("a");
       a.href = f; a.download = f.split("/").pop();
       a.textContent = "⬇ " + f.split("/").pop();
-      a.addEventListener("click", () => metric("prize_claim", { kind: opts.kind, file: f.split("/").pop() }));
+      a.addEventListener("click", () => metric("prize_claim", { kind: opts.kind, file: f.split("/").pop(), url: f }));
       files.appendChild(a);
     });
     $("payoutScore").textContent = SC.computeScore(S).score;
