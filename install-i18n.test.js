@@ -190,7 +190,7 @@ for (const f of ["icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png
 
 /* ---- VERSION / CHANGELOG in sync with build ---- */
 const ver = JSON.parse(fs.readFileSync(path.join(here, "VERSION.json"), "utf8"));
-ok(/^nn777-v\d+(\.\d+)?$/.test(ver.build), `VERSION.json build tag shape (${ver.build})`);
+ok(/^nn777-v\d+(\.\d+){0,2}$/.test(ver.build), `VERSION.json build tag shape (${ver.build})`);
 const idx = fs.readFileSync(path.join(here, "index.html"), "utf8");
 ok(idx.includes(`window.NN_BUILD = "${ver.build}"`), `index.html NN_BUILD matches VERSION.json (${ver.build})`);
 const sw = fs.readFileSync(path.join(here, "sw.js"), "utf8");

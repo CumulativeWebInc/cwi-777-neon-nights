@@ -1,5 +1,18 @@
 # 777 Neon Nights — Changelog
 
+## nn777-v8.2.1 (2026-09-20) — double-tap spin fix (Black's bug report)
+- Root cause (ATHENA, measured in code): the green `.spin-btn` had no
+  `touch-action:manipulation` and the viewport was scalable, so iOS Safari
+  delayed taps ~300ms waiting for a second tap (double-tap-zoom) and ate
+  quick second taps. Audio-unlock was ruled out and left untouched.
+- Fix: `touch-action:manipulation` on `.spin-btn` + viewport gains
+  `maximum-scale=1.0, user-scalable=no` (all other viewport values kept).
+  One tap = one spin, every time. Cache-bust tags bumped to
+  `?v=nn777-v8.2.1` so every device fetches the fixed assets.
+All prior constraints hold: single green Spin button, one spin per tap,
+200-spin pity cap, 40-spin cap, 9 rounds/3 stages, persistent credits,
+free/no-cash/no-gambling framing.
+
 ## nn777-v8.2 (2026-09-20) — GAME OVER loop (Black's order)
 1. **GAME OVER at 0 spins**: the machine marquee shows GAME OVER on the
    cabinet (3D + DOM fallback) and a modal opens: credit balance, replay
