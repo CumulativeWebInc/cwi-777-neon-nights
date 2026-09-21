@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-09-21T10:45:18.302Z",
+  "sink": "https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD",
+  "totals": {
+    "unique_devices": 0,
+    "beacons_received": 0,
+    "beacons_invalid": 0,
+    "game_starts": 0,
+    "spins": 0,
+    "spin_buys": 0,
+    "jackpot_wins": 0,
+    "prizes_claimed": 0,
+    "prizes_claimed_by_type": {},
+    "links_issued": {},
+    "links_issued_by_event": {},
+    "credits_earned": 0,
+    "credits_spent": 0,
+    "song_plays": 0,
+    "song_replays": 0,
+    "like_taps": 0,
+    "like_awards": 0,
+    "share_taps": 0,
+    "share_awards": 0,
+    "follow_taps": 0,
+    "follow_awards": 0,
+    "game_overs": 0
+  },
+  "per_day": {},
+  "first_seen": null,
+  "last_seen": null,
+  "_device_list": []
+}
