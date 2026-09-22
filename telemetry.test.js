@@ -33,6 +33,14 @@ function fakeTransport(calls, ret) {
   ok(w.links.length === 1 && w.links[0].url === "https://open.spotify.com/track/AAA" && w.links[0].e === "prize_claim", "prize_claim URL captured");
   ok(w.links[0].kind === "jackpot", "prize kind captured");
 
+  // winner prize choice detail: provider label (via) + song captured on claim
+  w = T.makeWindow();
+  T.ingest(w, "prize_claim", { kind: "jackpot", via: "Spotify", song: "Neon Nights Pt. 777", url: "https://open.spotify.com/track/AAA" });
+  ok(w.links.length === 1 && w.links[0].provider === "Spotify" && w.links[0].song === "Neon Nights Pt. 777", "prize_claim provider+song captured");
+  w = T.makeWindow();
+  T.ingest(w, "prize_claim", { kind: "encore", url: "https://open.spotify.com/track/BBB" });
+  ok(w.links.length === 1 && w.links[0].provider === undefined && w.links[0].song === undefined, "provider/song optional — URL-only claim still valid");
+
   // legacy metrics.js key: like_tap/follow_tap store the URL under `platform`
   w = T.makeWindow();
   T.ingest(w, "like_tap", { platform: "https://open.spotify.com/track/BBB" });

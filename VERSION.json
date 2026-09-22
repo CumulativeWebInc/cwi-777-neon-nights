@@ -1,6 +1,6 @@
 {
-  "build": "nn777-v8.3",
-  "date": "2026-09-21",
+  "build": "nn777-v8.4",
+  "date": "2026-09-22",
   "game": "777 Neon Nights",
-  "what": "v8.3 (2026-09-21): REAL PLAYER TELEMETRY (Black order). New game/telemetry.js: every metric() call mirrors into a batched anonymous beacon (random per-device id from metrics.js, per-event counts, issued-link URLs on prize_claim/like_tap/follow_tap). Flush every 60s + on pagehide/hidden + immediately on jackpot_win and prize_claim; sendBeacon preferred with fetch(keepalive) fallback; silent failure, gameplay never blocks. New telemetry/collect.js (VM, zero deps) polls the ntfy sink every 2h, appends raw batches to telemetry/raw/YYYY-MM-DD.jsonl, regenerates telemetry/summary.json (unique_devices, spins, wins_by_type, prizes_claimed_by_type, links_issued url->count, credits earned/spent, song plays/replays, per-day) and pushes it + telemetry/dashboard.html to the live site. Owner dashboard at /telemetry/dashboard.html on Blacks iPhone + export-JSON. Sink: ntfy.envs.net (community ntfy server, reachable from VM + phones, no account, $0; payloads anonymous aggregates only). All prior constraints hold: single green Spin button, one spin per tap, 200-spin pity cap, 40-spin cap, 9 rounds/3 stages, persistent credits, free/no-cash/no-gambling framing."
+  "what": "v8.4 (2026-09-22): BRAND VISIBILITY REDESIGN (Black order). New visible brandbar at top of first viewport: official CWI logo (art/cwi-logo-v1.jpg, circular gold-ringed badge) + CUMULATIVE WEB INC in gold neon, plus a tappable song strip linking That Boy Hi Hat — Neon Nights Pt. 777 to the Spotify track. The old header.marquee stays sr-only for screen readers; the visible cabinet canvas is untouched. Gameplay, credit economy, and telemetry beacons unchanged."
 }

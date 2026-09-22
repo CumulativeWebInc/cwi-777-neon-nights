@@ -1,5 +1,18 @@
 # 777 Neon Nights — Changelog
 
+## nn777-v8.4 (2026-09-22) — brand visibility redesign (Black's order)
+Black's complaint with an iPhone screenshot: the game showed no Cumulative Web
+Inc brand name and no artist song info in the viewport. Fix:
+1. **Visible brandbar** at the top of the first viewport: the official CWI logo
+   (`game/art/cwi-logo-v1.jpg`, circular gold-ringed badge) + "CUMULATIVE WEB INC"
+   in gold neon lettering.
+2. **Tappable song strip** under the brand name: "🎵 That Boy Hi Hat — Neon
+   Nights Pt. 777" linking to the Spotify track (prize link). No scrolling
+   needed on iPhone portrait.
+3. The old `header.marquee` stays `sr-only` for screen readers; the visible
+   cabinet canvas, reels, Spin button, SPINS counter, slot logic, credit
+   economy, and telemetry beacons are untouched.
+
 ## nn777-v8.3 (2026-09-21) — real player telemetry (Black's order)
 Black posted the game on X and asked the honest question: do we actually have
 real player data? We did not — metrics.js was localStorage-only. Now:

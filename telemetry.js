@@ -47,7 +47,9 @@
     }
     // Prize-link detail: capture the exact issued URL on claim/tap events.
     // metrics.js stores like/follow tap URLs under `platform` (legacy key);
-    // telemetry normalizes to `url`.
+    // telemetry normalizes to `url`. The game also sends `via` (provider
+    // label shown to the player, e.g. "Spotify") and `song` — both captured
+    // so the owner dashboard can show which song/provider each winner chose.
     var url = data.url || data.platform || null;
     if (typeof url === "string" && url.length > 0 &&
         (name === "prize_claim" || name === "like_tap" || name === "follow_tap" ||
@@ -57,6 +59,8 @@
           e: name,
           url: url.slice(0, 500),
           kind: typeof data.kind === "string" ? data.kind.slice(0, 80) : undefined,
+          provider: typeof data.via === "string" ? data.via.slice(0, 80) : undefined,
+          song: typeof data.song === "string" ? data.song.slice(0, 120) : undefined,
           at: Date.now(),
         });
       }

@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="777 Neon Nights">
-<link rel="stylesheet" href="styles.css?v=nn777-v8.3">
+<link rel="stylesheet" href="styles.css?v=nn777-v8.4">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -49,6 +49,15 @@
 </svg>
 
 <div id="app">
+  <!-- Brand bar (v8.4): visible CWI brand + song info in the first viewport.
+       Black's 2026-09-22 complaint: the game showed no brand name and no song info. -->
+  <div class="brandbar">
+    <img class="brandbar-logo" src="art/cwi-logo-v1.jpg" alt="Cumulative Web Inc logo" width="44" height="44">
+    <div class="brandbar-text">
+      <div class="brandbar-name">CUMULATIVE WEB INC</div>
+      <a class="songstrip" href="https://open.spotify.com/track/4XP56LZjeS0TJUd30kpGSK" target="_blank" rel="noopener">🎵 That Boy Hi Hat — Neon Nights Pt. 777</a>
+    </div>
+  </div>
   <header class="marquee sr-only">
     <div class="marquee-title">777 NEON NIGHTS</div>
     <div class="marquee-sub">Neon Nights Pt. 777 &bull; That Boy Hi Hat</div>
@@ -268,7 +277,7 @@
      scripts whose failures surface as masked "Script error.") are logged, never toasted:
      their bug must not masquerade as ours. -->
 <script>
-window.NN_BUILD = "nn777-v8.3";
+window.NN_BUILD = "nn777-v8.4";
 window.__nnErrors = [];
 function __nnLogError(kind, msg, file, line, col) {
   try {
@@ -317,12 +326,12 @@ setTimeout(function () {
 }, 9000);
 </script>
 
-<script src="config.js?v=nn777-v8.3"></script>
-<script src="logic.js?v=nn777-v8.3"></script>
-<script src="i18n.js?v=nn777-v8.3"></script>
-<script src="metrics.js?v=nn777-v8.3"></script>
-    <script src="telemetry.js?v=nn777-v8.3"></script>
-<script src="scores.js?v=nn777-v8.3"></script>
+<script src="config.js?v=nn777-v8.4"></script>
+<script src="logic.js?v=nn777-v8.4"></script>
+<script src="i18n.js?v=nn777-v8.4"></script>
+<script src="metrics.js?v=nn777-v8.4"></script>
+    <script src="telemetry.js?v=nn777-v8.4"></script>
+<script src="scores.js?v=nn777-v8.4"></script>
 <script type="importmap">
 {
   "imports": {
@@ -331,9 +340,9 @@ setTimeout(function () {
   }
 }
 </script>
-<script type="module" src="cabinet-anim.js?v=nn777-v8.3"></script>
-<script type="module" src="cabinet3d.js?v=nn777-v8.3"></script>
-<script type="module" src="game.js?v=nn777-v8.3"></script>
+<script type="module" src="cabinet-anim.js?v=nn777-v8.4"></script>
+<script type="module" src="cabinet3d.js?v=nn777-v8.4"></script>
+<script type="module" src="game.js?v=nn777-v8.4"></script>
 <script>
 // Service worker: nn777-v8. Never caches error responses; non-atomic install.
 // Version handshake: when a new SW is waiting, show an "Update available —
