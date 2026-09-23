@@ -1,4 +1,7 @@
 # 777 Neon Nights — Changelog
+## 2026-09-23 — v2026.09.23 — trust infra (A7/A8)
+- **A7 PR preview bot:** `.github/workflows/pr-preview.yml` builds each PR branch, deploys a live preview to `pr-previews/<PR#>/`, and posts the preview link + contract validation checklist as a PR comment (Vercel pattern).
+- **A8/A9 contract CI gate:** the build now fails if `.well-known/agent-card.json` is missing or invalid (name/url required), if the `SCHEMA-VERSIONS.json` contract breaks (where the registry exists), if `content.json` is invalid, or if `CHANGELOG.md` is missing.
 
 ## nn777-v8.5 (2026-09-23) — prize-mode abstraction + OS retrofit (OPERATION RETROFIT)
 1. **Prize-mode abstraction (plan §5, Black's 2026-09-21 direction):**
