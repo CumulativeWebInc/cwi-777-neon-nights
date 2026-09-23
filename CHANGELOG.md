@@ -1,5 +1,27 @@
 # 777 Neon Nights — Changelog
 
+## nn777-v8.5 (2026-09-23) — prize-mode abstraction + OS retrofit (OPERATION RETROFIT)
+1. **Prize-mode abstraction (plan §5, Black's 2026-09-21 direction):**
+   `game/prize-providers.js` implements the swappable-provider interface
+   (`award` → prize, `redeem` → receipt, `valueOf` → honest value label).
+   v1 ships `PromoPrizeProvider` only: free music links + Neon Credits (fun
+   points, NO cash value). Config flag `prize.mode = "promo"`. Money mode is
+   HARD-GATED: `getPrizeProvider()`/`enableMoneyMode()` REFUSE mode "money"
+   with an error listing all 7 unmet compliance gates (gambling/sweepstakes
+   licenses, counsel opinion, KYC/AML, age verification, geo-fencing,
+   certified RNG) + Black's explicit approval. No code path can activate it.
+   Every win award (jackpot/triple/listening prize) routes through the seam in
+   `game.js` (`prizeAward()`); the honest promo value label is stamped into
+   the `jackpot_win` telemetry. New node suite: `prize-providers.test.js` (33).
+2. **OS retrofit:** CTA strip above the fold (value prop + Neon Credits
+   explainer + verified HTTP-200 Agent Deck try-link; also mirrored in the
+   footer); OG/Twitter meta tags; JSON-LD (schema.org VideoGame);
+   `llms.txt`, `agent-card.json` (+ `/.well-known/agent-card.json`),
+   `content.json` (CTA + try-link payload).
+All prior constraints hold: single green Spin button, one spin per tap,
+200-spin pity cap, 40-spin cap, 9 rounds/3 stages, persistent credits,
+free/no-cash/no-gambling framing, anonymous-only telemetry, 41 languages.
+
 ## nn777-v8.4 (2026-09-22) — brand visibility redesign (Black's order)
 Black's complaint with an iPhone screenshot: the game showed no Cumulative Web
 Inc brand name and no artist song info in the viewport. Fix:

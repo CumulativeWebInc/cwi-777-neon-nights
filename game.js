@@ -10,6 +10,25 @@ import { spinLabelFor } from './cabinet-anim.js';
     try { if (window.NN_TELE && window.NN_TELE.ingest) window.NN_TELE.ingest(name, data || {}); } catch (e) {}
   };
   const SC = window.NN_SCORES;
+  /* ---------- prize-provider seam (v8.5, plan §5 "build once"): every win
+     award routes through the prize provider. v1 = promo prizes only (free
+     music links + Neon Credits, no cash value). Money mode REFUSES at the
+     provider — see game/prize-providers.js. Falls back to raw config awards
+     if the provider script failed to load, so the game never dies. ---------- */
+  const PP = (() => {
+    try { return window.NN_PRIZES ? window.NN_PRIZES.getPrizeProvider(C) : null; }
+    catch (e) { try { metric("prize_provider_error", { error: String((e && e.message) || e).slice(0, 160) }); } catch (x) {} return null; }
+  })();
+  function prizeAward(kind) {
+    if (PP) return PP.award({ kind }).creditAward;
+    return { jackpot: C.creditAwards.jackpot, triple: C.creditAwards.triple, prize: C.creditAwards.prize }[kind];
+  }
+  function prizeValue(kind) {
+    // Honest telemetry label for a win: {type:"promo", cashValue:0}. NEVER
+    // upgraded without evidence — the data-truth law.
+    if (PP) { try { return PP.valueOf(PP.award({ kind })); } catch (e) {} }
+    return { type: "promo", amount: 0, unit: "neon-credits", cashValue: 0 };
+  }
   // Remote telemetry beacon (v8.3): start once; every metric() call mirrors
   // into it. Silent on any failure — gameplay never depends on the network.
   try {
@@ -259,7 +278,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     // reloading). S.creditsAwarded persists the paid prize IDs.
     if (!S.creditsAwarded.includes(p.id)) {
       S.creditsAwarded.push(p.id);
-      bankCredits(C.creditAwards.prize);
+      bankCredits(prizeAward("prize"), "prize");
     }
     $("winBanner").textContent = msg;
     cabSafe("showPrize", c => c.showPrize(msg, creditScoreLine())); // prize name + credit score ON THE MACHINE (all 41 languages)
@@ -395,7 +414,7 @@ import { spinLabelFor } from './cabinet-anim.js';
     if (res.jackpot) {
       // Golden token pour on the canvas, then the credit-claim payout screen.
       cabSafe("celebrate", c => c.celebrate());
-      bankCredits(C.creditAwards.jackpot); // +1000: jackpot reaches the link price instantly
+      bankCredits(prizeAward("jackpot"), "jackpot"); // provider-routed: jackpot reaches the link price instantly
       $("winBanner").textContent = winText("jackpot");
       cabSafe("showPrize", c => c.showPrize(winText("jackpot"), creditScoreLine())); // prize name + credit score ON THE MACHINE
       setTimeout(() => { cabSafe("endCelebrate", c => c.endCelebrate()); openJackpot(); }, 2400);
@@ -403,7 +422,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       cabSafe("setSignFlare", c => c.setSignFlare(0));
       if (res.triple) {
         const label = C.symbols.find(s => s.id === res.triple).label;
-        bankCredits(C.creditAwards.triple); // +50 Neon Credits per triple
+        bankCredits(prizeAward("triple"), "triple"); // provider-routed: +50 Neon Credits per triple
         $("winBanner").textContent = winText("triple", { label });
         cabSafe("showPrize", c => c.showPrize($("winBanner").textContent, creditScoreLine())); // triple + credit score ON THE MACHINE
         if (res.triple === "bell" && L.bonusUnlocked(S))
@@ -523,13 +542,13 @@ import { spinLabelFor } from './cabinet-anim.js';
 
   /* ---------- jackpot ---------- */
   function openJackpot() {
-    metric("jackpot_win", { spinsSinceJackpot: S.spinsSinceJackpot, totalSpins: S.totalSpins });
+    metric("jackpot_win", { spinsSinceJackpot: S.spinsSinceJackpot, totalSpins: S.totalSpins, value: prizeValue("jackpot") });
     showPayout({
       kind: "jackpot",
       title: winText("jackpot"),
-      what: `You hit <b>777</b> on <b>Neon Nights Pt. 777</b> — <b>+${C.creditAwards.jackpot} Neon Credits</b> banked!`,
+      what: `You hit <b>777</b> on <b>Neon Nights Pt. 777</b> — <b>+${prizeAward("jackpot")} Neon Credits</b> banked!`,
       links: C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url })),
-      award: C.creditAwards.jackpot,
+      award: prizeAward("jackpot"),
     });
   }
 
@@ -538,9 +557,9 @@ import { spinLabelFor } from './cabinet-anim.js';
     showPayout({
       kind: "triple",
       title: winText("triple", { label }),
-      what: `Triple <b>${label}</b> — nice hit! <b>+${C.creditAwards.triple} Neon Credits</b> banked.`,
+      what: `Triple <b>${label}</b> — nice hit! <b>+${prizeAward("triple")} Neon Credits</b> banked.`,
       links: C.jackpotLinks.map(l => ({ label: l.platform, sub: "Neon Nights Pt. 777 — free stream", url: l.url })),
-      award: C.creditAwards.triple,
+      award: prizeAward("triple"),
     });
   }
 
@@ -606,7 +625,7 @@ import { spinLabelFor } from './cabinet-anim.js';
       what: `<b>${p.name}</b> — ${p.desc}`,
       links: musicLinks,
       files,
-      award: C.creditAwards.prize,
+      award: prizeAward("prize"),
     });
     refresh();
   }

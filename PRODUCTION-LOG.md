@@ -279,3 +279,58 @@ Black rejected the Canvas-2D version: it failed on his iPhone and did not resemb
 - `game/vendor/three/**` (0.160.0, local)
 - `game/.nojekyll`, `game/sw.js` (v4), `game/index.html`
 - `qa/qa3d.js` (standard + resilience), `qa/qa3d-fallback.js`, `qa/deploy.js`, `qa/deploy3d.js`
+
+## nn777-v8.5 (2026-09-23) — prize-mode abstraction + OS retrofit (OPERATION RETROFIT)
+### Prize-mode abstraction (plan §5)
+- `game/prize-providers.js` (new): swappable `PrizeProvider` interface
+  (`award` → prize, `redeem` → receipt, `valueOf` → honest value label).
+  v1 ships `PromoPrizeProvider` only (free music links + Neon Credits, no cash
+  value). Config flag `prize.mode = "promo"`.
+- Money mode HARD-GATED: `getPrizeProvider()`/`enableMoneyMode()` REFUSE mode
+  "money" — no code path to a MoneyPrizeProvider. The refusal lists all 7
+  unmet compliance gates (gambling/sweepstakes licenses, counsel opinion,
+  KYC/AML, age verification, geo-fencing, certified RNG) + Black's explicit
+  approval. Money mode can never switch on without all of them.
+- Seams in `game.js`: `prizeAward()` routes jackpot/triple/prize awards through
+  the provider (behavior-identical to config values); honest promo value label
+  stamped into `jackpot_win` telemetry. Defensive: game still boots if the
+  provider script fails to load (falls back to config awards).
+- New node suite `game/prize-providers.test.js`: 27/27 (award math, honest
+  valueOf, redeem receipt math + below-price refusal, money-mode refusal with
+  all 7 gates named, unknown-mode throws).
+### OS retrofit
+- CTA strip above the fold: value prop + Neon Credits explainer + verified
+  HTTP-200 Agent Deck try-link (also mirrored in the footer).
+- OG/Twitter meta tags (og:image = art/marquee-777.png, 1200x630 verified);
+  JSON-LD schema.org VideoGame; `llms.txt`, `agent-card.json`
+  (+ `/.well-known/agent-card.json`), `content.json` (CTA + try-link payload).
+### QA receipts (2026-09-23)
+| Suite | Result |
+|---|---|
+| prize-providers.test.js | **27/27 pass** |
+| game-logic.test.js | **94/94 pass** |
+| cabinet-error.test.js | **10/10 pass** |
+| cache-bust.test.js | **24/24 pass** (all 11 asset tags carry ?v=nn777-v8.5) |
+| metrics.test.js | **27/27 pass** |
+| payout-metrics.test.js | **33/33 pass** |
+| cabinet-anim.test.js | **33/33 pass** |
+| cabinet3d-anim.test.mjs | **56/56 pass** |
+| install-i18n.test.js | **7549/7549 pass** (incl. sw.js cache tag nn777-v8.5) |
+| game.js | ES-module syntax OK |
+| Live verify | all live assets byte-identical post-deploy; `?v=nn777-v8.5` on 11 tags |
+### Defect verification (Phase 1 — Black's 2026-09-20 iPhone defects)
+- Spin counter: NOT broken — regenSpins() fix (v6) present in live bytes.
+- Win music link: NOT broken — claim modal renders 10-link allowlist (v6).
+- Win announcement: NOT broken — machine-face showPrize + win banner + modal (v7).
+- All three were previously fixed and shipped; the live v8.4 build was byte-identical
+  to local with all markers present. No defect fix code needed; v8.5 adds features.
+### Red-team (2026-09-23, OS 12-item checklist): cleared — no blockers
+- failure-modes: boot watchdog + retry UI, cabSafe, DOM fallback, cache-bust, SW update toast, localStorage try/catch.
+- exploit-vectors: player name escaped (escapeHtml), score codes checksummed + shape-validated; innerHTML only from trusted i18n/config.
+- secret scan: zero secret-shaped identifiers in the game tree (token hits are casino-token visuals + URL-hygiene comments).
+- PII: payload = random device id + counts + public issued-link URLs; local-only metrics. No PII leaves device.
+- Watch: 100x player scale could hit the community ntfy sink's rate limits — game never blocks (silent failure, local metrics persist).
+### Standing checklist items for other apps (compounding)
+- SW cache tag must track VERSION.json — the install-i18n test caught a stale `nn777-v8.4` cache name; make the version bump checklist include sw.js cache constants.
+- Receipt balance after an actor-mutating call: report post-mutation state, never pre-mutation minus amount — caught by test.
+- Every published page: CTA + verified-HTTP-200 try-link; OG/Twitter/JSON-LD/llms.txt/agent-card/content.json as the metadata baseline.

@@ -1,4 +1,4 @@
-/* 777 Neon Nights — service worker "nn777-v8.4".
+/* 777 Neon Nights — service worker "nn777-v8.5".
    Cache `nn777-v8` (bumped from v6 to force refresh of the jackpot-show
    build: machine prize display + jackpot background light-up).
    Hardened after the 2026-09-20 iPhone post-mortem:
@@ -9,7 +9,7 @@
    3. Version handshake: SKIP_WAITING message support so the page's "Update
       available — tap to reload" toast can activate a waiting worker immediately.
    Cache-first for same-origin assets, network-first for navigations. */
-const CACHE = "nn777-v8.4";
+const CACHE = "nn777-v8.5";
 const ASSETS = [
   "./",
   "./index.html",

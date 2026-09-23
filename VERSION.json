@@ -1,6 +1,6 @@
 {
-  "build": "nn777-v8.4",
-  "date": "2026-09-22",
+  "build": "nn777-v8.5",
+  "date": "2026-09-23",
   "game": "777 Neon Nights",
-  "what": "v8.4 (2026-09-22): BRAND VISIBILITY REDESIGN (Black order). New visible brandbar at top of first viewport: official CWI logo (art/cwi-logo-v1.jpg, circular gold-ringed badge) + CUMULATIVE WEB INC in gold neon, plus a tappable song strip linking That Boy Hi Hat — Neon Nights Pt. 777 to the Spotify track. The old header.marquee stays sr-only for screen readers; the visible cabinet canvas is untouched. Gameplay, credit economy, and telemetry beacons unchanged."
+  "what": "v8.5 (2026-09-23): PRIZE-MODE ABSTRACTION (plan §5, Black order). game/prize-providers.js — PrizeProvider interface; PromoPrizeProvider (free music links + Neon Credits, no cash value) is the only active provider; config.prize.mode='promo'. Money mode HARD-GATED: getPrizeProvider/enableMoneyMode REFUSE with all 7 unmet compliance gates (licenses, counsel, KYC/AML, age, geo-fencing, certified RNG, Black's approval). Every win award (jackpot/triple/prize) routes through the seam in game.js; honest promo value labels stamped into telemetry. OS RETROFIT: OG/Twitter/JSON-LD metadata, CTA + verified Agent Deck try-link, Neon Credits explainer, llms.txt, agent-card.json, content.json."
 }

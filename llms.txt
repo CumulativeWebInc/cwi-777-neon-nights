@@ -1,0 +1,38 @@
+# 777 Neon Nights — llms.txt
+
+> Free promo slot game for "Neon Nights Pt. 777" by That Boy Hi Hat.
+> Built by Cumulative Web Inc. No gambling. No cash prizes. No purchase necessary.
+
+## About
+
+777 Neon Nights is a free promotional slot-machine web game for the single
+"Neon Nights Pt. 777" by alternative rap artist That Boy Hi Hat
+(Cumulative Web Inc). Players spin neon reels; wins award Neon Credits
+(fun points with no money value) and unlock free streaming links for the
+artist's catalog.
+
+- Live game: https://cumulativewebinc.github.io/cwi-777-neon-nights/
+- Machine-readable content: ./content.json
+- Agent card: ./agent-card.json (also /.well-known/agent-card.json)
+- Owner telemetry dashboard: ./telemetry/dashboard.html
+
+## Key facts (verified)
+
+- Free game: spins are free and regenerate over time; nothing can be bought with money.
+- Prizes: free music links (Spotify, Apple Music, YouTube, YouTube Music, TIDAL, Deezer, Amazon Music, Pandora, DistroKid hyperfollow allowlist) + listening prizes (phone wallpaper, art pack, Golden Reel spins).
+- Neon Credits: fun points — NO money value, redeemable only for free music links.
+- Not gambling: no real-money wagering, no cash prizes, prizes have no cash value.
+- Prize-mode architecture: v1 = promo prizes only. A future money-prize mode is
+  architecturally supported (swappable provider) but hard-gated behind gambling
+  licenses, counsel opinion, KYC/AML, age verification, geo-fencing, certified
+  RNG, and the owner's explicit approval — it cannot switch on without them.
+- Telemetry: anonymous-only (random device id, counts, public issued-link URLs). No PII.
+- i18n: 41 languages. Offline-capable PWA (service worker).
+- Version: nn777-v8.5. Changelog: ./CHANGELOG.md
+
+## Related
+
+- Agent Deck (CWI's AI-agent app shelf): https://cumulativewebinc.github.io/agent-deck/
+- Catalog machine-readable: https://cumulativewebinc.github.io/cwi-learn/catalog.json
+- Artist: https://open.spotify.com/artist/2f9j460EwjfvjYp3trBcb7
+- Track: https://open.spotify.com/track/4XP56LZjeS0TJUd30kpGSK

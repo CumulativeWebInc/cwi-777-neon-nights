@@ -25,6 +25,14 @@ const CONFIG = {
   creditLinkPrice: 1000,
   // Game-over refill: 10 spins for 25 credits (never purchasable with money).
   spinBuy: { price: 25, spins: 10 },
+  // Prize-mode switch (v8.5, plan §5 "build once"): "promo" is the ONLY live
+  // mode — free music links + Neon Credits (fun points, NO cash value).
+  // "money" does NOT activate a money-prize path: getPrizeProvider() in
+  // game/prize-providers.js REFUSES it, throwing with every unmet compliance
+  // gate (licenses, counsel opinion, KYC/AML, age verification, geo-fencing,
+  // certified RNG) plus Black's explicit approval. Money mode can never switch
+  // on without all of them — the abstraction holds the door; the law decides.
+  prize: { mode: "promo" },
   // Canonical game URL used in share payloads.
   gameUrl: "https://cumulativewebinc.github.io/cwi-777-neon-nights/",
   // Remote player telemetry (v8.3, Black's order 2026-09-21): batched anonymous
