@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-24T06:40:49.502Z",
+  "generated_at": "2026-09-24T06:50:49.992Z",
   "sink": "https://ntfy.envs.net/nn777-tele-cwi-YdFlqrKbnqYD",
   "totals": {
-    "unique_devices": 6,
-    "beacons_received": 31,
+    "unique_devices": 7,
+    "beacons_received": 35,
     "beacons_invalid": 0,
-    "game_starts": 19,
-    "spins": 121,
+    "game_starts": 22,
+    "spins": 124,
     "spin_buys": 0,
     "jackpot_wins": 1,
     "prizes_claimed": 1,
@@ -30,7 +30,7 @@
     ],
     "credits_earned": 1425,
     "credits_spent": 1000,
-    "song_plays": 21,
+    "song_plays": 24,
     "song_replays": 0,
     "like_taps": 0,
     "like_awards": 0,
@@ -69,16 +69,25 @@
       "spins": 6,
       "prizes": 0,
       "jackpots": 0
+    },
+    "2026-09-24": {
+      "devices": [
+        "d-so6grfp8muf61hlo"
+      ],
+      "spins": 3,
+      "prizes": 0,
+      "jackpots": 0
     }
   },
   "first_seen": "2026-09-21T12:45:05.717Z",
-  "last_seen": "2026-09-23T13:10:50.742Z",
+  "last_seen": "2026-09-24T06:50:49.992Z",
   "_device_list": [
     "d-uqm27l3omub8abj7",
     "d-7wh1xg5umub8pd2z",
     "d-nk7q8fbgmub8ztfq",
     "d-p5zmo1mdmuba3x3i",
     "d-9cmmrgf8muba4ipt",
-    "d-ealm89rtmucwwbd4"
+    "d-ealm89rtmucwwbd4",
+    "d-so6grfp8muf61hlo"
   ]
 }
