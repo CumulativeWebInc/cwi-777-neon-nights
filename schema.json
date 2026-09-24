@@ -1,0 +1,16 @@
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Neon Nights pt. 777",
+  "url": "https://cumulativewebinc.github.io/cwi-777-neon-nights/",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Organization",
+    "name": "Cumulative Web Inc",
+    "url": "https://cumulativeweb.com/"
+  },
+  "description": "Promo slot game for That Boy Hi Hat's Neon Nights; prize-mode abstraction, promo-only.",
+  "schema_version": "1.0.0",
+  "datePublished": "2026-09-23"
+}
